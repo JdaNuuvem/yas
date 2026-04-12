@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum RaffleStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+
+  @@map("raffle_status")
+}
+
+enum NumberStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+
+  @@map("number_status")
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  EXPIRED
+
+  @@map("payment_status")
+}
+
+enum GatewayAccount {
+  A
+  B
+
+  @@map("gateway_account")
+}
+
+enum UserRole {
+  ADMIN
+  MASTER
+
+  @@map("user_role")
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model Raffle {
+  id            String       @id @default(cuid()) @map("id")
+  name          String       @map("name")
+  description   String?      @map("description")
+  mainImageUrl  String?      @map("main_image_url")
+  themeColors   Json?        @map("theme_colors")
+  logoUrl       String?      @map("logo_url")
+  status        RaffleStatus @default(DRAFT) @map("status")
+  totalNumbers  Int          @default(1000000) @map("total_numbers")
+  numberPrice   Decimal      @default(0.20) @map("number_price") @db.Decimal(10, 2)
+  minPurchase   Decimal      @default(5.00) @map("min_purchase") @db.Decimal(10, 2)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  numbers   Number[]
+  prizes    Prize[]
+  purchases Purchase[]
+
+  @@map("raffles")
+}
+
+model Prize {
+  id                  String    @id @default(cuid()) @map("id")
+  raffleId            String    @map("raffle_id")
+  position            Int       @map("position")
+  name                String    @map("name")
+  description         String?   @map("description")
+  imageUrl            String?   @map("image_url")
+  winnerNumber        Int?      @map("winner_number")
+  winnerBuyerId       String?   @map("winner_buyer_id")
+  drawnAt             DateTime? @map("drawn_at")
+  predeterminedNumber String?   @map("predetermined_number")
+
+  raffle      Raffle @relation(fields: [raffleId], references: [id])
+  winnerBuyer Buyer? @relation(fields: [winnerBuyerId], references: [id])
+
+  @@unique([raffleId, position])
+  @@map("prizes")
+}
+
+model Buyer {
+  id        String   @id @default(cuid()) @map("id")
+  name      String   @map("name")
+  cpf       String   @map("cpf")
+  phone     String   @map("phone")
+  email     String?  @map("email")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  numbers   Number[]
+  purchases Purchase[]
+  prizes    Prize[]
+
+  @@map("buyers")
+}
+
+model Number {
+  id          String       @id @default(cuid()) @map("id")
+  raffleId    String       @map("raffle_id")
+  numberValue Int          @map("number_value")
+  status      NumberStatus @default(AVAILABLE) @map("status")
+  buyerId     String?      @map("buyer_id")
+  purchaseId  String?      @map("purchase_id")
+  reservedAt  DateTime?    @map("reserved_at")
+  soldAt      DateTime?    @map("sold_at")
+
+  raffle   Raffle    @relation(fields: [raffleId], references: [id])
+  buyer    Buyer?    @relation(fields: [buyerId], references: [id])
+  purchase Purchase? @relation(fields: [purchaseId], references: [id])
+
+  @@unique([raffleId, numberValue])
+  @@index([raffleId, status])
+  @@index([buyerId])
+  @@map("numbers")
+}
+
+model Purchase {
+  id                   String         @id @default(cuid()) @map("id")
+  raffleId             String         @map("raffle_id")
+  buyerId              String         @map("buyer_id")
+  quantity             Int            @map("quantity")
+  totalAmount          Decimal        @map("total_amount") @db.Decimal(10, 2)
+  gatewayAccount       GatewayAccount @map("gateway_account")
+  gatewayTransactionId String?        @map("gateway_transaction_id")
+  paymentStatus        PaymentStatus  @default(PENDING) @map("payment_status")
+  pixQrCode            String?        @map("pix_qr_code")
+  pixCopyPaste         String?        @map("pix_copy_paste")
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+
+  raffle  Raffle   @relation(fields: [raffleId], references: [id])
+  buyer   Buyer    @relation(fields: [buyerId], references: [id])
+  numbers Number[]
+
+  @@index([raffleId, gatewayAccount])
+  @@index([raffleId, paymentStatus])
+  @@map("purchases")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid()) @map("id")
+  email        String   @unique @map("email")
+  passwordHash String   @map("password_hash")
+  name         String   @map("name")
+  role         UserRole @map("role")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admin_users")
+}
+
+model MasterConfig {
+  id                    String         @id @default(cuid()) @map("id")
+  splitPercentage       Int            @default(50) @map("split_percentage")
+  paradiseACredentials  String?        @map("paradise_a_credentials")
+  paradiseBCredentials  String?        @map("paradise_b_credentials")
+  nextGateway           GatewayAccount @default(A) @map("next_gateway")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
+
+  @@map("master_config")
+}
