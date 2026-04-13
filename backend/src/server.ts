@@ -16,8 +16,11 @@ import("./jobs/expire-reservations.js");
 
 export async function buildServer() {
   const server = Fastify({
-    logger: true,
+    logger: process.env.NODE_ENV !== "production",
     bodyLimit: 50 * 1024 * 1024, // 50MB for base64 image uploads
+    connectionTimeout: 30000,
+    keepAliveTimeout: 72000,
+    maxRequestsPerSocket: 0, // unlimited
   });
 
   await server.register(cors, {
@@ -25,7 +28,14 @@ export async function buildServer() {
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   });
-  await server.register(rateLimit, { max: 100, timeWindow: "1 minute" });
+  await server.register(rateLimit, {
+    max: 300,
+    timeWindow: "1 minute",
+    allowList: (req) => {
+      // No rate limit for webhooks
+      return req.url?.startsWith("/api/webhook") ?? false;
+    },
+  });
   await registerJwt(server);
 
   // Public routes

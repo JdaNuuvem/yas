@@ -12,5 +12,7 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY prisma ./prisma
 RUN npx prisma generate
+ENV NODE_ENV=production
+ENV UV_THREADPOOL_SIZE=16
 EXPOSE 3001
-CMD ["node", "dist/server.js"]
+CMD ["node", "--max-old-space-size=512", "dist/server.js"]

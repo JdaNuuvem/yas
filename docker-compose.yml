@@ -8,11 +8,27 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-yasmin_secret_2026}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=200"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=512MB"
+      - "-c"
+      - "work_mem=4MB"
+      - "-c"
+      - "random_page_cost=1.1"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U yasmin -d yasmin_rifa"]
       interval: 5s
       timeout: 3s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
   backend:
     build:
@@ -28,8 +44,13 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
       PORT: "3001"
       NODE_ENV: production
+      DB_POOL_SIZE: "30"
     ports:
       - "3001:3001"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   frontend:
     build:
@@ -42,6 +63,10 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:3001}
     ports:
       - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
 volumes:
   pgdata:
