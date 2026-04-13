@@ -1,0 +1,2 @@
+[    1675ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.caikmisera.com.br/ref/bio-caik-misera:0
+[    2165ms] [LOG] Service Worker registration successfull with scope:  https://www.caikmisera.com.br/ @ https://www.caikmisera.com.br/_next/static/chunks/pages/_app-6410f2cbbb233a647d0c.js:0

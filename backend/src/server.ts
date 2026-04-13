@@ -15,9 +15,16 @@ import { drawRoutes } from "./modules/draw/draw.routes.js";
 import("./jobs/expire-reservations.js");
 
 export async function buildServer() {
-  const server = Fastify({ logger: true });
+  const server = Fastify({
+    logger: true,
+    bodyLimit: 50 * 1024 * 1024, // 50MB for base64 image uploads
+  });
 
-  await server.register(cors, { origin: true });
+  await server.register(cors, {
+    origin: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  });
   await server.register(rateLimit, { max: 100, timeWindow: "1 minute" });
   await registerJwt(server);
 
@@ -31,6 +38,26 @@ export async function buildServer() {
   // Protected routes
   await server.register(adminRoutes);
   await server.register(masterRoutes);
+
+  // Global Error Handler
+  server.setErrorHandler((error: any, request, reply) => {
+    server.log.error(error);
+
+    // Zod validation errors
+    if (error.name === "ZodError") {
+      return reply.status(400).send({ error: error.message });
+    }
+
+    // Business logic errors (thrown with new Error())
+    if (!error.statusCode && error.message && !error.message.includes("ERR_")) {
+      return reply.status(400).send({ error: error.message });
+    }
+
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500 ? "Erro interno do servidor" : error.message;
+    reply.status(statusCode).send({ error: message });
+  });
+
 
   server.get("/health", async () => ({ status: "ok" }));
 

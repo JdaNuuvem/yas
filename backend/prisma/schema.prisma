@@ -93,6 +93,7 @@ model Buyer {
   id        String   @id @default(cuid()) @map("id")
   name      String   @map("name")
   cpf       String   @map("cpf")
+  cpfHash   String   @map("cpf_hash") // Blind index for exact-match searching
   phone     String   @map("phone")
   email     String?  @map("email")
   createdAt DateTime @default(now()) @map("created_at")
@@ -102,6 +103,7 @@ model Buyer {
   purchases Purchase[]
   prizes    Prize[]
 
+  @@index([cpfHash])
   @@map("buyers")
 }
 
@@ -136,6 +138,8 @@ model Purchase {
   paymentStatus        PaymentStatus  @default(PENDING) @map("payment_status")
   pixQrCode            String?        @map("pix_qr_code")
   pixCopyPaste         String?        @map("pix_copy_paste")
+  confirmedAt          DateTime?      @map("confirmed_at")
+  expiredAt            DateTime?      @map("expired_at")
   createdAt            DateTime       @default(now()) @map("created_at")
   updatedAt            DateTime       @updatedAt @map("updated_at")
 

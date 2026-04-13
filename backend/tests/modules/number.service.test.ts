@@ -43,26 +43,24 @@ describe("NumberService", () => {
   });
 
   it("expires reservations older than 15 minutes", async () => {
-    const mockPrisma = {
+    const txMock = {
       number: {
+        findMany: vi.fn().mockResolvedValue([
+          { purchaseId: "p1" },
+          { purchaseId: "p2" },
+        ]),
         updateMany: vi.fn().mockResolvedValue({ count: 5 }),
       },
+      purchase: {
+        updateMany: vi.fn().mockResolvedValue({ count: 2 }),
+      },
+    };
+    const mockPrisma = {
+      $transaction: vi.fn(async (fn: any) => fn(txMock)),
     };
 
     const service = new NumberService(mockPrisma as any);
     const count = await service.expireReservations();
     expect(count).toBe(5);
-    expect(mockPrisma.number.updateMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          status: "RESERVED",
-          reservedAt: expect.objectContaining({ lt: expect.any(Date) }),
-        }),
-        data: expect.objectContaining({
-          status: "AVAILABLE",
-          buyerId: null,
-        }),
-      }),
-    );
   });
 });

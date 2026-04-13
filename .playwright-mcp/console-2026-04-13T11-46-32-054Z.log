@@ -1,0 +1,78 @@
+[     154ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     872ms] [LOG] [Fast Refresh] done in 821ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    1472ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    1531ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    1885ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[    1993ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/admin/configuracao:0
+[    2942ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[    4968ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[    8984ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[   35554ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/admin/configuracao:0
+[  191355ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  192183ms] [LOG] [Fast Refresh] done in 901ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  192296ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  192517ms] [LOG] [Fast Refresh] done in 327ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  192638ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  192904ms] [LOG] [Fast Refresh] done in 370ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  192947ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/admin/configuracao:0
+[  193289ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  193351ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  193483ms] ReferenceError: SplitModal is not defined
+    at AdminLayout (http://localhost:3000/_next/static/chunks/frontend_06j80nl._.js:101:228)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:15037:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:4620:24)
+    at updateFunctionComponent (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:6081:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:6691:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:965:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9555:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9449:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9433:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9098:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_0op9aht._.js:2647:64)
+[  205234ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  205487ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  205497ms] [LOG] [Fast Refresh] done in 352ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  205619ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  206110ms] [LOG] [Fast Refresh] done in 595ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  206192ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  206233ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  206657ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  206827ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/admin/configuracao:0
+[  207667ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  209680ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  213705ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  221597ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  222367ms] [LOG] [Fast Refresh] done in 861ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  222478ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  222731ms] [LOG] [Fast Refresh] done in 357ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  222886ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  223281ms] [LOG] [Fast Refresh] done in 496ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  224041ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  224085ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  224193ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  224339ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/admin/configuracao:0
+[  225203ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  227211ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  231231ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  773058ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  773944ms] [LOG] [Fast Refresh] done in 990ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  774048ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  774238ms] [LOG] [Fast Refresh] done in 290ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  774340ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  774419ms] [LOG] [Fast Refresh] done in 179ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  775690ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  775753ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  776144ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  776288ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/admin/configuracao:0
+[  777164ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  779171ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  783184ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/admin/gateway-keys:0
+[  803261ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  803293ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  828662ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  829161ms] [LOG] [Fast Refresh] done in 439ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  829334ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  829376ms] [LOG] [Fast Refresh] done in 151ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  829686ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  829688ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431

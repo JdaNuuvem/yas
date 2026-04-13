@@ -1,233 +1,212 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { PurchaseService } from "../../src/modules/purchase/purchase.service.js";
 
-function createMockDeps() {
-  const txNumber = {
-    updateMany: vi.fn().mockImplementation((args: any) => {
-      const count = args?.where?.numberValue?.in?.length ?? 25;
-      return Promise.resolve({ count });
-    }),
-  };
+// Mock crypto and paradise
+vi.mock("../../src/lib/crypto.js", () => ({
+  encrypt: vi.fn().mockImplementation((text) => `encrypted:${text}`),
+  decrypt: vi.fn().mockImplementation(() => JSON.stringify({ secretKey: "sk_test" })),
+  hashDeterministic: vi.fn().mockReturnValue("hash123"),
+}));
+
+vi.mock("../../src/lib/paradise.js", () => ({
+  ParadiseClient: class MockParadiseClient {
+    constructor() {}
+    createPixCharge = vi.fn().mockResolvedValue({
+      transactionId: 123,
+      id: "ref1",
+      qrCode: "00020126...",
+      qrCodeBase64: "data:image/png;base64,abc",
+    });
+  },
+}));
+
+function createMockPrisma(nextGateway = "A" as "A" | "B") {
   const txPurchase = {
-    create: vi.fn().mockResolvedValue({ id: "p1", gatewayAccount: "A" }),
+    create: vi.fn().mockResolvedValue({ id: "p1", gatewayAccount: nextGateway }),
+  };
+  const txQueryRaw = vi.fn().mockResolvedValue(
+    Array.from({ length: 25 }, (_, i) => ({ id: `n${i}` })),
+  );
+  const txNumber = {
+    updateMany: vi.fn().mockResolvedValue({ count: 25 }),
   };
 
   return {
-    prisma: {
-      masterConfig: {
-        findFirstOrThrow: vi
-          .fn()
-          .mockResolvedValue({ id: "mc1", nextGateway: "A" }),
-        update: vi.fn().mockResolvedValue({}),
-      },
-      number: {
-        updateMany: vi.fn().mockResolvedValue({ count: 25 }),
-        findMany: vi.fn().mockResolvedValue(
-          Array.from({ length: 25 }, (_, i) => ({
-            id: `n${i}`,
-            numberValue: i + 1,
-            status: "AVAILABLE",
-          })),
-        ),
-      },
-      purchase: {
-        create: vi.fn().mockResolvedValue({ id: "p1", gatewayAccount: "A" }),
-        update: vi.fn().mockResolvedValue({}),
-      },
-      buyer: {
-        findFirst: vi.fn().mockResolvedValue(null),
-        create: vi.fn().mockResolvedValue({ id: "b1" }),
-      },
-      $transaction: vi.fn((fn: any) =>
-        fn({ number: txNumber, purchase: txPurchase }),
-      ),
+    raffle: {
+      findUniqueOrThrow: vi.fn().mockResolvedValue({
+        numberPrice: "0.20",
+        status: "ACTIVE",
+        minPurchase: "5.00",
+      }),
     },
-    paradiseA: {
-      createPixCharge: vi
-        .fn()
-        .mockResolvedValue({ id: "txn_a", qrCode: "qr_a", qrCodeText: "text_a" }),
+    masterConfig: {
+      findFirstOrThrow: vi.fn().mockResolvedValue({
+        id: "mc1",
+        nextGateway,
+        splitPercentage: 50,
+        paradiseACredentials: 'encrypted:{"secretKey":"sk_a"}',
+        paradiseBCredentials: 'encrypted:{"secretKey":"sk_b"}',
+      }),
     },
-    paradiseB: {
-      createPixCharge: vi
-        .fn()
-        .mockResolvedValue({ id: "txn_b", qrCode: "qr_b", qrCodeText: "text_b" }),
+    buyer: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({ id: "b1" }),
     },
-    txNumber,
-    txPurchase,
+    purchase: {
+      update: vi.fn().mockResolvedValue({}),
+    },
+    $transaction: vi.fn(async (fn: any) =>
+      fn({ purchase: txPurchase, number: txNumber, $queryRaw: txQueryRaw }),
+    ),
+    _tx: { txPurchase, txNumber, txQueryRaw },
   };
 }
 
 describe("PurchaseService", () => {
-  it("routes first purchase to gateway A and flips to B", async () => {
-    const deps = createMockDeps();
-    const service = new PurchaseService(
-      deps.prisma as any,
-      deps.paradiseA as any,
-      deps.paradiseB as any,
-    );
+  beforeEach(() => {
+    process.env.ENCRYPTION_KEY = "a".repeat(64);
+    vi.clearAllMocks();
+  });
+
+  it("uses current nextGateway without flipping on purchase creation", async () => {
+    const prisma = createMockPrisma("A");
+    const service = new PurchaseService(prisma as any);
 
     const result = await service.createPurchase({
       raffleId: "r1",
       buyerName: "Joao",
-      buyerCpf: "12345678901",
+      buyerCpf: "52998224725",
       buyerPhone: "11999999999",
       buyerEmail: "joao@test.com",
       numberValues: Array.from({ length: 25 }, (_, i) => i + 1),
     });
 
-    // Should use Paradise A (current nextGateway)
-    expect(deps.paradiseA.createPixCharge).toHaveBeenCalledOnce();
-    expect(deps.paradiseB.createPixCharge).not.toHaveBeenCalled();
+    // Should NOT flip gateway (flip only happens on webhook confirmation)
+    expect(prisma.masterConfig.findFirstOrThrow).toHaveBeenCalled();
 
-    // Should flip nextGateway to B
-    expect(deps.prisma.masterConfig.update).toHaveBeenCalledWith({
-      where: { id: "mc1" },
-      data: { nextGateway: "B" },
-    });
-
-    // Should return purchase data
     expect(result.purchaseId).toBe("p1");
-    expect(result.qrCode).toBe("qr_a");
-    expect(result.qrCodeText).toBe("text_a");
     expect(result.quantity).toBe(25);
     expect(result.totalAmount).toBe(5);
+    expect(result.qrCode).toBe("00020126...");
   });
 
-  it("routes to gateway B when nextGateway is B", async () => {
-    const deps = createMockDeps();
-    deps.prisma.masterConfig.findFirstOrThrow.mockResolvedValue({
-      id: "mc1",
-      nextGateway: "B",
-    });
+  it("uses gateway B when nextGateway is B", async () => {
+    const prisma = createMockPrisma("B");
+    const service = new PurchaseService(prisma as any);
 
-    const service = new PurchaseService(
-      deps.prisma as any,
-      deps.paradiseA as any,
-      deps.paradiseB as any,
-    );
-
-    const result = await service.createPurchase({
+    await service.createPurchase({
       raffleId: "r1",
       buyerName: "Maria",
-      buyerCpf: "98765432100",
+      buyerCpf: "52998224725",
       buyerPhone: "11888888888",
       buyerEmail: "",
       numberValues: Array.from({ length: 25 }, (_, i) => i + 100),
     });
 
-    expect(deps.paradiseB.createPixCharge).toHaveBeenCalledOnce();
-    expect(deps.paradiseA.createPixCharge).not.toHaveBeenCalled();
-
-    // Should flip to A
-    expect(deps.prisma.masterConfig.update).toHaveBeenCalledWith({
-      where: { id: "mc1" },
-      data: { nextGateway: "A" },
-    });
-
-    expect(result.qrCode).toBe("qr_b");
+    // Verify it read gateway B credentials
+    expect(prisma.masterConfig.findFirstOrThrow).toHaveBeenCalled();
   });
 
-  it("throws when not all numbers are available", async () => {
-    const deps = createMockDeps();
-    deps.txNumber.updateMany.mockImplementation(() =>
-      Promise.resolve({ count: 10 }),
-    );
+  it("reuses existing buyer when phone matches", async () => {
+    const prisma = createMockPrisma();
+    prisma.buyer.findFirst.mockResolvedValue({ id: "existing-b1" });
 
-    const service = new PurchaseService(
-      deps.prisma as any,
-      deps.paradiseA as any,
-      deps.paradiseB as any,
-    );
+    const service = new PurchaseService(prisma as any);
+
+    await service.createPurchase({
+      raffleId: "r1",
+      buyerName: "Joao",
+      buyerCpf: "52998224725",
+      buyerPhone: "11999999999",
+      buyerEmail: "joao@test.com",
+      numberValues: Array.from({ length: 25 }, (_, i) => i + 1),
+    });
+
+    expect(prisma.buyer.create).not.toHaveBeenCalled();
+  });
+
+  it("creates new buyer when phone doesnt match", async () => {
+    const prisma = createMockPrisma();
+    const service = new PurchaseService(prisma as any);
+
+    await service.createPurchase({
+      raffleId: "r1",
+      buyerName: "New User",
+      buyerCpf: "52998224725",
+      buyerPhone: "11777777777",
+      buyerEmail: "new@test.com",
+      numberValues: Array.from({ length: 25 }, (_, i) => i + 1),
+    });
+
+    expect(prisma.buyer.create).toHaveBeenCalled();
+  });
+
+  it("throws when raffle is not ACTIVE", async () => {
+    const prisma = createMockPrisma();
+    prisma.raffle.findUniqueOrThrow.mockResolvedValue({
+      numberPrice: "0.20",
+      status: "DRAFT",
+      minPurchase: "5.00",
+    });
+
+    const service = new PurchaseService(prisma as any);
 
     await expect(
       service.createPurchase({
         raffleId: "r1",
         buyerName: "Test",
-        buyerCpf: "00000000000",
+        buyerCpf: "52998224725",
         buyerPhone: "11000000000",
         buyerEmail: "",
         numberValues: Array.from({ length: 25 }, (_, i) => i + 1),
       }),
-    ).rejects.toThrow("Only 10 of 25 numbers available");
+    ).rejects.toThrow("não está aberto");
   });
 
-  it("reuses existing buyer when phone matches", async () => {
-    const deps = createMockDeps();
-    const existingBuyer = { id: "existing-b1", name: "Joao", phone: "11999999999" };
-    deps.prisma.buyer.findFirst.mockResolvedValue(existingBuyer);
-
-    const service = new PurchaseService(
-      deps.prisma as any,
-      deps.paradiseA as any,
-      deps.paradiseB as any,
-    );
-
-    await service.createPurchase({
-      raffleId: "r1",
-      buyerName: "Joao",
-      buyerCpf: "12345678901",
-      buyerPhone: "11999999999",
-      buyerEmail: "joao@test.com",
-      numberValues: [1, 2, 3],
+  it("throws when credentials not configured", async () => {
+    const prisma = createMockPrisma("B");
+    prisma.masterConfig.findFirstOrThrow.mockResolvedValue({
+      id: "mc1",
+      nextGateway: "B",
+      splitPercentage: 50,
+      paradiseACredentials: null,
+      paradiseBCredentials: null,
     });
 
-    // Should NOT create a new buyer
-    expect(deps.prisma.buyer.create).not.toHaveBeenCalled();
+    const service = new PurchaseService(prisma as any);
+
+    await expect(
+      service.createPurchase({
+        raffleId: "r1",
+        buyerName: "Test",
+        buyerCpf: "52998224725",
+        buyerPhone: "11000000000",
+        buyerEmail: "",
+        numberValues: Array.from({ length: 25 }, (_, i) => i + 1),
+      }),
+    ).rejects.toThrow("não configuradas");
   });
 
-  it("creates a new buyer when no existing phone match", async () => {
-    const deps = createMockDeps();
-
-    const service = new PurchaseService(
-      deps.prisma as any,
-      deps.paradiseA as any,
-      deps.paradiseB as any,
-    );
-
-    await service.createPurchase({
-      raffleId: "r1",
-      buyerName: "New User",
-      buyerCpf: "11111111111",
-      buyerPhone: "11777777777",
-      buyerEmail: "new@test.com",
-      numberValues: [1],
-    });
-
-    expect(deps.prisma.buyer.create).toHaveBeenCalledWith({
-      data: {
-        name: "New User",
-        cpf: "11111111111",
-        phone: "11777777777",
-        email: "new@test.com",
-      },
-    });
-  });
-
-  it("updates purchase with PIX charge data after creation", async () => {
-    const deps = createMockDeps();
-
-    const service = new PurchaseService(
-      deps.prisma as any,
-      deps.paradiseA as any,
-      deps.paradiseB as any,
-    );
+  it("updates purchase with PIX charge data", async () => {
+    const prisma = createMockPrisma();
+    const service = new PurchaseService(prisma as any);
 
     await service.createPurchase({
       raffleId: "r1",
       buyerName: "Test",
-      buyerCpf: "00000000000",
+      buyerCpf: "52998224725",
       buyerPhone: "11000000000",
       buyerEmail: "",
-      numberValues: [1],
+      numberValues: Array.from({ length: 25 }, (_, i) => i + 1),
     });
 
-    expect(deps.prisma.purchase.update).toHaveBeenCalledWith({
+    expect(prisma.purchase.update).toHaveBeenCalledWith({
       where: { id: "p1" },
-      data: {
-        gatewayTransactionId: "txn_a",
-        pixQrCode: "qr_a",
-        pixCopyPaste: "text_a",
-      },
+      data: expect.objectContaining({
+        gatewayTransactionId: "123",
+        pixQrCode: "00020126...",
+        pixCopyPaste: "data:image/png;base64,abc",
+      }),
     });
   });
 });

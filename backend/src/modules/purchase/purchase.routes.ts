@@ -1,21 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import { PurchaseService } from "./purchase.service.js";
 import { createPurchaseSchema } from "./purchase.schema.js";
-import { ParadiseClient } from "../../lib/paradise.js";
+import { z } from "zod";
 
 export async function purchaseRoutes(server: FastifyInstance) {
   const { prisma } = await import("../../lib/prisma.js");
-  const { env } = await import("../../config/env.js");
-
-  const paradiseA = new ParadiseClient({
-    apiKey: env.PARADISE_A_API_KEY,
-    secretKey: env.PARADISE_A_SECRET,
-  });
-  const paradiseB = new ParadiseClient({
-    apiKey: env.PARADISE_B_API_KEY,
-    secretKey: env.PARADISE_B_SECRET,
-  });
-  const service = new PurchaseService(prisma, paradiseA, paradiseB);
+  const service = new PurchaseService(prisma);
 
   server.post("/api/purchase", async (request) => {
     const input = createPurchaseSchema.parse(request.body);
@@ -29,5 +19,11 @@ export async function purchaseRoutes(server: FastifyInstance) {
       select: { paymentStatus: true, pixQrCode: true, pixCopyPaste: true },
     });
     return purchase;
+  });
+
+  server.get("/api/purchase/my-titles", async (request) => {
+    const qSchema = z.object({ phone: z.string().min(8) });
+    const { phone } = qSchema.parse(request.query);
+    return service.getPurchasesByPhone(phone);
   });
 }

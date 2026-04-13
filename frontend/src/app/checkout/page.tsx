@@ -12,7 +12,8 @@ import type { PurchaseResult } from "@/types";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { selectedNumbers, clear } = useCart();
+  const selectedNumbers = useCart((s) => s.selectedNumbers);
+  const clear = useCart((s) => s.clear);
   const [isLoading, setIsLoading] = useState(false);
   const [purchaseResult, setPurchaseResult] = useState<PurchaseResult | null>(
     null,
@@ -24,16 +25,14 @@ export default function CheckoutPage() {
     queryFn: () => api.getRaffle(),
   });
 
-  const numbers = Array.from(selectedNumbers).sort((a, b) => a - b);
+  const numbers = [...selectedNumbers].sort((a, b) => a - b);
 
   if (numbers.length === 0 && !purchaseResult) {
     router.replace("/");
     return null;
   }
 
-  const totalAmount = raffle
-    ? numbers.length * raffle.numberPrice
-    : 0;
+  const totalAmount = raffle ? numbers.length * raffle.numberPrice : 0;
 
   async function handleSubmit(data: {
     buyerName: string;
@@ -42,16 +41,15 @@ export default function CheckoutPage() {
     buyerEmail: string;
   }) {
     if (!raffle) return;
-
     setIsLoading(true);
     setError(null);
-
     try {
       const result = await api.createPurchase({
         raffleId: raffle.id,
         buyerName: data.buyerName,
         buyerCpf: data.buyerCpf,
         buyerPhone: data.buyerPhone,
+        buyerEmail: data.buyerEmail,
         numbers,
       });
       setPurchaseResult(result);
@@ -66,56 +64,77 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 py-6">
-      <div className="max-w-lg mx-auto px-4 space-y-6">
+    <div className="min-h-screen bg-white py-6">
+      <div className="max-w-lg mx-auto px-5 space-y-6">
         <button
           onClick={() => router.back()}
-          className="text-gray-400 hover:text-white transition-colors text-sm"
+          className="flex items-center gap-2 text-gray-400 hover:text-gray-700 transition-colors text-sm"
         >
-          &larr; Voltar
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          Voltar
         </button>
 
-        <h1 className="text-2xl font-bold text-white">Finalizar Compra</h1>
+        <h1 className="text-2xl font-extrabold text-gray-900">
+          Finalizar Compra
+        </h1>
 
         {!purchaseResult && (
           <>
-            <div className="bg-gray-800 rounded-xl p-4 space-y-3">
-              <h2 className="text-white font-medium">Numeros selecionados</h2>
-              <div className="flex flex-wrap gap-2">
-                {numbers.map((n) => (
+            <div className="card p-4 space-y-3">
+              <h2 className="text-gray-900 font-medium text-sm">
+                Números selecionados
+              </h2>
+              <div className="flex flex-wrap gap-1.5">
+                {numbers.slice(0, 30).map((n) => (
                   <span
                     key={n}
-                    className="bg-green-500/20 text-green-400 text-xs font-mono px-2 py-1 rounded"
+                    className="bg-green-50 text-green-700 text-[11px] font-mono px-2 py-1 rounded-lg"
                   >
                     {padNumber(n)}
                   </span>
                 ))}
+                {numbers.length > 30 && (
+                  <span className="text-gray-400 text-[11px] px-2 py-1">
+                    +{numbers.length - 30} mais
+                  </span>
+                )}
               </div>
-              <div className="flex justify-between pt-2 border-t border-gray-700">
-                <span className="text-gray-400">
-                  {numbers.length} {numbers.length === 1 ? "numero" : "numeros"}
+              <div className="flex justify-between pt-3 border-t border-gray-100">
+                <span className="text-gray-400 text-sm">
+                  {numbers.length} números
                 </span>
-                <span className="text-green-400 font-bold">
+                <span className="text-xl font-black text-green-600">
                   {formatCurrency(totalAmount)}
                 </span>
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-                <p className="text-red-400 text-sm">{error}</p>
+              <div className="card p-4 border-red-200 bg-red-50">
+                <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
 
-            <div className="bg-gray-800 rounded-xl p-4">
-              <h2 className="text-white font-medium mb-4">Seus dados</h2>
+            <div className="card p-4">
+              <h2 className="text-gray-900 font-medium text-sm mb-4">
+                Seus dados
+              </h2>
               <BuyerForm onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
           </>
         )}
 
         {purchaseResult && (
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="card p-6">
             <PixPayment
               qrCode={purchaseResult.qrCode}
               qrCodeText={purchaseResult.qrCodeText}

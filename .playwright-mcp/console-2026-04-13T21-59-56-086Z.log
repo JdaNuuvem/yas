@@ -1,0 +1,267 @@
+[    1077ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    1148ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[   28593ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/api/purchase:0
+[   79198ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=FQ4O22YMdqdvwb4Bw7l7b' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_12gpkjl._.js:13299
+[   82549ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=FQ4O22YMdqdvwb4Bw7l7b' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_12gpkjl._.js:13299
+[   85914ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=FQ4O22YMdqdvwb4Bw7l7b' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_12gpkjl._.js:13299
+[   89265ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=FQ4O22YMdqdvwb4Bw7l7b' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_12gpkjl._.js:13299
+[   92633ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=FQ4O22YMdqdvwb4Bw7l7b' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_12gpkjl._.js:13299
+[   97876ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[   99602ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[   99687ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  100004ms] [ERROR] Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render Router CheckoutPage CheckoutPage @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:3272
+[  100068ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  100083ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  100386ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  100469ms] [LOG] [Fast Refresh] done in 192ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  100636ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  100748ms] [LOG] [Fast Refresh] done in 212ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  101082ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  101115ms] [LOG] [Fast Refresh] done in 135ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  101813ms] Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RenderFromTemplateContext>
+      <ScrollAndMaybeFocusHandler cacheNode={{rsc:Promise, ...}}>
+        <InnerScrollAndFocusHandlerOld focusAndScrollRef={{...}} cacheNode={{rsc:Promise, ...}}>
+          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+            <LoadingBoundary name="/" loading={null}>
+              <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+                <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} ...>
+                  <RedirectBoundary>
+                    <RedirectErrorBoundary router={{...}}>
+                      <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:Promise, ...}} ...>
+                        <SegmentViewNode type="page" pagePath="page.tsx">
+                          <SegmentTrieNode>
+                          <ClientPageRoot Component={function Home} serverProvidedParams={{...}}>
+                            <Home params={Promise} searchParams={Promise}>
++                             <div className="min-h-screen flex items-center justify-center">
+-                             <Suspense>
+                        ...
+                      ...
+          ...
+
+    at throwOnHydrationMismatch (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:3318:56)
+    at beginWork (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:6758:918)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:965:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9555:97)
+    at workLoopConcurrentByScheduler (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9551:58)
+    at renderRootConcurrent (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9534:71)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_0op9aht._.js:2647:64)
+[  102053ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  102095ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  110715ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/api/purchase:0
+[  186334ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  186394ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  196460ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/api/purchase:0
+[  234518ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  234555ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  283357ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  284286ms] [LOG] [Fast Refresh] done in 1043ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  284394ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  284670ms] [LOG] [Fast Refresh] done in 378ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  285366ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  285371ms] [LOG] [Fast Refresh] done in 106ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  553946ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  553973ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  554230ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  554232ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  742826ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  743167ms] [LOG] [Fast Refresh] done in 399ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  743410ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  743452ms] [LOG] [Fast Refresh] done in 157ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  774910ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  775044ms] [LOG] [Fast Refresh] done in 236ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  775166ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  775446ms] [LOG] [Fast Refresh] done in 395ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  784748ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  784824ms] [LOG] [Fast Refresh] done in 191ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  784931ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  785051ms] [LOG] [Fast Refresh] done in 224ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  785164ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  785347ms] [LOG] [Fast Refresh] done in 288ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1011868ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1011891ms] [LOG] [Fast Refresh] done in 132ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1223997ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1224014ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1227643ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/checkout:0
+[ 1453763ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1454445ms] [LOG] [Fast Refresh] done in 790ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1454498ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1454518ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1454538ms] [ERROR] Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render Router CheckoutPage CheckoutPage @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:3272
+[ 1454643ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1454717ms] [LOG] [Fast Refresh] done in 176ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1458966ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1468979ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1478998ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1489259ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1499273ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1509313ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1519338ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1529372ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1539380ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1549403ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1559417ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1569438ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1578635ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3001/api/raffle/cmnw8d3h2000328rj47iqkxez/buyers/top:0
+[ 1578774ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3001/api/raffle/cmnw8d3h2000328rj47iqkxez/buyers/recent:0
+[ 1581787ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1581990ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3001/api/raffle/cmnw8d3h2000328rj47iqkxez/buyers/top:0
+[ 1582130ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3001/api/raffle/cmnw8d3h2000328rj47iqkxez/buyers/recent:0
+[ 1585137ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1586340ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3001/api/raffle/cmnw8d3h2000328rj47iqkxez/buyers/top:0
+[ 1586480ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3001/api/raffle/cmnw8d3h2000328rj47iqkxez/buyers/recent:0
+[ 1589485ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1592093ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1592129ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1592303ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/master/login:0
+[ 1595157ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/master/login:0
+[ 1600224ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/master:0
+[ 1622677ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/master:0
+[ 1622677ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/master:0
+[ 1625655ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/master:0
+[ 1653286ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/master:0
+[ 1756474ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1756525ms] [LOG] [Fast Refresh] done in 158ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1756641ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1756699ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 1760495ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1764102ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1767926ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/checkout:0
+[ 1772184ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/checkout:0
+[ 3097778ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3101322ms] [WARNING] The resource http://localhost:3000/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/checkout:0
+[ 3103833ms] [LOG] [Fast Refresh] done in 6161ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3124279ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3126462ms] [LOG] [Fast Refresh] done in 790ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3126572ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3126603ms] [LOG] [Fast Refresh] done in 132ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3126920ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3127098ms] [LOG] [Fast Refresh] done in 281ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3138542ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3138698ms] [LOG] [Fast Refresh] done in 258ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3140688ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3141088ms] [LOG] [Fast Refresh] done in 512ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3172070ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3172260ms] [LOG] [Fast Refresh] done in 306ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3172370ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3172447ms] [LOG] [Fast Refresh] done in 183ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3172649ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3172748ms] [LOG] [Fast Refresh] done in 210ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3173805ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3173903ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3174019ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3174059ms] [LOG] [Fast Refresh] done in 144ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3174183ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3174260ms] [LOG] [Fast Refresh] done in 191ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3194180ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3194955ms] [LOG] [Fast Refresh] done in 866ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3195077ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3195323ms] [LOG] [Fast Refresh] done in 360ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3195576ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3195679ms] [LOG] [Fast Refresh] done in 213ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3226502ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3226518ms] [LOG] [Fast Refresh] done in 119ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3249553ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3249673ms] [LOG] [Fast Refresh] done in 237ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3249734ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3250382ms] [LOG] [Fast Refresh] done in 635ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3250526ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3250529ms] [LOG] [Fast Refresh] done in 106ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3250664ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3250911ms] [LOG] [Fast Refresh] done in 350ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3251144ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3251238ms] [LOG] [Fast Refresh] done in 204ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3251360ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3251369ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252012ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252052ms] [LOG] [Fast Refresh] done in 141ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252188ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252284ms] [LOG] [Fast Refresh] done in 200ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252640ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252655ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252771ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252834ms] [LOG] [Fast Refresh] done in 175ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252939ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3252966ms] [LOG] [Fast Refresh] done in 130ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3253372ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3253457ms] [LOG] [Fast Refresh] done in 188ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3255201ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3255204ms] [LOG] [Fast Refresh] done in 228ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3255980ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3255983ms] [LOG] [Fast Refresh] done in 779ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3369829ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3369886ms] [LOG] [Fast Refresh] done in 168ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3448965ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3449616ms] [LOG] [Fast Refresh] done in 765ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3449730ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3450410ms] [LOG] [Fast Refresh] done in 787ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3450577ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3450881ms] [LOG] [Fast Refresh] done in 408ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3451016ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3451016ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3451794ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3451798ms] [LOG] [Fast Refresh] done in 334ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3853136ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3853152ms] [LOG] [Fast Refresh] done in 132ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3858757ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3858832ms] [LOG] [Fast Refresh] done in 180ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3905384ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3905480ms] [LOG] [Fast Refresh] done in 228ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3905828ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3905895ms] [LOG] [Fast Refresh] done in 174ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3906045ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3906105ms] [LOG] [Fast Refresh] done in 171ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3906253ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3906367ms] [LOG] [Fast Refresh] done in 217ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3906917ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3906954ms] [LOG] [Fast Refresh] done in 145ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3907897ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3908018ms] [LOG] [Fast Refresh] done in 225ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3908190ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3908255ms] [LOG] [Fast Refresh] done in 177ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3908570ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3908626ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909124ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909175ms] [LOG] [Fast Refresh] done in 160ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909479ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909552ms] [LOG] [Fast Refresh] done in 173ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909678ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909717ms] [LOG] [Fast Refresh] done in 146ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909910ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3909991ms] [LOG] [Fast Refresh] done in 194ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3910147ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3910156ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3910374ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3910381ms] [LOG] [Fast Refresh] done in 218ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3910916ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3910968ms] [LOG] [Fast Refresh] done in 160ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3911088ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3911119ms] [LOG] [Fast Refresh] done in 144ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3911458ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3911474ms] [LOG] [Fast Refresh] done in 120ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3914746ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 3914749ms] [LOG] [Fast Refresh] done in 111ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4094721ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4094987ms] [LOG] [Fast Refresh] done in 328ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4095298ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4096001ms] [LOG] [Fast Refresh] done in 818ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4447940ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4448153ms] [LOG] [Fast Refresh] done in 235ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4448277ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4448278ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4448389ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[ 4448554ms] [LOG] [Fast Refresh] done in 268ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431

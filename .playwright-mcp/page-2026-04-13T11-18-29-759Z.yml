@@ -1,0 +1,14 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - heading "Painel Administrativo" [level=1] [ref=e4]
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: Email
+        - textbox "admin@exemplo.com" [ref=e8]
+      - generic [ref=e9]:
+        - generic [ref=e10]: Senha
+        - textbox "********" [ref=e11]
+      - button "Entrar" [ref=e12]
+  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
+    - img [ref=e19]
+  - alert [ref=e22]

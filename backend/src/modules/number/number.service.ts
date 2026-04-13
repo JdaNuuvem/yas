@@ -51,14 +51,48 @@ export class NumberService {
   }
 
   async expireReservations(): Promise<number> {
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
-    const result = await this.prisma.number.updateMany({
-      where: {
-        status: "RESERVED",
-        reservedAt: { lt: fifteenMinutesAgo },
-      },
-      data: { status: "AVAILABLE", buyerId: null, purchaseId: null, reservedAt: null },
+    const cutoffTime = new Date(Date.now() - 15 * 60 * 1000);
+
+    // Expire Purchase and Number together in a single transaction.
+    // If we only freed Number rows, a late-arriving webhook could still
+    // confirm the purchase and mark those (now unrelated) numbers as SOLD.
+    const expiredCount = await this.prisma.$transaction(async (tx) => {
+      // Find purchaseIds linked to over-age reserved numbers
+      const staleNumbers = await tx.number.findMany({
+        where: { status: "RESERVED", reservedAt: { lt: cutoffTime } },
+        select: { purchaseId: true },
+        distinct: ["purchaseId"],
+      });
+
+      const purchaseIds = staleNumbers
+        .map((n) => n.purchaseId)
+        .filter((id): id is string => id !== null);
+
+      if (purchaseIds.length === 0) return 0;
+
+      // Expire the parent purchases first to block any concurrent webhook
+      await tx.purchase.updateMany({
+        where: { id: { in: purchaseIds }, paymentStatus: "PENDING" },
+        data: { paymentStatus: "EXPIRED", expiredAt: new Date() },
+      });
+
+      // Release the reserved numbers back to the pool
+      const result = await tx.number.updateMany({
+        where: {
+          status: "RESERVED",
+          reservedAt: { lt: cutoffTime },
+        },
+        data: {
+          status: "AVAILABLE",
+          buyerId: null,
+          purchaseId: null,
+          reservedAt: null,
+        },
+      });
+
+      return result.count;
     });
-    return result.count;
+
+    return expiredCount;
   }
 }

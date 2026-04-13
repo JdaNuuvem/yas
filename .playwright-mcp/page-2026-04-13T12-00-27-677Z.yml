@@ -1,0 +1,9 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - heading "Acesso" [level=1] [ref=e4]
+    - textbox "Email" [ref=e5]
+    - textbox "Senha" [ref=e6]
+    - button "Entrar" [ref=e7]
+  - button "Open Next.js Dev Tools" [ref=e13] [cursor=pointer]:
+    - img [ref=e14]
+  - alert [ref=e17]

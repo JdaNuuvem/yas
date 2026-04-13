@@ -1,5 +1,15 @@
 import type { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { encrypt } from "../../lib/crypto.js";
+
+interface UpdateCredentialsInput {
+  readonly paradiseAApiKey: string;
+  readonly paradiseASecret: string;
+  readonly paradiseAWebhookSecret: string;
+  readonly paradiseBApiKey: string;
+  readonly paradiseBSecret: string;
+  readonly paradiseBWebhookSecret: string;
+}
 
 export class MasterService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -88,5 +98,39 @@ export class MasterService {
       name: user.name,
       role: user.role,
     };
+  }
+
+  // Credentials are stored encrypted so a DB dump never leaks live API keys.
+  async updateCredentials(input: UpdateCredentialsInput): Promise<void> {
+    const encryptionKey = process.env.ENCRYPTION_KEY;
+    if (!encryptionKey) {
+      throw new Error("ENCRYPTION_KEY não configurada no servidor.");
+    }
+
+    const encryptedA = encrypt(
+      JSON.stringify({ 
+        apiKey: input.paradiseAApiKey, 
+        secretKey: input.paradiseASecret,
+        webhookSecret: input.paradiseAWebhookSecret
+      }),
+      encryptionKey,
+    );
+    const encryptedB = encrypt(
+      JSON.stringify({ 
+        apiKey: input.paradiseBApiKey, 
+        secretKey: input.paradiseBSecret,
+        webhookSecret: input.paradiseBWebhookSecret
+      }),
+      encryptionKey,
+    );
+
+    const config = await this.prisma.masterConfig.findFirstOrThrow();
+    await this.prisma.masterConfig.update({
+      where: { id: config.id },
+      data: {
+        paradiseACredentials: encryptedA,
+        paradiseBCredentials: encryptedB,
+      },
+    });
   }
 }

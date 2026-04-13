@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]
+  - generic [ref=e239]:
+    - button "Voltar" [ref=e240]:
+      - img [ref=e241]
+      - text: Voltar
+    - heading "Finalizar Compra" [level=1] [ref=e243]
+    - generic [ref=e244]:
+      - heading "Números selecionados" [level=2] [ref=e245]
+      - generic [ref=e246]:
+        - generic [ref=e247]: "096678"
+        - generic [ref=e248]: "140353"
+        - generic [ref=e249]: "165298"
+        - generic [ref=e250]: "277867"
+        - generic [ref=e251]: "318748"
+        - generic [ref=e252]: "449879"
+        - generic [ref=e253]: "498119"
+        - generic [ref=e254]: "534784"
+        - generic [ref=e255]: "567159"
+        - generic [ref=e256]: "661101"
+        - generic [ref=e257]: "674309"
+        - generic [ref=e258]: "681315"
+        - generic [ref=e259]: "730850"
+        - generic [ref=e260]: "741861"
+        - generic [ref=e261]: "776648"
+        - generic [ref=e262]: "780551"
+        - generic [ref=e263]: "784901"
+        - generic [ref=e264]: "852277"
+        - generic [ref=e265]: "853951"
+        - generic [ref=e266]: "862454"
+        - generic [ref=e267]: "886239"
+        - generic [ref=e268]: "912785"
+        - generic [ref=e269]: "921033"
+        - generic [ref=e270]: "946924"
+        - generic [ref=e271]: "957965"
+      - generic [ref=e272]:
+        - generic [ref=e273]: 25 números
+        - generic [ref=e274]: R$ 5,00
+    - paragraph [ref=e294]: Internal Server Error
+    - generic [ref=e275]:
+      - heading "Seus dados" [level=2] [ref=e276]
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - generic [ref=e279]: Nome completo *
+          - textbox "Seu nome completo" [ref=e280]: João Teste Silva
+        - generic [ref=e281]:
+          - generic [ref=e282]: CPF *
+          - textbox "000.000.000-00" [ref=e283]: 529.982.247-25
+        - generic [ref=e284]:
+          - generic [ref=e285]: WhatsApp / Telefone *
+          - textbox "(00) 00000-0000" [ref=e286]: (11) 99988-7766
+        - generic [ref=e287]:
+          - generic [ref=e288]: Email (opcional)
+          - textbox "seu@email.com" [ref=e289]: joao@teste.com
+        - button "Gerar pagamento PIX" [ref=e290]

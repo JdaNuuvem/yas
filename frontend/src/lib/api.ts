@@ -1,8 +1,11 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const needsAuth = path.startsWith("/api/admin");
   const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    needsAuth && typeof window !== "undefined"
+      ? localStorage.getItem("token")
+      : null;
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
@@ -40,14 +43,33 @@ export const api = {
     buyerName: string;
     buyerCpf: string;
     buyerPhone: string;
+    buyerEmail?: string;
     numbers: number[];
   }) =>
     request<import("@/types").PurchaseResult>("/api/purchase", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        raffleId: data.raffleId,
+        buyerName: data.buyerName,
+        buyerCpf: data.buyerCpf,
+        buyerPhone: data.buyerPhone,
+        buyerEmail: data.buyerEmail ?? "",
+        numberValues: data.numbers,
+      }),
     }),
   getPurchaseStatus: (id: string) =>
     request<{ paymentStatus: string }>(`/api/purchase/${id}/status`),
+  getMyPurchases: (phone: string) => 
+    request<
+      {
+        id: string;
+        paymentStatus: string;
+        totalAmount: number;
+        createdAt: string;
+        raffle: { name: string; status: string };
+        numbers: { numberValue: number; status: string }[];
+      }[]
+    >(`/api/purchase/my-titles?phone=${encodeURIComponent(phone)}`),
   getRecentBuyers: (raffleId: string) =>
     request<
       { buyerName: string; quantity: number; createdAt: string }[]
@@ -77,12 +99,12 @@ export const api = {
       page: number;
       limit: number;
     }>(`/api/admin/buyers?raffleId=${raffleId}&page=${page}`),
-  adminTriggerDraw: (raffleId: string, position: number) =>
+  adminTriggerDraw: (raffleId: string, position: number, numberValue: number) =>
     request<{ winnerNumber: number; drawnAt: string }>(
       `/api/admin/draw/${position}`,
       {
         method: "POST",
-        body: JSON.stringify({ raffleId }),
+        body: JSON.stringify({ raffleId, numberValue }),
       },
     ),
   updateRaffle: (raffleId: string, data: Partial<import("@/types").Raffle>) =>
@@ -90,35 +112,35 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(data),
     }),
-  // Master
-  masterLogin: (email: string, password: string) =>
-    request<{ token: string }>("/api/master/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    }),
-  masterDashboard: (raffleId: string) =>
-    request<import("@/types").MasterDashboard>(
-      `/api/master/dashboard?raffleId=${raffleId}`,
-    ),
-  masterGatewayStatus: () =>
-    request<{ activeGateway: string; statusA: string; statusB: string }>(
-      "/api/master/gateway/status",
-    ),
-  masterOverrideGateway: (gateway: "A" | "B") =>
-    request<{ activeGateway: string }>("/api/master/gateway/override", {
+  // Admin set predetermined winner (proxied through admin endpoint)
+  adminSetWinner: (raffleId: string, position: number, numberValue: number) =>
+    request<{ success: boolean }>(`/api/admin/draw/${position}/set`, {
       method: "PUT",
-      body: JSON.stringify({ gateway }),
+      body: JSON.stringify({ raffleId, numberValue }),
     }),
-  masterSetWinner: (
-    raffleId: string,
-    position: number,
-    numberValue: number,
-  ) =>
-    request<{ winnerNumber: number; drawnAt: string }>(
-      `/api/master/draw/${position}/set`,
-      {
-        method: "PUT",
-        body: JSON.stringify({ raffleId, numberValue }),
-      },
+  // Admin prizes
+  adminCreatePrize: (data: { raffleId: string; position: number; name: string; description?: string }) =>
+    request<import("@/types").Prize>("/api/admin/prizes", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  adminUpdatePrize: (prizeId: string, data: { name?: string; description?: string }) =>
+    request<import("@/types").Prize>(`/api/admin/prizes/${prizeId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  adminDeletePrize: (prizeId: string) =>
+    request<{ success: boolean }>(`/api/admin/prizes/${prizeId}`, {
+      method: "DELETE",
+    }),
+  // Admin gateway keys
+  adminGetGatewayKeys: () =>
+    request<{ hasKeys: boolean }>(
+      "/api/admin/gateway-keys",
     ),
+  adminSaveGatewayKeys: (secretKey: string) =>
+    request<{ success: boolean }>("/api/admin/gateway-keys", {
+      method: "PUT",
+      body: JSON.stringify({ secretKey }),
+    }),
 };

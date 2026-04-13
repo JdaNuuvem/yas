@@ -1,0 +1,189 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - text:    
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e7]:
+          - button "Menu" [ref=e9] [cursor=pointer]:
+            - generic [ref=e10]: 
+          - link "Página inicial" [ref=e12] [cursor=pointer]:
+            - /url: /
+            - img "Caik Misera" [ref=e13]
+          - link " Suporte" [ref=e15] [cursor=pointer]:
+            - /url: /contato
+            - generic [ref=e17]: 
+            - generic [ref=e18]: Suporte
+        - generic [ref=e19]:
+          - separator [ref=e20]
+          - list [ref=e24]:
+            - listitem [ref=e25]:
+              - link " Campanhas" [ref=e26] [cursor=pointer]:
+                - /url: /campanhas
+                - generic [ref=e27]: 
+                - text: Campanhas
+            - listitem [ref=e28]:
+              - link "Meus títulos" [ref=e29] [cursor=pointer]:
+                - /url: /meus-numeros
+    - text:                
+    - generic [ref=e30]:
+      - generic [ref=e32]:
+        - generic [ref=e34]:
+          - img "KIT BMW" [ref=e37]
+          - button "Previous" [ref=e39] [cursor=pointer]:
+            - generic [ref=e41]: Previous
+          - button "Next" [ref=e42] [cursor=pointer]:
+            - generic [ref=e44]: Next
+        - generic [ref=e46]:
+          - generic [ref=e47]: Adquira já!
+          - heading "KIT BMW" [level=1] [ref=e48]:
+            - link "KIT BMW" [ref=e49] [cursor=pointer]:
+              - /url: /campanha/voce-de-bmw-81304
+          - paragraph [ref=e51]: Sorteio de 1 carro BMW 320i 2020 + 1 moto BMW Gs 1250 2020
+      - generic [ref=e55] [cursor=pointer]:
+        - generic [ref=e56]: 
+        - text: Meus títulos
+    - generic [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e60]: Por apenas
+        - generic [ref=e61] [cursor=pointer]: R$ 0,25
+      - generic [ref=e62]:
+        - generic [ref=e65]:
+          - generic [ref=e69]:
+            - generic [ref=e72]: 
+            - generic [ref=e75]: 
+            - spinbutton "Quantidade de números" [ref=e77]: "20"
+            - generic [ref=e80]: 
+          - generic [ref=e81]:
+            - generic [ref=e83] [cursor=pointer]:
+              - generic [ref=e84]: "+100"
+              - paragraph [ref=e85]: Selecionar
+            - generic [ref=e87] [cursor=pointer]:
+              - generic [ref=e88]: "+200"
+              - paragraph [ref=e89]: Selecionar
+            - generic [ref=e91] [cursor=pointer]:
+              - generic [ref=e92]: "+250"
+              - paragraph [ref=e93]: Selecionar
+            - generic [ref=e95] [cursor=pointer]:
+              - generic [ref=e96]: "+300"
+              - paragraph [ref=e97]: Selecionar
+            - generic [ref=e98] [cursor=pointer]:
+              - text: Popular
+              - generic [ref=e99]:
+                - generic [ref=e100]: "+500"
+                - paragraph [ref=e101]: Selecionar
+            - generic [ref=e103] [cursor=pointer]:
+              - generic [ref=e104]: "+1000"
+              - paragraph [ref=e105]: Selecionar
+          - button " Comprar  Garantir meus números R$ 5,00" [ref=e109] [cursor=pointer]:
+            - generic [ref=e110]:
+              - generic [ref=e112]: 
+              - generic [ref=e113]:
+                - generic [ref=e114]: Comprar
+                - generic [ref=e115]:
+                  - generic [ref=e116]: 
+                  - text: Garantir meus números
+            - generic [ref=e117]: R$ 5,00
+        - button " Descrição/Regulamento" [ref=e120] [cursor=pointer]:
+          - generic [ref=e121]: 
+          - text: Descrição/Regulamento
+        - generic [ref=e122]:
+          - generic [ref=e123]:
+            - generic [ref=e126]:
+              - heading "🏆" [level=1] [ref=e128]
+              - generic [ref=e129]:
+                - heading "Títulos premiados" [level=1] [ref=e130]
+                - text: Veja a lista de prêmios
+            - generic [ref=e132] [cursor=pointer]: Total 80
+          - generic [ref=e133]:
+            - generic [ref=e135] [cursor=pointer]: Disponíveis 77
+            - generic [ref=e137] [cursor=pointer]: Sorteados 3
+          - generic [ref=e138]:
+            - generic [ref=e139]:
+              - generic [ref=e140]:
+                - generic [ref=e141]: 
+                - text: "4618686"
+              - generic [ref=e142]: PIX R$ 1.000
+              - generic [ref=e143]: Disponível
+            - generic [ref=e144]:
+              - generic [ref=e145]:
+                - generic [ref=e146]: 
+                - text: "8758242"
+              - generic [ref=e147]: PIX R$ 200,00
+              - generic [ref=e148]: Disponível
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - generic [ref=e151]: 
+                - text: "6036878"
+              - generic [ref=e152]: PIX R$ 2.000
+              - generic [ref=e153]: Disponível
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - generic [ref=e156]: 
+                - text: "0408827"
+              - generic [ref=e157]: PIX R$ 2.000
+              - generic [ref=e158]: Disponível
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - generic [ref=e161]: 
+                - text: "6547010"
+              - generic [ref=e162]: PIX R$ 1.000
+              - generic [ref=e163]: Disponível
+            - generic [ref=e164]:
+              - generic [ref=e165]:
+                - generic [ref=e166]: 
+                - text: "1224589"
+              - generic [ref=e167]: PIX R$ 500,00
+              - generic [ref=e168]: Disponível
+            - generic [ref=e169]:
+              - generic [ref=e170]:
+                - generic [ref=e171]: 
+                - text: "4095000"
+              - generic [ref=e172]: PIX R$ 1.000
+              - generic [ref=e173]: Disponível
+            - generic [ref=e174]:
+              - generic [ref=e175]:
+                - generic [ref=e176]: 
+                - text: "1777444"
+              - generic [ref=e177]: PIX R$ 200,00
+              - generic [ref=e178]: Disponível
+            - generic [ref=e179]:
+              - generic [ref=e180]:
+                - generic [ref=e181]: 
+                - text: "0348356"
+              - generic [ref=e182]: PIX R$ 500,00
+              - generic [ref=e183]: Disponível
+            - generic [ref=e184]:
+              - generic [ref=e185]:
+                - generic [ref=e186]: 
+                - text: "5880212"
+              - generic [ref=e187]: Moto BMW Gs 310 0km
+              - generic [ref=e188]: Disponível
+          - button " Ver mais" [ref=e189] [cursor=pointer]:
+            - generic [ref=e190]: 
+            - text: Ver mais
+    - contentinfo [ref=e191]:
+      - 'generic "Classificação indicativa: 18 anos" [ref=e192]':
+        - generic [ref=e193]: 18+
+        - generic [ref=e194]: Permitido para maiores de 18 anos
+      - generic [ref=e197]:
+        - generic [ref=e198]:
+          - img "Capitalizadora" [ref=e199]
+          - img "Distribuidora" [ref=e200]
+        - paragraph [ref=e202]: "Este bilhete de loteria está autorizado com base no termo de autorização descrito no regulamento da promoção. Antes de contratar, consulte o Regulamento do produto. É proibida a venda para menores de 18 anos. Os sorteios e entrega dos prémios serão realizados de acordo com os critérios estabelecidos neste site, nos termos seguintes: O adquirente concorrerá em todos os sorteios previstos no bilhete digital emitido, mesmo sendo contemplado em alguns deles. Ao contribuir, o titular do BILHETE Digital concorda desde já e sem ônus a utilização de seu nome, sua voz e imagem para a divulgação desta campanha social. Confira o resultado dos sorteios e as condições de participação em https://www.caikmisera.com.br/"
+        - generic [ref=e203]: 2026 Caik Misera© - Todos os direitos reservados.
+      - img "Google Safe Browsing" [ref=e205]
+    - generic [ref=e208]:
+      - paragraph [ref=e212]: ✅ Você está participando com condições especiais.
+      - button "Fechar" [ref=e214] [cursor=pointer]:
+        - generic [ref=e215]: 
+    - text:   
+    - generic [ref=e218] [cursor=pointer]:
+      - generic [ref=e219]: 
+      - text: Grupo
+    - region "Aviso de cookies":
+      - generic [ref=e221]:
+        - generic [ref=e222]:
+          - paragraph [ref=e223]: Aviso de Cookies
+          - paragraph [ref=e224]: Ao usar este site, você aceita automaticamente o armazenamento de Cookies no seu dispositivo para melhorar a navegação, analisar a utilização do site e ajudar nas nossas iniciativas de marketing. Política de Segurança e Privacidade.
+        - button "Ok, entendi. Fechar aviso de cookies" [ref=e226] [cursor=pointer]: Ok, entendi.
+  - alert [ref=e227]

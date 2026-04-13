@@ -1,10 +1,14 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { masterApi } from "@/lib/api-master";
 import { api } from "@/lib/api";
 import { formatCurrency } from "@/lib/format";
 
 export default function MasterDashboardPage() {
+  const queryClient = useQueryClient();
+
   const { data: raffle } = useQuery({
     queryKey: ["raffle"],
     queryFn: () => api.getRaffle(),
@@ -12,9 +16,45 @@ export default function MasterDashboardPage() {
 
   const { data: dashboard, isLoading } = useQuery({
     queryKey: ["master-dashboard", raffle?.id],
-    queryFn: () => api.masterDashboard(raffle!.id),
+    queryFn: () => masterApi.dashboard(raffle!.id),
     enabled: !!raffle?.id,
   });
+
+  const { data: creds } = useQuery({
+    queryKey: ["master-credentials"],
+    queryFn: () => masterApi.getCredentials(),
+  });
+
+  const [showCreds, setShowCreds] = useState(false);
+  const [showSecrets, setShowSecrets] = useState(false);
+  const [form, setForm] = useState({
+    paradiseASecret: "",
+    paradiseBSecret: "",
+  });
+
+  const credsMutation = useMutation({
+    mutationFn: () => masterApi.updateCredentials({
+      paradiseAApiKey: "",
+      paradiseASecret: form.paradiseASecret,
+      paradiseAWebhookSecret: "",
+      paradiseBApiKey: "",
+      paradiseBSecret: form.paradiseBSecret,
+      paradiseBWebhookSecret: "",
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["master-credentials"] });
+      setShowCreds(false);
+      setForm({
+        paradiseASecret: "",
+        paradiseBSecret: "",
+        paradiseBWebhookSecret: "",
+      });
+    },
+  });
+
+  function handleFormChange(field: keyof typeof form, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
 
   if (isLoading || !dashboard) {
     return (
@@ -87,6 +127,132 @@ export default function MasterDashboardPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Credenciais Paradise */}
+      <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Credenciais Paradise</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              API Keys e Secrets dos gateways de pagamento (A e B)
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {creds && (
+              <div className="flex gap-2">
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                  creds.paradiseA.configured
+                    ? "bg-green-400/10 text-green-400"
+                    : "bg-red-400/10 text-red-400"
+                }`}>
+                  A: {creds.paradiseA.configured ? "OK" : "Pendente"}
+                </span>
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                  creds.paradiseB.configured
+                    ? "bg-green-400/10 text-green-400"
+                    : "bg-red-400/10 text-red-400"
+                }`}>
+                  B: {creds.paradiseB.configured ? "OK" : "Pendente"}
+                </span>
+              </div>
+            )}
+            <button
+              onClick={() => setShowCreds(!showCreds)}
+              className="text-sm text-red-400 hover:text-red-300 font-medium"
+            >
+              {showCreds ? "Fechar" : "Configurar"}
+            </button>
+          </div>
+        </div>
+
+        {showCreds && (
+          <form
+            onSubmit={(e) => { e.preventDefault(); credsMutation.mutate(); }}
+            className="space-y-5 pt-2"
+          >
+            {/* Webhook URL */}
+            <div className="bg-gray-800/50 rounded-lg p-4 space-y-2">
+              <label className="block text-xs text-gray-400 font-medium">URL do Webhook (copie e cole na Paradise)</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={`${typeof window !== "undefined" ? window.location.origin.replace(":3000", ":3001") : ""}/api/webhook/paradise`}
+                  className="flex-1 rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-green-400 text-sm font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = `${window.location.origin.replace(":3000", ":3001")}/api/webhook/paradise`;
+                    navigator.clipboard.writeText(url);
+                  }}
+                  className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors"
+                >
+                  Copiar
+                </button>
+              </div>
+              <p className="text-gray-500 text-[11px]">Cole esta URL no campo &quot;Postback URL&quot; ou &quot;Webhook&quot; do painel Paradise.</p>
+            </div>
+
+            {/* Paradise A */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-green-400">Paradise A (Nosso)</h3>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Secret Key</label>
+                <input
+                  type={showSecrets ? "text" : "password"}
+                  value={form.paradiseASecret}
+                  onChange={(e) => handleFormChange("paradiseASecret", e.target.value)}
+                  placeholder={creds?.paradiseA.configured ? "••••••••  (configurado)" : "Secret Key da conta A"}
+                  className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+            </div>
+
+            {/* Paradise B */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-blue-400">Paradise B (Dono)</h3>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Secret Key</label>
+                <input
+                  type={showSecrets ? "text" : "password"}
+                  value={form.paradiseBSecret}
+                  onChange={(e) => handleFormChange("paradiseBSecret", e.target.value)}
+                  placeholder={creds?.paradiseB.configured ? "••••••••  (configurado)" : "Secret Key da conta B"}
+                  className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <button
+                type="button"
+                onClick={() => setShowSecrets(!showSecrets)}
+                className="text-xs text-gray-500 hover:text-gray-300"
+              >
+                {showSecrets ? "Ocultar secrets" : "Mostrar secrets"}
+              </button>
+
+              <button
+                type="submit"
+                disabled={credsMutation.isPending || !form.paradiseASecret || !form.paradiseBSecret}
+                className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm"
+              >
+                {credsMutation.isPending ? "Salvando..." : "Salvar Credenciais"}
+              </button>
+            </div>
+
+            {credsMutation.error && (
+              <p className="text-red-400 text-sm">
+                {credsMutation.error instanceof Error ? credsMutation.error.message : "Erro ao salvar"}
+              </p>
+            )}
+            {credsMutation.isSuccess && (
+              <p className="text-green-400 text-sm">Credenciais salvas com sucesso!</p>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );

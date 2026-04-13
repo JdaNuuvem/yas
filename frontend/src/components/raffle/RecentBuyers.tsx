@@ -15,27 +15,34 @@ export function RecentBuyers({ raffleId }: RecentBuyersProps) {
     refetchInterval: 10000,
   });
 
-  if (!buyers || buyers.length === 0) {
-    return null;
-  }
+  if (!buyers || buyers.length === 0) return null;
+
+  const doubled = [...buyers, ...buyers];
 
   return (
-    <section className="space-y-4">
-      <h2 className="text-xl font-bold text-white">Compras Recentes</h2>
-      <div className="bg-gray-800 rounded-xl divide-y divide-gray-700">
-        {buyers.map((buyer, idx) => (
-          <div
-            key={`${buyer.buyerName}-${buyer.createdAt}-${idx}`}
-            className="flex items-center justify-between px-4 py-3"
-          >
-            <span className="text-gray-300 text-sm">
-              {maskName(buyer.buyerName)}
-            </span>
-            <span className="text-green-400 text-sm font-medium">
-              {buyer.quantity} {buyer.quantity === 1 ? "numero" : "numeros"}
-            </span>
-          </div>
-        ))}
+    <section className="space-y-3 overflow-hidden">
+      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider px-5">
+        Comprando agora
+      </h3>
+      <div className="relative">
+        <div className="flex gap-3 animate-ticker whitespace-nowrap px-5">
+          {doubled.map((buyer, idx) => (
+            <div
+              key={`${buyer.buyerName}-${idx}`}
+              className="inline-flex items-center gap-2 card px-4 py-2 flex-shrink-0"
+            >
+              <span className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700">
+                {buyer.buyerName[0]?.toUpperCase()}
+              </span>
+              <span className="text-gray-600 text-sm font-medium">
+                {maskName(buyer.buyerName)}
+              </span>
+              <span className="text-green-600 text-xs font-bold">
+                +{buyer.quantity}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

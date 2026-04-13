@@ -1,5 +1,4 @@
 interface ParadiseConfig {
-  apiKey: string;
   secretKey: string;
   baseUrl?: string;
   fetchFn?: typeof fetch;
@@ -8,13 +7,21 @@ interface ParadiseConfig {
 interface CreatePixChargeInput {
   amount: number; // cents
   description: string;
-  externalRef: string;
+  reference: string;
+  customer: {
+    name: string;
+    email: string;
+    document: string; // CPF digits only
+    phone: string; // digits only
+  };
+  splits?: Array<{ recipientId: number; amount: number }>;
 }
 
 interface PixChargeResult {
+  transactionId: number;
   id: string;
   qrCode: string;
-  qrCodeText: string;
+  qrCodeBase64: string;
 }
 
 export class ParadiseClient {
@@ -22,42 +29,55 @@ export class ParadiseClient {
 
   constructor(config: ParadiseConfig) {
     this.config = {
-      baseUrl: "https://api.paradise.com/v1",
+      baseUrl: "https://multi.paradisepags.com/api/v1",
       fetchFn: globalThis.fetch,
       ...config,
     };
   }
 
   async createPixCharge(input: CreatePixChargeInput): Promise<PixChargeResult> {
+    const body: Record<string, unknown> = {
+      amount: input.amount,
+      description: input.description,
+      reference: input.reference,
+      source: "api_externa",
+      customer: input.customer,
+    };
+
+    if (input.splits && input.splits.length > 0) {
+      body.splits = input.splits;
+    }
+
     const response = await this.config.fetchFn(
-      `${this.config.baseUrl}/charges`,
+      `${this.config.baseUrl}/transaction.php`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${this.config.secretKey}`,
+          "X-API-Key": this.config.secretKey,
         },
-        body: JSON.stringify({
-          amount: input.amount,
-          payment_method: "pix",
-          description: input.description,
-          external_reference: input.externalRef,
-        }),
+        body: JSON.stringify(body),
       },
     );
 
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({ message: "Unknown error" }));
       throw new Error(
-        `Paradise API error (${response.status}): ${err.error ?? "Unknown"}`,
+        `Paradise API error (${response.status}): ${err.message ?? err.error ?? "Unknown"}`,
       );
     }
 
     const data = await response.json();
+
+    if (data.status !== "success") {
+      throw new Error(`Paradise error: ${data.message ?? "Falha ao criar transação"}`);
+    }
+
     return {
-      id: data.id,
+      transactionId: data.transaction_id,
+      id: String(data.id),
       qrCode: data.qr_code,
-      qrCodeText: data.qr_code_text,
+      qrCodeBase64: data.qr_code_base64,
     };
   }
 }

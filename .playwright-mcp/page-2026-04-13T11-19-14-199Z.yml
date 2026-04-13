@@ -1,0 +1,20 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
+    - img [ref=e19]
+  - alert [ref=e22]
+  - generic [ref=e23]:
+    - complementary [ref=e24]:
+      - heading "Admin" [level=2] [ref=e26]
+      - navigation [ref=e27]:
+        - link "Dashboard" [ref=e28] [cursor=pointer]:
+          - /url: /admin
+        - link "Configuracao" [ref=e29] [cursor=pointer]:
+          - /url: /admin/configuracao
+        - link "Premios" [ref=e30] [cursor=pointer]:
+          - /url: /admin/premios
+        - link "Compradores" [ref=e31] [cursor=pointer]:
+          - /url: /admin/compradores
+        - link "Sorteio" [ref=e32] [cursor=pointer]:
+          - /url: /admin/sorteio
+    - main [ref=e33]:
+      - generic [ref=e34]: Carregando...

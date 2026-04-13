@@ -1,19 +1,19 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { masterApi } from "@/lib/api-master";
 
 export default function MasterGatewayPage() {
   const queryClient = useQueryClient();
 
   const { data: status, isLoading } = useQuery({
     queryKey: ["master-gateway-status"],
-    queryFn: () => api.masterGatewayStatus(),
+    queryFn: () => masterApi.gatewayStatus(),
     refetchInterval: 5000,
   });
 
   const overrideMutation = useMutation({
-    mutationFn: (gateway: "A" | "B") => api.masterOverrideGateway(gateway),
+    mutationFn: (gateway: "A" | "B") => masterApi.overrideGateway(gateway),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["master-gateway-status"] });
     },
@@ -25,7 +25,7 @@ export default function MasterGatewayPage() {
     );
   }
 
-  const isA = status.activeGateway === "A";
+  const isA = status.nextGateway === "A";
 
   return (
     <div className="space-y-8">
@@ -41,35 +41,28 @@ export default function MasterGatewayPage() {
                 : "bg-blue-900/40 text-blue-400"
             }`}
           >
-            Paradise {status.activeGateway} {isA ? "(Nosso)" : "(Dono)"}
+            Paradise {status.nextGateway} {isA ? "(Nosso)" : "(Dono)"}
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-            <p className="text-sm text-gray-400 mb-1">Paradise A</p>
-            <span
-              className={`text-sm font-medium ${
-                status.statusA === "online"
-                  ? "text-green-400"
-                  : "text-red-400"
-              }`}
-            >
-              {status.statusA}
+            <p className="text-sm text-gray-400 mb-1">Paradise A (Nosso)</p>
+            <span className={`text-sm font-medium ${isA ? "text-green-400" : "text-gray-500"}`}>
+              {isA ? "Proximo" : "Inativo"}
             </span>
           </div>
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-            <p className="text-sm text-gray-400 mb-1">Paradise B</p>
-            <span
-              className={`text-sm font-medium ${
-                status.statusB === "online"
-                  ? "text-green-400"
-                  : "text-red-400"
-              }`}
-            >
-              {status.statusB}
+            <p className="text-sm text-gray-400 mb-1">Paradise B (Dono)</p>
+            <span className={`text-sm font-medium ${!isA ? "text-blue-400" : "text-gray-500"}`}>
+              {!isA ? "Proximo" : "Inativo"}
             </span>
           </div>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <p className="text-sm text-gray-400 mb-1">Split Atual</p>
+          <span className="text-lg font-bold text-white">{status.splitPercentage}%</span>
         </div>
 
         <div className="flex gap-4">

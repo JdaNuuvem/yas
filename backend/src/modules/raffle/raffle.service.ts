@@ -4,10 +4,17 @@ export class RaffleService {
   constructor(private readonly prisma: PrismaClient) {}
 
   async getActive() {
-    return this.prisma.raffle.findFirst({
+    const raffle = await this.prisma.raffle.findFirst({
       where: { status: "ACTIVE" },
       include: { prizes: { orderBy: { position: "asc" } } },
     });
+    if (!raffle) return null;
+
+    const soldCount = await this.prisma.number.count({
+      where: { raffleId: raffle.id, status: "SOLD" },
+    });
+
+    return { ...raffle, soldCount };
   }
 
   async update(

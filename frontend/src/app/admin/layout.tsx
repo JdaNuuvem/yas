@@ -1,13 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const navItems = [
-  { label: "Dashboard", href: "/admin" },
-  { label: "Configuracao", href: "/admin/configuracao" },
-  { label: "Premios", href: "/admin/premios" },
-  { label: "Compradores", href: "/admin/compradores" },
+  { label: "Configuração", href: "/admin/configuracao" },
+  { label: "Prêmios", href: "/admin/premios" },
   { label: "Sorteio", href: "/admin/sorteio" },
 ];
 
@@ -17,9 +16,25 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (pathname === "/admin/login") return;
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token || (role !== "admin" && role !== "ADMIN" && role !== "master" && role !== "MASTER")) {
+      router.replace("/admin/login");
+    }
+  }, [pathname, router]);
 
   if (pathname === "/admin/login") {
     return <>{children}</>;
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    router.replace("/admin/login");
   }
 
   return (
@@ -46,9 +61,18 @@ export default function AdminLayout({
             );
           })}
         </nav>
+        <div className="px-3 py-4 border-t border-gray-800">
+          <button
+            onClick={handleLogout}
+            className="w-full px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:text-white hover:bg-red-600/20 transition-colors text-left"
+          >
+            Sair
+          </button>
+        </div>
       </aside>
 
       <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+
     </div>
   );
 }

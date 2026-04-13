@@ -1,0 +1,77 @@
+[     129ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     135ms] [LOG] [Fast Refresh] done in 121ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     239ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     696ms] [LOG] [Fast Refresh] done in 559ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     813ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    1436ms] [LOG] [Fast Refresh] done in 736ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    1448ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/:0
+[    1600ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_react-dom_0ajqp8m._.js:15305
+[    1706ms] Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\.next\dev\server\pages\_document.js
+- D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\require.js
+- D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\load-components.js
+- D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\build\utils.js
+- D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\router-server.js
+- D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at <unknown> (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\require-hook.js:68:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\require-hook.js:79:28)
+    at require (node:internal/modules/helpers:152:16)
+    at Object.<anonymous> (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\.next\dev\server\pages\_document.js:1:7)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\require-hook.js:79:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\require.js:105:80)
+    at loadComponentsImpl (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\load-components.js:88:38)
+    at DevServer.findPageComponentsImpl (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\next-server.js:837:77)
+    at <unknown> (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\next-server.js:819:21)
+    at <unknown> (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\trace\tracer.js:195:36)
+    at NoopContextManager.with (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at <unknown> (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\trace\tracer.js:164:103)
+    at NoopContextManager.with (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NextTracerImpl.trace (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\trace\tracer.js:164:28)
+    at DevServer.findPageComponents (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\next-server.js:814:41)
+    at DevServer.findPageComponents (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\dev\next-dev-server.js:704:28)
+    at async DevServer.renderErrorToResponseImpl (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\base-server.js:1745:26)
+    at async pipe.req.req (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\base-server.js:1652:30)
+    at async DevServer.pipeImpl (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\base-server.js:1043:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\next-server.js:353:21)
+    at async DevServer.handleRequestImpl (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\base-server.js:934:17)
+    at async (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\dev\next-dev-server.js:394:20)
+    at async Span.traceAsyncFn (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\dev\next-dev-server.js:390:24)
+    at async invokeRender (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\router-server.js:266:21)
+    at async handleRequest (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\router-server.js:465:24)
+    at async requestHandlerImpl (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\router-server.js:514:13)
+    at async Server.requestListener (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\start-server.js:225:13)
+[    1694ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[   13658ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[   13660ms] [LOG] [Fast Refresh] done in 103ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[   99122ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_0s_b6ps._.js:2342
+[  102490ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_0s_b6ps._.js:2342
+[  105868ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_0s_b6ps._.js:2342
+[  108709ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr' failed: Error during WebSocket handshake: net::ERR_CONNECTION_RESET @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_0s_b6ps._.js:2342
+[  112074ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_0s_b6ps._.js:2342
+[  119419ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_0s_b6ps._.js:2342
+[  126780ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_client_0s_b6ps._.js:2342
+[  131794ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[  133934ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  133963ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431

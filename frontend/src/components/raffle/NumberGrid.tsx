@@ -15,7 +15,9 @@ const PAGE_SIZE = 1000;
 export function NumberGrid({ raffleId }: NumberGridProps) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const { selectedNumbers, toggle, addMany } = useCart();
+  const selectedNumbers = useCart((s) => s.selectedNumbers);
+  const toggle = useCart((s) => s.toggle);
+  const addMany = useCart((s) => s.addMany);
 
   const { data, isLoading } = useQuery({
     queryKey: ["numbers", raffleId, page],
@@ -41,7 +43,7 @@ export function NumberGrid({ raffleId }: NumberGridProps) {
       <div className="flex gap-2">
         <input
           type="text"
-          placeholder="Buscar numero..."
+          placeholder="Buscar número..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -57,13 +59,13 @@ export function NumberGrid({ raffleId }: NumberGridProps) {
           onClick={handleRandom}
           className="px-4 py-2 bg-purple-600 rounded-lg text-white"
         >
-          Aleatorio 25
+          Aleatório 25
         </button>
       </div>
 
       {isLoading ? (
         <div className="text-center py-20 text-gray-400">
-          Carregando numeros...
+          Carregando números...
         </div>
       ) : (
         <div className="grid grid-cols-5 sm:grid-cols-10 gap-1">
@@ -71,7 +73,7 @@ export function NumberGrid({ raffleId }: NumberGridProps) {
             <NumberCell
               key={n.numberValue}
               number={n}
-              isSelected={selectedNumbers.has(n.numberValue)}
+              isSelected={selectedNumbers.includes(n.numberValue)}
               onToggle={toggle}
             />
           ))}
@@ -87,14 +89,14 @@ export function NumberGrid({ raffleId }: NumberGridProps) {
           Anterior
         </button>
         <span className="text-gray-400">
-          Pagina {page} de {totalPages}
+          Página {page} de {totalPages}
         </span>
         <button
           disabled={page >= totalPages}
           onClick={() => setPage((p) => p + 1)}
           className="px-3 py-1 bg-gray-800 rounded disabled:opacity-50 text-white"
         >
-          Proxima
+          Próxima
         </button>
       </div>
     </div>

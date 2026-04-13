@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { masterApi } from "@/lib/api-master";
 
 export default function MasterLoginPage() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function MasterLoginPage() {
     setLoading(true);
 
     try {
-      const { token } = await api.masterLogin(email, password);
+      const { token } = await masterApi.login(email, password);
       localStorage.setItem("token", token);
       localStorage.setItem("role", "master");
       router.push("/master");

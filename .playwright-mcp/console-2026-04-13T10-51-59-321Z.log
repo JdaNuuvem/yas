@@ -1,0 +1,175 @@
+[     120ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     204ms] [LOG] [Fast Refresh] done in 188ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     326ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     361ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  202528ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  202731ms] [LOG] [Fast Refresh] done in 240ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  202838ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  203020ms] [LOG] [Fast Refresh] done in 289ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  210441ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  211019ms] [ERROR] ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:3272
+[  211186ms] [ERROR] ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:3272
+[  211292ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  212703ms] [ERROR] ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:3272
+[  212797ms] [ERROR] ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:3272
+[  212903ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  213515ms] [ERROR] ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:3272
+[  213516ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/?_rsc=wnywt:0
+[  213553ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/?_rsc=wnywt:0
+[  213603ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/:0
+[  213730ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_react-dom_0ajqp8m._.js:15305
+[  213903ms] Error: ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./frontend/src/app/page.tsx:90:1)
+    at Object.getCompilationErrors (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\dev\next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\dev\next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file://D:\TRABALHOS E PARCERIAS ORGANIZADAS\YASMIN\frontend\node_modules\next\dist\server\base-server.js:1745:26)
+[  213903ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[  213908ms] [ERROR] ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1945
+[  213985ms] [ERROR] ./frontend/src/app/page.tsx:90:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  88 |     </div>
+  89 |   );
+> 90 | }
+     | ^
+  91 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1945
+[  214020ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[  219354ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[  220695ms] [LOG] [Fast Refresh] done in 608ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[  220907ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[  220944ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0bby6l4._.js:1226
+[  221197ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[  221264ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431

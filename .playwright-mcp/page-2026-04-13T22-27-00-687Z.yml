@@ -1,0 +1,77 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - generic [ref=e12]:
+    - complementary [ref=e13]:
+      - heading "Master Panel" [level=2] [ref=e15]
+      - navigation [ref=e16]:
+        - link "Dashboard Real" [ref=e17] [cursor=pointer]:
+          - /url: /master
+        - link "Gateway" [ref=e18] [cursor=pointer]:
+          - /url: /master/gateway
+      - button "Sair" [ref=e20]
+    - main [ref=e21]:
+      - generic [ref=e22]:
+        - heading "Dashboard Real" [level=1] [ref=e23]
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - paragraph [ref=e26]: Total REAL Vendidos
+            - paragraph [ref=e27]: "0"
+          - generic [ref=e28]:
+            - paragraph [ref=e29]: Arrecadacao BRUTA
+            - paragraph [ref=e30]: R$ 0,00
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: Total Compras
+            - paragraph [ref=e33]: "0"
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading "NOSSO (Paradise A)" [level=2] [ref=e36]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - paragraph [ref=e39]: Receita
+                - paragraph [ref=e40]: R$ 0,00
+              - generic [ref=e41]:
+                - paragraph [ref=e42]: Compras
+                - paragraph [ref=e43]: "0"
+          - generic [ref=e44]:
+            - heading "DONO (Paradise B)" [level=2] [ref=e45]
+            - generic [ref=e46]:
+              - generic [ref=e47]:
+                - paragraph [ref=e48]: Receita
+                - paragraph [ref=e49]: R$ 0,00
+              - generic [ref=e50]:
+                - paragraph [ref=e51]: Compras
+                - paragraph [ref=e52]: "0"
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - heading "Credenciais Paradise" [level=2] [ref=e56]
+              - paragraph [ref=e57]: API Keys e Secrets dos gateways de pagamento (A e B)
+            - generic [ref=e58]:
+              - generic [ref=e59]:
+                - generic [ref=e60]: "A: OK"
+                - generic [ref=e61]: "B: OK"
+              - button "Fechar" [active] [ref=e63]
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - generic [ref=e66]: URL do Webhook (copie e cole na Paradise)
+              - generic [ref=e67]:
+                - textbox [ref=e68]: http://localhost:3001/api/webhook/paradise
+                - button "Copiar" [ref=e69]
+              - paragraph [ref=e70]: Cole esta URL no campo "Postback URL" ou "Webhook" do painel Paradise.
+            - generic [ref=e71]:
+              - heading "Paradise A (Nosso)" [level=3] [ref=e72]
+              - generic [ref=e73]:
+                - generic [ref=e74]: Secret Key
+                - textbox "•••••••• (configurado)" [ref=e75]:
+                  - /placeholder: ••••••••  (configurado)
+            - generic [ref=e76]:
+              - heading "Paradise B (Dono)" [level=3] [ref=e77]
+              - generic [ref=e78]:
+                - generic [ref=e79]: Secret Key
+                - textbox "•••••••• (configurado)" [ref=e80]:
+                  - /placeholder: ••••••••  (configurado)
+            - generic [ref=e81]:
+              - button "Mostrar secrets" [ref=e82]
+              - button "Salvar Credenciais" [disabled] [ref=e83]

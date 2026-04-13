@@ -1,56 +1,66 @@
 "use client";
 
-import Image from "next/image";
+import { useRef } from "react";
+import { motion } from "framer-motion";
 import type { Prize } from "@/types";
 
 interface PrizeListProps {
   prizes: Prize[];
 }
 
+const MEDAL = ["", "\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"];
+
 export function PrizeList({ prizes }: PrizeListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const sorted = [...prizes].sort((a, b) => a.position - b.position);
 
   return (
-    <section className="space-y-4">
-      <h2 className="text-xl font-bold text-white">Premios</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+    <section className="space-y-3 px-5">
+      <h2 className="text-base font-bold text-gray-900">Prêmios</h2>
+
+      <div
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
         {sorted.map((prize) => {
-          const isFirst = prize.position === 1;
+          const isMain = prize.position === 1;
+          const medal = MEDAL[prize.position] ?? "";
+
           return (
-            <div
+            <motion.div
               key={prize.id}
-              className={`bg-gray-800 rounded-xl p-3 flex flex-col items-center text-center space-y-2
-                ${isFirst ? "border-2 border-yellow-400 col-span-2 md:col-span-1" : "border border-gray-700"}`}
+              whileHover={{ scale: 1.05, y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className={`flex-shrink-0 snap-center rounded-2xl p-4 space-y-1.5 cursor-default ${
+                isMain
+                  ? "w-60 bg-green-50 border-2 border-green-200"
+                  : "w-44 card"
+              }`}
             >
-              {prize.imageUrl && (
-                <div className="relative w-full aspect-square rounded-lg overflow-hidden">
-                  <Image
-                    src={prize.imageUrl}
-                    alt={prize.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              <span
-                className={`text-xs font-bold ${isFirst ? "text-yellow-400" : "text-gray-500"}`}
+              <div className="flex items-center gap-1.5">
+                {medal && <span className="text-lg">{medal}</span>}
+                <span
+                  className={`text-[11px] font-bold uppercase tracking-wider ${
+                    isMain ? "text-green-700" : "text-gray-400"
+                  }`}
+                >
+                  {prize.position}º Prêmio
+                </span>
+              </div>
+              <p
+                className={`font-bold leading-snug ${
+                  isMain ? "text-base text-gray-900" : "text-sm text-gray-700"
+                }`}
               >
-                {prize.position}o Premio
-              </span>
-              <span className="text-white text-sm font-medium">
                 {prize.name}
-              </span>
+              </p>
               {prize.description && (
-                <span className="text-gray-400 text-xs">
+                <p className="text-[11px] text-gray-400 leading-relaxed">
                   {prize.description}
-                </span>
+                </p>
               )}
-              {prize.winnerNumber !== null && (
-                <span className="text-green-400 text-xs font-mono">
-                  Ganhador: {String(prize.winnerNumber).padStart(6, "0")}
-                </span>
-              )}
-            </div>
+            </motion.div>
           );
         })}
       </div>

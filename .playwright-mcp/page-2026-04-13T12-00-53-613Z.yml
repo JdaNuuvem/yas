@@ -1,0 +1,21 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e18]:
+    - heading "Painel de Controle" [level=1] [ref=e19]
+    - generic [ref=e20]:
+      - generic [ref=e21]: Split de Receita
+      - generic [ref=e22]:
+        - slider [ref=e23]: "50"
+        - generic [ref=e24]: 50%
+      - generic [ref=e25]:
+        - generic [ref=e26]: "Conta A: 50%"
+        - generic [ref=e27]: "Conta B: 50%"
+      - button "Salvar Split" [ref=e28]
+    - separator [ref=e29]
+    - generic [ref=e30]:
+      - generic [ref=e31]: Gateway Ativo
+      - generic [ref=e32]:
+        - button "Conta A (ativo)" [ref=e33]
+        - button "Conta B" [ref=e34]
+  - button "Open Next.js Dev Tools" [ref=e13] [cursor=pointer]:
+    - img [ref=e14]
+  - alert [ref=e17]

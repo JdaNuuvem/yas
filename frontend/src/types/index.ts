@@ -10,6 +10,7 @@ export interface Raffle {
   numberPrice: number;
   minPurchase: number;
   prizes: Prize[];
+  soldCount: number;
 }
 
 export interface Prize {

@@ -78,8 +78,23 @@ export class DrawService {
       include: { winnerBuyer: { select: { name: true } } },
     });
 
-    if (!prize.winnerNumber) {
+    if (!prize.winnerNumber || !prize.drawnAt) {
       return { position, status: "pending" as const, prizeName: prize.name };
+    }
+
+    // Prevent clients from polling the winner before the animation finishes.
+    // The animation runs for ~15s; we gate at 20s to add a safety margin.
+    const ANIMATION_WINDOW_MS = 20_000;
+    const timeSinceDraw = Date.now() - prize.drawnAt.getTime();
+
+    if (timeSinceDraw < ANIMATION_WINDOW_MS) {
+      return {
+        position,
+        status: "animating" as const,
+        prizeName: prize.name,
+        // Reveal when the animation will finish (lets frontend sync the reveal)
+        revealsAt: new Date(prize.drawnAt.getTime() + ANIMATION_WINDOW_MS).toISOString(),
+      };
     }
 
     return {

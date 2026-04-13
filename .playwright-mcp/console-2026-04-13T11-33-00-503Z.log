@@ -1,0 +1,17 @@
+[     129ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     295ms] [LOG] [Fast Refresh] done in 280ms @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[     997ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    1421ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0r9g_next_dist_0gdr-x8._.js:2431
+[    2760ms] TypeError: Cannot read properties of undefined (reading 'toLocaleString')
+    at HeroSection (http://localhost:3000/_next/static/chunks/frontend_src_0.nl8yj._.js:355:76)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:15037:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:4620:24)
+    at updateFunctionComponent (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:6081:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:6691:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:965:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9555:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9449:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9433:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:9098:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_react-dom_08_6uy3._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/0r9g_next_dist_compiled_0op9aht._.js:2647:64)

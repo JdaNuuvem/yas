@@ -1,0 +1,55 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - button "Voltar" [ref=e4]:
+      - img [ref=e5]
+      - text: Voltar
+    - heading "Finalizar Compra" [level=1] [ref=e7]
+    - generic [ref=e8]:
+      - heading "Numeros selecionados" [level=2] [ref=e9]
+      - generic [ref=e10]:
+        - generic [ref=e11]: "104732"
+        - generic [ref=e12]: "104769"
+        - generic [ref=e13]: "104806"
+        - generic [ref=e14]: "104843"
+        - generic [ref=e15]: "104880"
+        - generic [ref=e16]: "104917"
+        - generic [ref=e17]: "104954"
+        - generic [ref=e18]: "104991"
+        - generic [ref=e19]: "105028"
+        - generic [ref=e20]: "105065"
+        - generic [ref=e21]: "105102"
+        - generic [ref=e22]: "105139"
+        - generic [ref=e23]: "105176"
+        - generic [ref=e24]: "105213"
+        - generic [ref=e25]: "105250"
+        - generic [ref=e26]: "105287"
+        - generic [ref=e27]: "105324"
+        - generic [ref=e28]: "105361"
+        - generic [ref=e29]: "105398"
+        - generic [ref=e30]: "105435"
+        - generic [ref=e31]: "105472"
+        - generic [ref=e32]: "105509"
+        - generic [ref=e33]: "105546"
+        - generic [ref=e34]: "105583"
+        - generic [ref=e35]: "105620"
+      - generic [ref=e36]:
+        - generic [ref=e37]: 25 numeros
+        - generic [ref=e38]: R$ 5,00
+    - generic [ref=e39]:
+      - heading "Seus dados" [level=2] [ref=e40]
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]: Nome completo *
+          - textbox "Seu nome completo" [ref=e44]
+        - generic [ref=e45]:
+          - generic [ref=e46]: CPF *
+          - textbox "000.000.000-00" [ref=e47]
+        - generic [ref=e48]:
+          - generic [ref=e49]: WhatsApp / Telefone *
+          - textbox "(00) 00000-0000" [ref=e50]
+        - generic [ref=e51]:
+          - generic [ref=e52]: Email (opcional)
+          - textbox "seu@email.com" [ref=e53]
+        - button "Gerar pagamento PIX" [ref=e54]
+  - button "Open Next.js Dev Tools" [ref=e60] [cursor=pointer]:
+    - img [ref=e61]

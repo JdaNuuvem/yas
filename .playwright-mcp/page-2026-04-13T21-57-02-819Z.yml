@@ -1,0 +1,56 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]
+  - generic [ref=e239]:
+    - button "Voltar" [ref=e240]:
+      - img [ref=e241]
+      - text: Voltar
+    - heading "Finalizar Compra" [level=1] [ref=e243]
+    - generic [ref=e244]:
+      - heading "Números selecionados" [level=2] [ref=e245]
+      - generic [ref=e246]:
+        - generic [ref=e247]: "032860"
+        - generic [ref=e248]: "041047"
+        - generic [ref=e249]: "047622"
+        - generic [ref=e250]: "070288"
+        - generic [ref=e251]: "077696"
+        - generic [ref=e252]: "090171"
+        - generic [ref=e253]: "091229"
+        - generic [ref=e254]: "111065"
+        - generic [ref=e255]: "130349"
+        - generic [ref=e256]: "184902"
+        - generic [ref=e257]: "197605"
+        - generic [ref=e258]: "209099"
+        - generic [ref=e259]: "209470"
+        - generic [ref=e260]: "258047"
+        - generic [ref=e261]: "281999"
+        - generic [ref=e262]: "288770"
+        - generic [ref=e263]: "473846"
+        - generic [ref=e264]: "510310"
+        - generic [ref=e265]: "585152"
+        - generic [ref=e266]: "657877"
+        - generic [ref=e267]: "707483"
+        - generic [ref=e268]: "780380"
+        - generic [ref=e269]: "857863"
+        - generic [ref=e270]: "927960"
+        - generic [ref=e271]: "991069"
+      - generic [ref=e272]:
+        - generic [ref=e273]: 25 números
+        - generic [ref=e274]: R$ 5,00
+    - generic [ref=e275]:
+      - heading "Seus dados" [level=2] [ref=e276]
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - generic [ref=e279]: Nome completo *
+          - textbox "Seu nome completo" [ref=e280]
+        - generic [ref=e281]:
+          - generic [ref=e282]: CPF *
+          - textbox "000.000.000-00" [ref=e283]
+        - generic [ref=e284]:
+          - generic [ref=e285]: WhatsApp / Telefone *
+          - textbox "(00) 00000-0000" [ref=e286]
+        - generic [ref=e287]:
+          - generic [ref=e288]: Email (opcional)
+          - textbox "seu@email.com" [ref=e289]
+        - button "Gerar pagamento PIX" [ref=e290]
