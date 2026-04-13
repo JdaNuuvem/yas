@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
+import compress from "@fastify/compress";
 import { env } from "./config/env.js";
 import { registerJwt } from "./lib/jwt.js";
 import { raffleRoutes } from "./modules/raffle/raffle.routes.js";
@@ -17,24 +18,25 @@ import("./jobs/expire-reservations.js");
 export async function buildServer() {
   const server = Fastify({
     logger: process.env.NODE_ENV !== "production",
-    bodyLimit: 50 * 1024 * 1024, // 50MB for base64 image uploads
-    connectionTimeout: 30000,
+    bodyLimit: 50 * 1024 * 1024,
+    connectionTimeout: 60000,
     keepAliveTimeout: 72000,
-    maxRequestsPerSocket: 0, // unlimited
+    maxRequestsPerSocket: 0,
+    requestTimeout: 30000,
   });
+
+  await server.register(compress, { global: true });
 
   await server.register(cors, {
     origin: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
   });
   await server.register(rateLimit, {
-    max: 300,
+    max: 1000,
     timeWindow: "1 minute",
-    allowList: (req) => {
-      // No rate limit for webhooks
-      return req.url?.startsWith("/api/webhook") ?? false;
-    },
+    allowList: (req) => req.url?.startsWith("/api/webhook") ?? false,
   });
   await registerJwt(server);
 

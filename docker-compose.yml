@@ -11,24 +11,33 @@ services:
     command:
       - "postgres"
       - "-c"
-      - "max_connections=200"
+      - "max_connections=500"
       - "-c"
-      - "shared_buffers=256MB"
+      - "shared_buffers=512MB"
       - "-c"
-      - "effective_cache_size=512MB"
+      - "effective_cache_size=1536MB"
       - "-c"
-      - "work_mem=4MB"
+      - "work_mem=8MB"
+      - "-c"
+      - "maintenance_work_mem=128MB"
       - "-c"
       - "random_page_cost=1.1"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "default_statistics_target=100"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U yasmin -d yasmin_rifa"]
       interval: 5s
       timeout: 3s
       retries: 5
+    shm_size: 256mb
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
 
   backend:
     build:
@@ -44,13 +53,13 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
       PORT: "3001"
       NODE_ENV: production
-      DB_POOL_SIZE: "30"
+      DB_POOL_SIZE: "50"
     ports:
       - "3001:3001"
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
 
   frontend:
     build:
@@ -66,7 +75,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
 
 volumes:
   pgdata:

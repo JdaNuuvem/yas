@@ -1,37 +1,30 @@
 import type { FastifyInstance } from "fastify";
 import { RaffleService } from "./raffle.service.js";
 import { adminAuth } from "../../middleware/auth.js";
-
-// Simple in-memory cache for hot endpoints
-const cache = new Map<string, { data: unknown; expires: number }>();
-function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {
-  const entry = cache.get(key);
-  if (entry && entry.expires > Date.now()) return Promise.resolve(entry.data as T);
-  return fn().then((data) => {
-    cache.set(key, { data, expires: Date.now() + ttlMs });
-    return data;
-  });
-}
+import { cached, invalidate } from "../../lib/cache.js";
 
 export async function raffleRoutes(server: FastifyInstance) {
   const { prisma } = await import("../../lib/prisma.js");
   const service = new RaffleService(prisma);
 
-  // Cache raffle data for 5s — 10k users hitting this won't hammer the DB
-  server.get("/api/raffle", async () =>
-    cached("raffle:active", 5000, () => service.getActive()),
-  );
-
-  // Cache recent buyers for 10s
-  server.get("/api/raffle/:raffleId/buyers/recent", async (request) => {
-    const { raffleId } = request.params as { raffleId: string };
-    return cached(`recent:${raffleId}`, 10000, () => service.getRecentBuyers(raffleId));
+  // Cache raffle 15s — 100k users = 1 query per 15s
+  server.get("/api/raffle", async (_, reply) => {
+    reply.header("Cache-Control", "public, max-age=10, stale-while-revalidate=30");
+    return cached("raffle:active", 15000, () => service.getActive());
   });
 
-  // Cache top buyers for 30s
-  server.get("/api/raffle/:raffleId/buyers/top", async (request) => {
+  // Cache recent buyers 15s
+  server.get("/api/raffle/:raffleId/buyers/recent", async (request, reply) => {
     const { raffleId } = request.params as { raffleId: string };
-    return cached(`top:${raffleId}`, 30000, () => service.getTopBuyers(raffleId));
+    reply.header("Cache-Control", "public, max-age=10, stale-while-revalidate=30");
+    return cached(`recent:${raffleId}`, 15000, () => service.getRecentBuyers(raffleId));
+  });
+
+  // Cache top buyers 60s
+  server.get("/api/raffle/:raffleId/buyers/top", async (request, reply) => {
+    const { raffleId } = request.params as { raffleId: string };
+    reply.header("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
+    return cached(`top:${raffleId}`, 60000, () => service.getTopBuyers(raffleId));
   });
 
   server.put(
