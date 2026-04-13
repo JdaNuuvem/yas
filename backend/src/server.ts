@@ -11,6 +11,9 @@ import { adminRoutes } from "./modules/admin/admin.routes.js";
 import { masterRoutes } from "./modules/master/master.routes.js";
 import { drawRoutes } from "./modules/draw/draw.routes.js";
 
+// Start reservation expiry job
+import("./jobs/expire-reservations.js");
+
 export async function buildServer() {
   const server = Fastify({ logger: true });
 

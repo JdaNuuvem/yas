@@ -1,0 +1,14 @@
+{
+  "name": "yasmin",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "db:setup": "cd backend && npx prisma migrate dev && npx tsx prisma/seed.ts && npx tsx scripts/seed-numbers.ts",
+    "test": "cd backend && npm test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
