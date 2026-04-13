@@ -1,0 +1,58 @@
+import type { PrismaClient } from "@prisma/client";
+
+export class RaffleService {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async getActive() {
+    return this.prisma.raffle.findFirst({
+      where: { status: "ACTIVE" },
+      include: { prizes: { orderBy: { position: "asc" } } },
+    });
+  }
+
+  async update(
+    raffleId: string,
+    data: {
+      name?: string;
+      description?: string;
+      mainImageUrl?: string;
+      themeColors?: object;
+      logoUrl?: string;
+    },
+  ) {
+    return this.prisma.raffle.update({ where: { id: raffleId }, data });
+  }
+
+  async getRecentBuyers(raffleId: string) {
+    const purchases = await this.prisma.purchase.findMany({
+      where: { raffleId, paymentStatus: "CONFIRMED" },
+      orderBy: { updatedAt: "desc" },
+      take: 20,
+      include: { buyer: { select: { name: true } } },
+    });
+    return purchases.map((p: any) => ({
+      name: p.buyer.name.split(" ")[0] + "***",
+      quantity: p.quantity,
+      createdAt: p.updatedAt,
+    }));
+  }
+
+  async getTopBuyers(raffleId: string) {
+    const buyers = await this.prisma.purchase.groupBy({
+      by: ["buyerId"],
+      where: { raffleId, paymentStatus: "CONFIRMED" },
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: "desc" } },
+      take: 10,
+    });
+    const buyerDetails = await this.prisma.buyer.findMany({
+      where: { id: { in: buyers.map((b: any) => b.buyerId) } },
+      select: { id: true, name: true },
+    });
+    const nameMap = new Map(buyerDetails.map((b: any) => [b.id, b.name]));
+    return buyers.map((b: any) => ({
+      name: (nameMap.get(b.buyerId)?.split(" ")[0] ?? "") + "***",
+      totalNumbers: b._sum.quantity,
+    }));
+  }
+}
