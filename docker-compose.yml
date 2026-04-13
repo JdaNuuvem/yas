@@ -1,14 +1,47 @@
 services:
-  postgres:
+  db:
     image: postgres:16-alpine
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: yasmin
-    ports:
-      - "5434:5432"
+      POSTGRES_DB: yasmin_rifa
+      POSTGRES_USER: yasmin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-yasmin_secret_2026}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yasmin -d yasmin_rifa"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://yasmin:${DB_PASSWORD:-yasmin_secret_2026}@db:5432/yasmin_rifa
+      JWT_SECRET: ${JWT_SECRET:-change_me_in_production_at_least_32_chars}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      PORT: "3001"
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:3001}
+    ports:
+      - "3000:3000"
 
 volumes:
   pgdata:
