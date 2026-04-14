@@ -186,7 +186,7 @@ export async function buildServer() {
     if (!raffle) return { error: "No active raffle" };
 
     const existing = await prisma.number.count({ where: { raffleId: raffle.id } });
-    if (existing > 0) return { status: "already has numbers", count: existing };
+    if (existing >= 1000000) return { status: "complete", count: existing };
 
     const BATCH = 5000;
     const TOTAL = 1000000;
