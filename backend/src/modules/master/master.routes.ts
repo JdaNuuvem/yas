@@ -290,6 +290,202 @@ export async function masterRoutes(server: FastifyInstance) {
     },
   );
 
+  // Get predestination status of all prizes
+  server.get(
+    "/api/master/prizes-predestination",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId } = z
+        .object({ raffleId: z.string() })
+        .parse(request.query);
+
+      const prizes = await prisma.prize.findMany({
+        where: { raffleId },
+        orderBy: { position: "asc" },
+      });
+
+      const result = await Promise.all(
+        prizes.map(async (prize) => {
+          let predestinedNumber: number | null = null;
+          let buyerName: string | null = null;
+          let buyerPhone: string | null = null;
+          let locked = false;
+
+          if (prize.predeterminedNumber) {
+            predestinedNumber = parseInt(
+              drawService.decryptNumber(prize.predeterminedNumber),
+              10,
+            );
+
+            // Check if this number is already sold to a buyer
+            const numberRecord = await prisma.number.findUnique({
+              where: {
+                raffleId_numberValue: {
+                  raffleId,
+                  numberValue: predestinedNumber,
+                },
+              },
+              include: { buyer: { select: { name: true, phone: true } } },
+            });
+
+            if (numberRecord?.buyer) {
+              buyerName = numberRecord.buyer.name;
+              buyerPhone = numberRecord.buyer.phone;
+              locked = true;
+            }
+          }
+
+          return {
+            id: prize.id,
+            position: prize.position,
+            name: prize.name,
+            predestinedNumber,
+            buyerName,
+            buyerPhone,
+            locked,
+            drawn: !!prize.winnerNumber,
+            winnerNumber: prize.winnerNumber,
+          };
+        }),
+      );
+
+      return result;
+    },
+  );
+
+  // Predestine a prize: set predetermined number + assign to buyer (SOLD)
+  server.post(
+    "/api/master/predestine-prize",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const {
+        raffleId,
+        position,
+        numberValue,
+        buyerName,
+        buyerCpf,
+        buyerPhone,
+      } = z
+        .object({
+          raffleId: z.string(),
+          position: z.number().int().min(1).max(11),
+          numberValue: z.number().int().min(1).max(1000000),
+          buyerName: z.string().min(2),
+          buyerCpf: z.string().default(""),
+          buyerPhone: z.string().min(10).max(15),
+        })
+        .parse(request.body);
+
+      // Check if prize already has a locked predestination (number sold to buyer)
+      const prize = await prisma.prize.findUniqueOrThrow({
+        where: { raffleId_position: { raffleId, position } },
+      });
+
+      if (prize.winnerNumber) {
+        throw new Error("Este prêmio já foi sorteado");
+      }
+
+      if (prize.predeterminedNumber) {
+        const existingNum = parseInt(
+          drawService.decryptNumber(prize.predeterminedNumber),
+          10,
+        );
+        const existingRecord = await prisma.number.findUnique({
+          where: {
+            raffleId_numberValue: { raffleId, numberValue: existingNum },
+          },
+          include: { buyer: { select: { name: true } } },
+        });
+        if (existingRecord?.buyer) {
+          throw new Error(
+            `Este prêmio já está predestinado ao número ${existingNum} (${existingRecord.buyer.name}). Remova a predestinação antes de alterar.`,
+          );
+        }
+      }
+
+      // Number MUST be AVAILABLE — only unsold numbers can be predestined
+      const numberRecord = await prisma.number.findUnique({
+        where: { raffleId_numberValue: { raffleId, numberValue } },
+        include: { buyer: { select: { name: true, phone: true } } },
+      });
+      if (!numberRecord) {
+        throw new Error(`Número ${numberValue} não encontrado nesta rifa`);
+      }
+      if (numberRecord.status !== "AVAILABLE") {
+        const ownerInfo = numberRecord.buyer
+          ? ` — pertence a ${numberRecord.buyer.name} (${numberRecord.buyer.phone})`
+          : "";
+        throw new Error(
+          `Número ${numberValue} já está ${numberRecord.status === "SOLD" ? "vendido" : "reservado"}${ownerInfo}. Escolha um número que ainda não foi vendido.`,
+        );
+      }
+
+      const { encrypt: encryptFn, hashDeterministic } = await import(
+        "../../lib/crypto.js"
+      );
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      const cleanCpf = buyerCpf.replace(/\D/g, "");
+      const cleanPhone = buyerPhone.replace(/\D/g, "");
+
+      // Create or find buyer
+      let buyer = await prisma.buyer.findFirst({
+        where: { phone: cleanPhone },
+      });
+      if (!buyer) {
+        buyer = await prisma.buyer.create({
+          data: {
+            name: buyerName,
+            cpf:
+              cleanCpf && encKey ? encryptFn(cleanCpf, encKey) : "manual",
+            cpfHash:
+              cleanCpf && encKey
+                ? hashDeterministic(cleanCpf, encKey)
+                : "manual",
+            phone: cleanPhone,
+          },
+        });
+      }
+
+      // Assign number to buyer (mark as SOLD)
+      await prisma.number.update({
+        where: { id: numberRecord.id },
+        data: { status: "SOLD", buyerId: buyer.id, soldAt: new Date() },
+      });
+
+      // Set predetermined winner
+      await drawService.setPredeterminedWinner(raffleId, position, numberValue);
+
+      return {
+        success: true,
+        position,
+        numberValue,
+        buyerName: buyer.name,
+        buyerPhone: buyer.phone,
+      };
+    },
+  );
+
+  // Remove predestination from a prize (does NOT unsell the number)
+  server.delete(
+    "/api/master/predestine-prize/:position",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId } = z
+        .object({ raffleId: z.string() })
+        .parse(request.body);
+      const { position } = z
+        .object({ position: z.coerce.number().int().min(1).max(11) })
+        .parse(request.params);
+
+      await prisma.prize.update({
+        where: { raffleId_position: { raffleId, position } },
+        data: { predeterminedNumber: null },
+      });
+
+      return { success: true };
+    },
+  );
+
   // Full reset — clears all purchases, numbers back to AVAILABLE, remove buyers
   server.post(
     "/api/master/reset-all",

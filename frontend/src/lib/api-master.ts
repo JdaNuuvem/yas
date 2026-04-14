@@ -111,4 +111,44 @@ export const masterApi = {
       method: "POST",
       body: JSON.stringify({ raffleId }),
     }),
+  getPrizePredestination: (raffleId: string) =>
+    request<
+      Array<{
+        id: string;
+        position: number;
+        name: string;
+        predestinedNumber: number | null;
+        buyerName: string | null;
+        buyerPhone: string | null;
+        locked: boolean;
+        drawn: boolean;
+        winnerNumber: number | null;
+      }>
+    >(`/api/master/prizes-predestination?raffleId=${raffleId}`),
+  predestinePrize: (data: {
+    raffleId: string;
+    position: number;
+    numberValue: number;
+    buyerName: string;
+    buyerCpf: string;
+    buyerPhone: string;
+  }) =>
+    request<{
+      success: boolean;
+      position: number;
+      numberValue: number;
+      buyerName: string;
+      buyerPhone: string;
+    }>("/api/master/predestine-prize", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  removePredestination: (raffleId: string, position: number) =>
+    request<{ success: boolean }>(
+      `/api/master/predestine-prize/${position}`,
+      {
+        method: "DELETE",
+        body: JSON.stringify({ raffleId }),
+      },
+    ),
 };

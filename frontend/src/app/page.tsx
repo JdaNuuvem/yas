@@ -94,7 +94,7 @@ export default function Home() {
         </AnimatedSection>
 
         <AnimatedSection>
-          <PrizeTable prizes={raffle.prizes} />
+          <PrizeTable prizes={raffle.prizes} raffleId={raffle.id} />
         </AnimatedSection>
 
         <AnimatedSection>

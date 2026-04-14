@@ -51,7 +51,7 @@ export class NumberService {
   }
 
   async expireReservations(): Promise<number> {
-    const cutoffTime = new Date(Date.now() - 15 * 60 * 1000);
+    const cutoffTime = new Date(Date.now() - 60 * 60 * 1000); // 1 hour
 
     // Expire Purchase and Number together in a single transaction.
     // If we only freed Number rows, a late-arriving webhook could still

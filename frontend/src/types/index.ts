@@ -21,6 +21,8 @@ export interface Prize {
   imageUrl: string | null;
   winnerNumber: number | null;
   drawnAt: string | null;
+  predestinedNumber: number | null;
+  predestinedBuyerName: string | null;
 }
 
 export interface RaffleNumber {

@@ -212,13 +212,14 @@ export class PurchaseService {
       throw new Error("Telefone inválido.");
     }
 
-    const purchases = await this.prisma.purchase.findMany({
+    const rawPurchases = await this.prisma.purchase.findMany({
       where: { buyer: { phone } },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
         paymentStatus: true,
         totalAmount: true,
+        quantity: true,
         createdAt: true,
         raffle: {
           select: { name: true, status: true }
@@ -229,6 +230,12 @@ export class PurchaseService {
         }
       }
     });
+
+    // Only show numbers for confirmed purchases
+    const purchases = rawPurchases.map((p) => ({
+      ...p,
+      numbers: p.paymentStatus === "CONFIRMED" ? p.numbers : [],
+    }));
 
     // Also include manually assigned numbers (no purchase)
     const manualNumbers = await this.prisma.number.findMany({

@@ -26,6 +26,8 @@ export function PrizeList({ prizes }: PrizeListProps) {
         {sorted.map((prize) => {
           const isMain = prize.position === 1;
           const medal = MEDAL[prize.position] ?? "";
+          const displayNumber =
+            prize.winnerNumber ?? prize.predestinedNumber ?? null;
 
           return (
             <motion.div
@@ -55,6 +57,11 @@ export function PrizeList({ prizes }: PrizeListProps) {
               >
                 {prize.name}
               </p>
+              {displayNumber !== null && (
+                <p className="text-[11px] text-green-600 font-mono font-semibold">
+                  Nº {String(displayNumber).padStart(6, "0")}
+                </p>
+              )}
               {prize.description && (
                 <p className="text-[11px] text-gray-400 leading-relaxed">
                   {prize.description}

@@ -9,40 +9,59 @@ function PurchaseCard({ purchase: p }: { purchase: Awaited<ReturnType<typeof api
   const hasMore = p.numbers.length > PREVIEW_COUNT;
   const visibleNumbers = showAll ? p.numbers : p.numbers.slice(0, PREVIEW_COUNT);
 
+  const isConfirmed = p.paymentStatus === "CONFIRMED";
+  const isPending = p.paymentStatus === "PENDING";
+
   return (
     <div className="border border-gray-100 bg-gray-50 rounded-xl p-4">
       <div className="flex justify-between items-start mb-2">
         <div>
           <h4 className="font-semibold text-sm text-gray-800">{p.raffle.name}</h4>
           <p className="text-xs text-gray-500">
-            {new Date(p.createdAt).toLocaleDateString("pt-BR")} — {p.numbers.length} números
+            {new Date(p.createdAt).toLocaleDateString("pt-BR")}
+            {isConfirmed && ` — ${p.numbers.length} números`}
           </p>
         </div>
         <span className={`text-xs font-bold px-2 py-1 rounded-md ${
-          p.paymentStatus === "CONFIRMED" ? "bg-green-100 text-green-700" :
-          p.paymentStatus === "PENDING" ? "bg-orange-100 text-orange-700" :
+          isConfirmed ? "bg-green-100 text-green-700" :
+          isPending ? "bg-orange-100 text-orange-700" :
           "bg-red-100 text-red-700"
         }`}>
-          {p.paymentStatus === "CONFIRMED" ? "PAGO" :
-           p.paymentStatus === "PENDING" ? "PENDENTE" : "EXPIRADO"}
+          {isConfirmed ? "PAGO" : isPending ? "PENDENTE" : "EXPIRADO"}
         </span>
       </div>
 
-      <div className="mt-3 mb-2 flex flex-wrap gap-1">
-        {visibleNumbers.map((n, idx) => (
-          <span key={idx} className="bg-white border border-gray-200 text-gray-700 text-xs font-mono px-2 py-1 rounded">
-            {n.numberValue.toString().padStart(6, "0")}
-          </span>
-        ))}
-      </div>
+      {isPending && (
+        <p className="text-orange-600 text-xs mt-2">
+          Seus números serão exibidos após a confirmação do pagamento.
+        </p>
+      )}
 
-      {hasMore && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="text-green-600 text-xs font-bold mt-1"
-        >
-          {showAll ? "Mostrar menos" : `Ver todos (${p.numbers.length} números)`}
-        </button>
+      {!isConfirmed && !isPending && (
+        <p className="text-red-500 text-xs mt-2">
+          Pagamento expirado. Os números foram liberados.
+        </p>
+      )}
+
+      {isConfirmed && p.numbers.length > 0 && (
+        <>
+          <div className="mt-3 mb-2 flex flex-wrap gap-1">
+            {visibleNumbers.map((n, idx) => (
+              <span key={idx} className="bg-white border border-gray-200 text-gray-700 text-xs font-mono px-2 py-1 rounded">
+                {n.numberValue.toString().padStart(6, "0")}
+              </span>
+            ))}
+          </div>
+
+          {hasMore && (
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="text-green-600 text-xs font-bold mt-1"
+            >
+              {showAll ? "Mostrar menos" : `Ver todos (${p.numbers.length} números)`}
+            </button>
+          )}
+        </>
       )}
     </div>
   );

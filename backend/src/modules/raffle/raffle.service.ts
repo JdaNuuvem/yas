@@ -47,16 +47,44 @@ export class RaffleService {
 
     const hasImage = !!raffle.mainImageUrl;
 
-    // Add masked CPF to each prize
-    const prizesWithCpf = raffle.prizes.map((p: any) => {
-      const firstName = p.winnerBuyer?.name?.split(" ")[0] ?? null;
-      return {
-        ...p,
-        winnerName: firstName,
-        winnerCpfMasked: p.winnerBuyer ? this.maskCpf(p.winnerBuyer.cpf) : null,
-        winnerBuyer: undefined,
-      };
-    });
+    // Decrypt predetermined numbers and add masked CPF to each prize
+    const { decrypt: decryptFn } = require("../../lib/crypto.js");
+    const encKey = process.env.ENCRYPTION_KEY ?? "";
+
+    const prizesWithCpf = await Promise.all(
+      raffle.prizes.map(async (p: any) => {
+        const firstName = p.winnerBuyer?.name?.split(" ")[0] ?? null;
+
+        // Decrypt predetermined number if set (and not yet drawn)
+        let predestinedNumber: number | null = null;
+        let predestinedBuyerName: string | null = null;
+        if (p.predeterminedNumber && !p.winnerNumber) {
+          try {
+            predestinedNumber = parseInt(decryptFn(p.predeterminedNumber, encKey), 10);
+            // Find the buyer who owns this number
+            const numRecord = await this.prisma.number.findUnique({
+              where: { raffleId_numberValue: { raffleId: raffle.id, numberValue: predestinedNumber } },
+              include: { buyer: { select: { name: true } } },
+            });
+            if (numRecord?.buyer) {
+              predestinedBuyerName = numRecord.buyer.name.split(" ")[0];
+            }
+          } catch {
+            // ignore decryption failures
+          }
+        }
+
+        return {
+          ...p,
+          winnerName: firstName,
+          winnerCpfMasked: p.winnerBuyer ? this.maskCpf(p.winnerBuyer.cpf) : null,
+          predestinedNumber,
+          predestinedBuyerName,
+          winnerBuyer: undefined,
+          predeterminedNumber: undefined,
+        };
+      }),
+    );
 
     return {
       ...raffle,

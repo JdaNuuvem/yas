@@ -5,6 +5,11 @@ import type { Prize } from "@/types";
 
 interface PrizeTableProps {
   prizes: Prize[];
+  raffleId: string;
+}
+
+function formatNumber(n: number): string {
+  return String(n).padStart(6, "0");
 }
 
 type Filter = "all" | "available" | "drawn";
@@ -61,19 +66,15 @@ export function PrizeTable({ prizes }: PrizeTableProps) {
       {/* Prize list */}
       <div className="card divide-y divide-gray-100 overflow-hidden">
         {filtered.map((prize) => {
-          const isDrawn = prize.winnerNumber !== null;
+          const displayNumber =
+            prize.winnerNumber ?? prize.predestinedNumber ?? null;
+
           return (
             <div
               key={prize.id}
               className="flex items-center gap-3 px-4 py-3"
             >
-              <div
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
-                  isDrawn
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-500"
-                }`}
-              >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold bg-green-100 text-green-700">
                 {prize.position}
               </div>
               <div className="flex-1 min-w-0">
@@ -81,15 +82,11 @@ export function PrizeTable({ prizes }: PrizeTableProps) {
                   {prize.name}
                 </p>
               </div>
-              <span
-                className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
-                  isDrawn
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-500"
-                }`}
-              >
-                {isDrawn ? "Sorteado" : "Disponível"}
-              </span>
+              {displayNumber !== null && (
+                <span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full font-mono shrink-0">
+                  {formatNumber(displayNumber)}
+                </span>
+              )}
             </div>
           );
         })}

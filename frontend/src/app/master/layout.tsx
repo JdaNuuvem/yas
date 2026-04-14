@@ -8,7 +8,7 @@ const navItems = [
   { label: "Dashboard Real", href: "/master" },
   { label: "Gateway", href: "/master/gateway" },
   { label: "Atribuir Números", href: "/master/atribuir" },
-  { label: "Predefinir Sorteio", href: "/master/sorteio" },
+  { label: "Predestinar Prêmios", href: "/master/sorteio" },
 ];
 
 function Fake404() {
