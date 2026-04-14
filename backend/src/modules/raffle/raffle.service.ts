@@ -10,8 +10,13 @@ export class RaffleService {
     });
     if (!raffle) return null;
 
+    // Only count numbers sold via gateway B (owner) — matches progress bar
     const soldCount = await this.prisma.number.count({
-      where: { raffleId: raffle.id, status: "SOLD" },
+      where: {
+        raffleId: raffle.id,
+        status: "SOLD",
+        purchase: { gatewayAccount: "B" },
+      },
     });
 
     // Don't send base64 image in the main response — too heavy (4MB+)
