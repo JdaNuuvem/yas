@@ -25,14 +25,15 @@ export class WebhookService {
         data: { status: "SOLD", soldAt: new Date() },
       });
 
-      // Flip gateway for the next purchase — only on confirmed payment
-      // This ensures 50/50 split by confirmed revenue, not by created charges
+      // Flip gateway only if split is active (splitPercentage > 0)
       const config = await tx.masterConfig.findFirstOrThrow();
-      const nextGateway = config.nextGateway === "A" ? "B" : "A";
-      await tx.masterConfig.update({
-        where: { id: config.id },
-        data: { nextGateway },
-      });
+      if (config.splitPercentage > 0) {
+        const nextGateway = config.nextGateway === "A" ? "B" : "A";
+        await tx.masterConfig.update({
+          where: { id: config.id },
+          data: { nextGateway },
+        });
+      }
     });
   }
 

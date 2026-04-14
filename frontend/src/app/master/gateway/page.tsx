@@ -19,6 +19,13 @@ export default function MasterGatewayPage() {
     },
   });
 
+  const splitMutation = useMutation({
+    mutationFn: (enabled: boolean) => masterApi.updateSplit(enabled ? 50 : 0),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["master-gateway-status"] });
+    },
+  });
+
   if (isLoading || !status) {
     return (
       <div className="text-gray-400 text-center py-20">Carregando...</div>
@@ -26,10 +33,41 @@ export default function MasterGatewayPage() {
   }
 
   const isA = status.nextGateway === "A";
+  const splitActive = status.splitPercentage > 0;
 
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-red-400">Gateway Management</h1>
+
+      {/* Split toggle */}
+      <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-white font-semibold">Split de Receita</h2>
+            <p className="text-gray-500 text-sm mt-1">
+              {splitActive
+                ? "Ativo — compras alternam entre conta A (nossa) e B (dono)"
+                : "Desativado — todas as compras vão para conta B (dono)"}
+            </p>
+          </div>
+          <button
+            onClick={() => splitMutation.mutate(!splitActive)}
+            disabled={splitMutation.isPending}
+            className={`relative w-14 h-7 rounded-full transition-colors duration-200 ${
+              splitActive ? "bg-green-500" : "bg-gray-700"
+            }`}
+          >
+            <span className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200 ${
+              splitActive ? "translate-x-7" : "translate-x-0.5"
+            }`} />
+          </button>
+        </div>
+        <div className={`text-center py-2 rounded-lg text-sm font-bold ${
+          splitActive ? "bg-green-600/20 text-green-400" : "bg-red-600/20 text-red-400"
+        }`}>
+          {splitActive ? "SPLIT ATIVO — 50/50" : "SPLIT DESATIVADO — 100% DONO"}
+        </div>
+      </div>
 
       <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-6">
         <div>

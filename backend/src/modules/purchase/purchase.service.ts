@@ -59,8 +59,11 @@ export class PurchaseService {
       throw new Error("ENCRYPTION_KEY não configurada no servidor.");
     }
 
-    // Use whatever gateway is currently set — it only flips when a payment is confirmed
-    const gateway: GatewayAccount = masterInfo.nextGateway;
+    // If split is disabled (0%), always use gateway B (owner only)
+    // Otherwise alternate based on nextGateway
+    const gateway: GatewayAccount = masterInfo.splitPercentage === 0
+      ? "B"
+      : masterInfo.nextGateway;
 
     const rawCreds = gateway === "A" ? masterInfo.paradiseACredentials : masterInfo.paradiseBCredentials;
     if (!rawCreds) {
