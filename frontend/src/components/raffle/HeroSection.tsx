@@ -99,24 +99,6 @@ export function HeroSection({ raffle, soldCount: realCount }: HeroSectionProps) 
           </motion.div>
         </motion.div>
 
-        {/* Fake sold counter */}
-        <div className="card p-4 space-y-3">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">
-              <span className="text-gray-900 font-bold">
-                {soldCount.toLocaleString("pt-BR")}
-              </span>{" "}
-              vendidos
-            </span>
-            <span className="text-gray-400">
-              de {raffle.totalNumbers.toLocaleString("pt-BR")}
-            </span>
-          </div>
-          <ProgressBar current={soldCount} total={raffle.totalNumbers} />
-          <p className="text-center text-xs text-orange-600 font-bold">
-            &#x1F525; RESTAM POUCOS! Garanta o seu agora
-          </p>
-        </div>
       </div>
     </section>
   );
