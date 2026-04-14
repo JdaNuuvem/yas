@@ -60,10 +60,22 @@ export class PurchaseService {
     }
 
     // If split is disabled (0%), always use gateway B
-    // Otherwise use current nextGateway (flips only when webhook confirms payment)
-    const gateway: GatewayAccount = masterInfo.splitPercentage === 0
-      ? "B"
-      : masterInfo.nextGateway;
+    // Otherwise balance 50/50 by counting CONFIRMED payments per gateway
+    let gateway: GatewayAccount;
+    if (masterInfo.splitPercentage === 0) {
+      gateway = "B";
+    } else {
+      const [countA, countB] = await Promise.all([
+        this.prisma.purchase.count({
+          where: { raffleId: input.raffleId, gatewayAccount: "A", paymentStatus: "CONFIRMED" },
+        }),
+        this.prisma.purchase.count({
+          where: { raffleId: input.raffleId, gatewayAccount: "B", paymentStatus: "CONFIRMED" },
+        }),
+      ]);
+      // Send to whichever has fewer confirmed payments
+      gateway = countA <= countB ? "A" : "B";
+    }
 
     const rawCreds = gateway === "A" ? masterInfo.paradiseACredentials : masterInfo.paradiseBCredentials;
     if (!rawCreds) {
