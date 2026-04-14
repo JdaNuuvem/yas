@@ -1,0 +1,280 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Coolify" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.463" [ref=e9] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.463
+        - button / [ref=e11]:
+          - img [ref=e12]
+          - generic [ref=e14]: /
+        - button "Preferences 9+" [ref=e17] [cursor=pointer]:
+          - img "Preferences" [ref=e18]
+          - generic [ref=e20]: 9+
+      - combobox [ref=e23]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+        - option "GDR"
+      - list [ref=e24]:
+        - listitem [ref=e25]:
+          - list [ref=e26]:
+            - listitem [ref=e27]:
+              - link "Dashboard" [ref=e28] [cursor=pointer]:
+                - /url: /
+                - img [ref=e29]
+                - generic [ref=e31]: Dashboard
+            - listitem [ref=e32]:
+              - link "Projects" [ref=e33] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e34]
+                - generic [ref=e39]: Projects
+            - listitem [ref=e40]:
+              - link "Servers" [ref=e41] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e42]
+                - generic [ref=e47]: Servers
+            - listitem [ref=e48]:
+              - link "Sources" [ref=e49] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/sources
+                - img [ref=e50]
+                - generic [ref=e52]: Sources
+            - listitem [ref=e53]:
+              - link "Destinations" [ref=e54] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/destinations
+                - img [ref=e55]
+                - generic [ref=e57]: Destinations
+            - listitem [ref=e58]:
+              - link "S3 Storages" [ref=e59] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/storages
+                - img [ref=e60]
+                - generic [ref=e65]: S3 Storages
+            - listitem [ref=e66]:
+              - link "Shared Variables" [ref=e67] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/shared-variables
+                - img [ref=e68]
+                - generic [ref=e72]: Shared Variables
+            - listitem [ref=e73]:
+              - link "Notifications" [ref=e74] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/notifications/email
+                - img [ref=e75]
+                - generic [ref=e77]: Notifications
+            - listitem [ref=e78]:
+              - link "Keys & Tokens" [ref=e79] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/security/private-key
+                - img [ref=e80]
+                - generic [ref=e82]: Keys & Tokens
+            - listitem [ref=e83]:
+              - link "Tags" [ref=e84] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/tags
+                - img [ref=e85]
+                - generic [ref=e89]: Tags
+            - listitem [ref=e90]:
+              - link "Terminal" [ref=e91] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/terminal
+                - img [ref=e92]
+                - generic [ref=e95]: Terminal
+            - listitem [ref=e96]:
+              - link "Profile" [ref=e97] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/profile
+                - img [ref=e98]
+                - generic [ref=e103]: Profile
+            - listitem [ref=e104]:
+              - link "Teams" [ref=e105] [cursor=pointer]:
+                - /url: http://187.124.112.164:8000/team
+                - img [ref=e106]
+                - generic [ref=e114]: Teams
+            - listitem [ref=e115]:
+              - link "Settings" [ref=e116] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e117]
+                - generic [ref=e121]: Settings
+            - generic:
+              - listitem:
+                - generic "No upgrade available"
+            - listitem [ref=e123]:
+              - link "Sponsor us" [ref=e124] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e125]
+                - generic [ref=e129]: Sponsor us
+            - listitem [ref=e130]:
+              - generic "Send us feedback or get help!" [ref=e133] [cursor=pointer]:
+                - img [ref=e134]
+                - generic [ref=e136]: Feedback
+            - listitem [ref=e137]:
+              - button "Logout" [ref=e139]:
+                - img [ref=e140]
+                - generic [ref=e142]: Logout
+    - main [ref=e143]:
+      - generic [ref=e145]:
+        - heading "Dashboard" [level=1] [ref=e146]
+        - generic [ref=e147]: Your self-hosted infrastructure.
+        - generic [ref=e148]:
+          - generic [ref=e149]:
+            - heading "Projects" [level=3] [ref=e150]
+            - button [ref=e153] [cursor=pointer]:
+              - img [ref=e154]
+          - generic [ref=e156]:
+            - generic [ref=e157] [cursor=pointer]:
+              - link [ref=e158]:
+                - /url: http://187.124.112.164:8000/project/wsokckws0k0cw0g4o48sow4o/environment/tgcko8000ks0404k0kc48cwk
+              - generic [ref=e159]:
+                - generic [ref=e160]:
+                  - generic [ref=e161]: BlinkHelix
+                  - generic [ref=e162]: Plataforma de jogos BlinkHelix
+                - generic [ref=e163]:
+                  - link "+ Add Resource" [ref=e164]:
+                    - /url: http://187.124.112.164:8000/project/wsokckws0k0cw0g4o48sow4o/environment/tgcko8000ks0404k0kc48cwk/new
+                  - link "Settings" [ref=e165]:
+                    - /url: http://187.124.112.164:8000/project/wsokckws0k0cw0g4o48sow4o/edit
+            - generic [ref=e166] [cursor=pointer]:
+              - link [ref=e167]:
+                - /url: http://187.124.112.164:8000/project/c4kosoogocso8gsc04gsswss/environment/uw80s080ggcgs80wo4o4w48s
+              - generic [ref=e168]:
+                - generic [ref=e170]: carros
+                - generic [ref=e171]:
+                  - link "+ Add Resource" [ref=e172]:
+                    - /url: http://187.124.112.164:8000/project/c4kosoogocso8gsc04gsswss/environment/uw80s080ggcgs80wo4o4w48s/new
+                  - link "Settings" [ref=e173]:
+                    - /url: http://187.124.112.164:8000/project/c4kosoogocso8gsc04gsswss/edit
+            - generic [ref=e174] [cursor=pointer]:
+              - link [ref=e175]:
+                - /url: http://187.124.112.164:8000/project/t40kgw04oooosowckgwcck8c/environment/nkks8scswo8s40gkk88c8ck4
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - generic [ref=e178]: chinesadom
+                  - generic [ref=e179]: Plataforma de jogos chinesadom
+                - generic [ref=e180]:
+                  - link "+ Add Resource" [ref=e181]:
+                    - /url: http://187.124.112.164:8000/project/t40kgw04oooosowckgwcck8c/environment/nkks8scswo8s40gkk88c8ck4/new
+                  - link "Settings" [ref=e182]:
+                    - /url: http://187.124.112.164:8000/project/t40kgw04oooosowckgwcck8c/edit
+            - generic [ref=e183] [cursor=pointer]:
+              - link [ref=e184]:
+                - /url: http://187.124.112.164:8000/project/josccc4w880wwk4k0wss4g4c/environment/moc00w44wog44o004c4sc4gc
+              - generic [ref=e185]:
+                - generic [ref=e186]:
+                  - generic [ref=e187]: helix cliente 1
+                  - generic [ref=e188]: Plataforma de jogos Helix - Cliente 1
+                - generic [ref=e189]:
+                  - link "+ Add Resource" [ref=e190]:
+                    - /url: http://187.124.112.164:8000/project/josccc4w880wwk4k0wss4g4c/environment/moc00w44wog44o004c4sc4gc/new
+                  - link "Settings" [ref=e191]:
+                    - /url: http://187.124.112.164:8000/project/josccc4w880wwk4k0wss4g4c/edit
+            - generic [ref=e192] [cursor=pointer]:
+              - link [ref=e193]:
+                - /url: http://187.124.112.164:8000/project/uc8sws8gk448wo0g004kk8s4/environment/bo08sk80o04sgwkk0g0ccgs8
+              - generic [ref=e194]:
+                - generic [ref=e195]:
+                  - generic [ref=e196]: HelixWins
+                  - generic [ref=e197]: Plataforma de jogos HelixWins com gateway AmploPay
+                - generic [ref=e198]:
+                  - link "+ Add Resource" [ref=e199]:
+                    - /url: http://187.124.112.164:8000/project/uc8sws8gk448wo0g004kk8s4/environment/bo08sk80o04sgwkk0g0ccgs8/new
+                  - link "Settings" [ref=e200]:
+                    - /url: http://187.124.112.164:8000/project/uc8sws8gk448wo0g004kk8s4/edit
+            - generic [ref=e201] [cursor=pointer]:
+              - link [ref=e202]:
+                - /url: http://187.124.112.164:8000/project/oss8wk00w8w0ws8wgwgo00c4/environment/wsgggg0scgg0kow0kkwco0kw
+              - generic [ref=e203]:
+                - generic [ref=e204]:
+                  - generic [ref=e205]: imports china brasil
+                  - generic [ref=e206]: Loja headless Next.js + Express + Postgres
+                - generic [ref=e207]:
+                  - link "+ Add Resource" [ref=e208]:
+                    - /url: http://187.124.112.164:8000/project/oss8wk00w8w0ws8wgwgo00c4/environment/wsgggg0scgg0kow0kkwco0kw/new
+                  - link "Settings" [ref=e209]:
+                    - /url: http://187.124.112.164:8000/project/oss8wk00w8w0ws8wgwgo00c4/edit
+            - generic [ref=e210] [cursor=pointer]:
+              - link [ref=e211]:
+                - /url: http://187.124.112.164:8000/project/s80cwwwcs0g0wwc8oko0s00o/environment/jgkwgw4wkosccgo4k08s8g04
+              - generic [ref=e212]:
+                - generic [ref=e213]:
+                  - generic [ref=e214]: imports china brasil 2
+                  - generic [ref=e215]: Loja headless Next.js + Express + Postgres - Cliente 2
+                - generic [ref=e216]:
+                  - link "+ Add Resource" [ref=e217]:
+                    - /url: http://187.124.112.164:8000/project/s80cwwwcs0g0wwc8oko0s00o/environment/jgkwgw4wkosccgo4k08s8g04/new
+                  - link "Settings" [ref=e218]:
+                    - /url: http://187.124.112.164:8000/project/s80cwwwcs0g0wwc8oko0s00o/edit
+            - generic [ref=e219] [cursor=pointer]:
+              - link [ref=e220]:
+                - /url: http://187.124.112.164:8000/project/hs4wwokkwcww0kc8gcw00g8c/environment/zsg40o4o04co88ogc8wkss04
+              - generic [ref=e221]:
+                - generic [ref=e222]:
+                  - generic [ref=e223]: imports china brasil 3
+                  - generic [ref=e224]: Loja headless Next.js + Express + Postgres - Cliente 3
+                - generic [ref=e225]:
+                  - link "+ Add Resource" [ref=e226]:
+                    - /url: http://187.124.112.164:8000/project/hs4wwokkwcww0kc8gcw00g8c/environment/zsg40o4o04co88ogc8wkss04/new
+                  - link "Settings" [ref=e227]:
+                    - /url: http://187.124.112.164:8000/project/hs4wwokkwcww0kc8gcw00g8c/edit
+            - generic [ref=e228] [cursor=pointer]:
+              - link [ref=e229]:
+                - /url: http://187.124.112.164:8000/project/coowkw0cgc80wskog8k8gwg8/environment/pkcwg44084o4k4gwsg4ccwk0
+              - generic [ref=e230]:
+                - generic [ref=e231]:
+                  - generic [ref=e232]: imports china brasil 4
+                  - generic [ref=e233]: Loja headless Next.js + Express + Postgres - Cliente 4
+                - generic [ref=e234]:
+                  - link "+ Add Resource" [ref=e235]:
+                    - /url: http://187.124.112.164:8000/project/coowkw0cgc80wskog8k8gwg8/environment/pkcwg44084o4k4gwsg4ccwk0/new
+                  - link "Settings" [ref=e236]:
+                    - /url: http://187.124.112.164:8000/project/coowkw0cgc80wskog8k8gwg8/edit
+            - generic [ref=e237] [cursor=pointer]:
+              - link [ref=e238]:
+                - /url: http://187.124.112.164:8000/project/c8wkkk0w4csccwgg8kkgc8gs/environment/xsws0c8sgwwc0s48c4w8ccg0
+              - generic [ref=e239]:
+                - generic [ref=e240]:
+                  - generic [ref=e241]: Mega Rifa Yasmin
+                  - generic [ref=e242]: Plataforma de rifa digital com gateway Paradise e split 50/50
+                - generic [ref=e243]:
+                  - link "+ Add Resource" [ref=e244]:
+                    - /url: http://187.124.112.164:8000/project/c8wkkk0w4csccwgg8kkgc8gs/environment/xsws0c8sgwwc0s48c4w8ccg0/new
+                  - link "Settings" [ref=e245]:
+                    - /url: http://187.124.112.164:8000/project/c8wkkk0w4csccwgg8kkgc8gs/edit
+            - generic [ref=e246] [cursor=pointer]:
+              - link [ref=e247]:
+                - /url: http://187.124.112.164:8000/project/okkogk0kcwo4c4cwwg088ckg/environment/qks08s8k8g0wc4c4co8gs4g4
+              - generic [ref=e248]:
+                - generic [ref=e250]: moneybet
+                - generic [ref=e251]:
+                  - link "+ Add Resource" [ref=e252]:
+                    - /url: http://187.124.112.164:8000/project/okkogk0kcwo4c4cwwg088ckg/environment/qks08s8k8g0wc4c4co8gs4g4/new
+                  - link "Settings" [ref=e253]:
+                    - /url: http://187.124.112.164:8000/project/okkogk0kcwo4c4cwwg088ckg/edit
+            - generic [ref=e254] [cursor=pointer]:
+              - link [ref=e255]:
+                - /url: http://187.124.112.164:8000/project/bskc0ww000c0ogswk4wowgcg/environment/f4w84cc0c4o4s4gk4w4goww0
+              - generic [ref=e256]:
+                - generic [ref=e258]: My first project
+                - generic [ref=e259]:
+                  - link "+ Add Resource" [ref=e260]:
+                    - /url: http://187.124.112.164:8000/project/bskc0ww000c0ogswk4wowgcg/environment/f4w84cc0c4o4s4gk4w4goww0/new
+                  - link "Settings" [ref=e261]:
+                    - /url: http://187.124.112.164:8000/project/bskc0ww000c0ogswk4wowgcg/edit
+            - generic [ref=e262] [cursor=pointer]:
+              - link [ref=e263]:
+                - /url: http://187.124.112.164:8000/project/a4coowcckccwkgo0sgcwosg8/environment/sg4kgkkccowggkck480kwg8g
+              - generic [ref=e264]:
+                - generic [ref=e265]:
+                  - generic [ref=e266]: subway cliente 1
+                  - generic [ref=e267]: Plataforma de jogos Subway - Cliente 1
+                - generic [ref=e268]:
+                  - link "+ Add Resource" [ref=e269]:
+                    - /url: http://187.124.112.164:8000/project/a4coowcckccwkgo0sgcwosg8/environment/sg4kgkkccowggkck480kwg8g/new
+                  - link "Settings" [ref=e270]:
+                    - /url: http://187.124.112.164:8000/project/a4coowcckccwkgo0sgcwosg8/edit
+        - generic [ref=e271]:
+          - generic [ref=e272]:
+            - heading "Servers" [level=3] [ref=e273]
+            - button [ref=e276] [cursor=pointer]:
+              - img [ref=e277]
+          - link "localhost This is the server where Coolify is running on. Don't delete this!" [ref=e280] [cursor=pointer]:
+            - /url: http://187.124.112.164:8000/server/m4occw4gw8sgc4koogs8kowg
+            - generic [ref=e281]:
+              - generic [ref=e282]: localhost
+              - generic [ref=e283]: This is the server where Coolify is running on. Don't delete this!
+  - img
+  - list

@@ -1,0 +1,11 @@
+[  956629ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://187.124.112.164:8000/api/v1/applications/icgs0sowkk484k8sgoogwk0c/envs:0
+[  956847ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://187.124.112.164:8000/api/v1/applications/icgs0sowkk484k8sgoogwk0c/envs:0
+[  957063ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://187.124.112.164:8000/api/v1/applications/icgs0sowkk484k8sgoogwk0c/envs:0
+[  957290ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://187.124.112.164:8000/api/v1/applications/icgs0sowkk484k8sgoogwk0c/envs:0
+[  957504ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://187.124.112.164:8000/api/v1/applications/icgs0sowkk484k8sgoogwk0c/envs:0
+[  957714ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://187.124.112.164:8000/api/v1/applications/icgs0sowkk484k8sgoogwk0c/envs:0
+[ 1098234ms] [WARNING] [Terminal] WebSocket not ready, message not sent: {checkActive: force} @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[ 1098328ms] [LOG] [Terminal] Attempting connection to: ws://187.124.112.164:6002/terminal/ws @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[ 1098887ms] [LOG] [Terminal] WebSocket connection established. Cool cool cool cool cool cool. @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[ 1133891ms] [WARNING] [Terminal] Ping timeout - missed 1/3 @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[ 1186833ms] [LOG] [Terminal] Tab hidden, pausing heartbeat monitoring @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
