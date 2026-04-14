@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 
 interface MilestoneProgressProps {
   raffleId: string;
-  prizes: { position: number; name: string; winnerNumber: number | null }[];
+  prizes: { position: number; name: string; winnerNumber: number | null; winnerCpfMasked?: string | null }[];
 }
 
 export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) {
@@ -127,7 +127,7 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                   </p>
                   <p className="text-[11px] text-gray-400">
                     {prize.winnerNumber
-                      ? `Ganhador: ${prize.winnerNumber.toString().padStart(6, "0")}`
+                      ? `Ganhador: ${prize.winnerNumber.toString().padStart(6, "0")}${prize.winnerCpfMasked ? ` — ${prize.winnerCpfMasked}` : ""}`
                       : unlocked
                         ? "Liberado — aguardando sorteio"
                         : isNext
