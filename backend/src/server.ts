@@ -175,6 +175,34 @@ export async function buildServer() {
     return { status: "already seeded", raffleId: raffle.id };
   });
 
+  // Seed 1M numbers in batches via raw SQL
+  server.get("/api/seed-numbers", async (request, reply) => {
+    const secret = (request.query as any).secret;
+    if (secret !== env.JWT_SECRET) {
+      return reply.status(404).send({ error: "Not found" });
+    }
+    const { prisma } = await import("./lib/prisma.js");
+    const raffle = await prisma.raffle.findFirst({ where: { status: "ACTIVE" } });
+    if (!raffle) return { error: "No active raffle" };
+
+    const existing = await prisma.number.count({ where: { raffleId: raffle.id } });
+    if (existing > 0) return { status: "already has numbers", count: existing };
+
+    const BATCH = 10000;
+    const TOTAL = 1000000;
+    for (let i = 0; i < TOTAL; i += BATCH) {
+      const values = Array.from({ length: BATCH }, (_, j) => {
+        const num = i + j + 1;
+        return `('${raffle.id}', ${num}, 'AVAILABLE')`;
+      }).join(",");
+      await (prisma as any).$executeRawUnsafe(
+        `INSERT INTO numbers (raffle_id, number_value, status) VALUES ${values} ON CONFLICT DO NOTHING`
+      );
+    }
+    const finalCount = await prisma.number.count({ where: { raffleId: raffle.id } });
+    return { status: "numbers seeded", count: finalCount };
+  });
+
   return server;
 }
 
