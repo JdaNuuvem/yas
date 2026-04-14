@@ -92,6 +92,68 @@ export async function buildServer() {
     }
   });
 
+  // One-time seed endpoint
+  server.get("/api/seed", async (request, reply) => {
+    const secret = (request.query as any).secret;
+    if (secret !== env.JWT_SECRET) {
+      return reply.status(404).send({ error: "Not found" });
+    }
+    const { prisma } = await import("./lib/prisma.js");
+    const bcrypt = await import("bcrypt");
+
+    const adminHash = await bcrypt.hash("admin123", 10);
+    const masterHash = await bcrypt.hash("master123", 10);
+
+    await prisma.adminUser.upsert({
+      where: { email: "admin@rifa.com" },
+      update: {},
+      create: { email: "admin@rifa.com", passwordHash: adminHash, name: "Administrador", role: "ADMIN" },
+    });
+    await prisma.adminUser.upsert({
+      where: { email: "master@rifa.com" },
+      update: {},
+      create: { email: "master@rifa.com", passwordHash: masterHash, name: "Master", role: "MASTER" },
+    });
+
+    const existing = await prisma.masterConfig.findFirst();
+    if (!existing) {
+      await prisma.masterConfig.create({ data: { splitPercentage: 50, nextGateway: "A" } });
+    }
+
+    const raffle = await prisma.raffle.findFirst({ where: { status: "ACTIVE" } });
+    if (!raffle) {
+      const r = await prisma.raffle.create({
+        data: {
+          name: "Mega Rifa da Moto",
+          description: "Concorra a uma Moto Honda CG 160 0km e mais 9 premios incriveis! Apenas R$0,20 por numero.",
+          status: "ACTIVE",
+          totalNumbers: 1000000,
+          numberPrice: 0.20,
+          minPurchase: 5.00,
+          themeColors: { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#FFD700" },
+        },
+      });
+      const prizes = [
+        { position: 1, name: "Moto Honda CG 160", description: "Moto Honda CG 160 0km" },
+        { position: 2, name: "Smart TV 55\"", description: "Smart TV LED 55\" 4K UHD" },
+        { position: 3, name: "iPhone 15", description: "iPhone 15 128GB" },
+        { position: 4, name: "Notebook", description: "Notebook Intel Core i5 8GB RAM" },
+        { position: 5, name: "Air Fryer", description: "Air Fryer Digital 5.5L" },
+        { position: 6, name: "PIX R$500", description: "Premio em dinheiro via PIX" },
+        { position: 7, name: "PIX R$300", description: "Premio em dinheiro via PIX" },
+        { position: 8, name: "PIX R$200", description: "Premio em dinheiro via PIX" },
+        { position: 9, name: "PIX R$100", description: "Premio em dinheiro via PIX" },
+        { position: 10, name: "PIX R$50", description: "Premio em dinheiro via PIX" },
+        { position: 11, name: "PIX R$25", description: "Premio em dinheiro via PIX" },
+      ];
+      for (const p of prizes) {
+        await prisma.prize.create({ data: { raffleId: r.id, ...p } });
+      }
+      return { status: "seeded", raffleId: r.id };
+    }
+    return { status: "already seeded", raffleId: raffle.id };
+  });
+
   return server;
 }
 
