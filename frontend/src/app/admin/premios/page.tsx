@@ -23,10 +23,20 @@ export default function AdminPrêmiosPage() {
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["raffle"] });
 
+  const [saveError, setSaveError] = useState("");
+
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: { name?: string; description?: string } }) =>
       api.adminUpdatePrize(id, data),
-    onSuccess: () => { invalidate(); setEditingId(null); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+      queryClient.refetchQueries({ queryKey: ["raffle"] });
+      setEditingId(null);
+      setSaveError("");
+    },
+    onError: (err) => {
+      setSaveError(err instanceof Error ? err.message : "Erro ao salvar");
+    },
   });
 
   const deleteMutation = useMutation({
@@ -160,6 +170,7 @@ export default function AdminPrêmiosPage() {
                   placeholder="Descrição"
                   className="w-full rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-white text-sm"
                 />
+                {saveError && <p className="text-red-400 text-sm">{saveError}</p>}
                 <div className="flex gap-2">
                   <button
                     onClick={() => saveEdit(prize.id)}
@@ -169,7 +180,7 @@ export default function AdminPrêmiosPage() {
                     {updateMutation.isPending ? "Salvando..." : "Salvar"}
                   </button>
                   <button
-                    onClick={() => setEditingId(null)}
+                    onClick={() => { setEditingId(null); setSaveError(""); }}
                     className="text-gray-400 hover:text-white text-sm px-4 py-2"
                   >
                     Cancelar
