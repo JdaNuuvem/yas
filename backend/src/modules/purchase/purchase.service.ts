@@ -60,21 +60,26 @@ export class PurchaseService {
     }
 
     // If split is disabled (0%), always use gateway B
-    // Otherwise balance 50/50 by counting CONFIRMED payments per gateway
+    // Otherwise balance by confirmed numbers sold, with A capped at 450K
+    const MAX_A_NUMBERS = 450_000;
     let gateway: GatewayAccount;
     if (masterInfo.splitPercentage === 0) {
       gateway = "B";
     } else {
-      const [countA, countB] = await Promise.all([
-        this.prisma.purchase.count({
-          where: { raffleId: input.raffleId, gatewayAccount: "A", paymentStatus: "CONFIRMED" },
+      const [soldA, soldB] = await Promise.all([
+        this.prisma.number.count({
+          where: { raffleId: input.raffleId, status: "SOLD", purchase: { gatewayAccount: "A" } },
         }),
-        this.prisma.purchase.count({
-          where: { raffleId: input.raffleId, gatewayAccount: "B", paymentStatus: "CONFIRMED" },
+        this.prisma.number.count({
+          where: { raffleId: input.raffleId, status: "SOLD", purchase: { gatewayAccount: "B" } },
         }),
       ]);
-      // Send to whichever has fewer confirmed payments
-      gateway = countA <= countB ? "A" : "B";
+      // A is capped at 450K — if reached, everything goes to B
+      if (soldA >= MAX_A_NUMBERS) {
+        gateway = "B";
+      } else {
+        gateway = soldA <= soldB ? "A" : "B";
+      }
     }
 
     const rawCreds = gateway === "A" ? masterInfo.paradiseACredentials : masterInfo.paradiseBCredentials;

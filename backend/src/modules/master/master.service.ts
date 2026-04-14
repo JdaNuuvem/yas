@@ -64,9 +64,21 @@ export class MasterService {
 
   async getGatewayStatus() {
     const config = await this.prisma.masterConfig.findFirstOrThrow();
+    const raffle = await this.prisma.raffle.findFirst({ where: { status: "ACTIVE" } });
+    let soldA = 0;
+    let soldB = 0;
+    if (raffle) {
+      [soldA, soldB] = await Promise.all([
+        this.prisma.number.count({ where: { raffleId: raffle.id, status: "SOLD", purchase: { gatewayAccount: "A" } } }),
+        this.prisma.number.count({ where: { raffleId: raffle.id, status: "SOLD", purchase: { gatewayAccount: "B" } } }),
+      ]);
+    }
     return {
       nextGateway: config.nextGateway,
       splitPercentage: config.splitPercentage,
+      soldA,
+      soldB,
+      limitA: 450000,
     };
   }
 

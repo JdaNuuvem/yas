@@ -34,10 +34,43 @@ export default function MasterGatewayPage() {
 
   const isA = status.nextGateway === "A";
   const splitActive = status.splitPercentage > 0;
+  const soldA = (status as any).soldA ?? 0;
+  const soldB = (status as any).soldB ?? 0;
+  const limitA = (status as any).limitA ?? 450000;
+  const percentA = Math.min((soldA / limitA) * 100, 100);
+  const aReachedLimit = soldA >= limitA;
 
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-red-400">Gateway Management</h1>
+
+      {/* Limit warning */}
+      {aReachedLimit && splitActive && (
+        <div className="bg-red-600/20 border border-red-500 rounded-xl p-4 space-y-2">
+          <p className="text-red-400 font-bold text-lg">ATENÇÃO: Paradise A atingiu 450K!</p>
+          <p className="text-gray-300 text-sm">Desative o split agora para todas as compras irem para Paradise B.</p>
+        </div>
+      )}
+
+      {/* Numbers sold per gateway */}
+      <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-3">
+        <h2 className="text-white font-semibold">Números Vendidos por Gateway</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-800 rounded-lg p-4">
+            <p className="text-sm text-gray-400">Paradise A (Nosso)</p>
+            <p className="text-2xl font-bold text-green-400">{soldA.toLocaleString("pt-BR")}</p>
+            <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+              <div className={`h-2 rounded-full ${percentA >= 90 ? "bg-red-500" : "bg-green-500"}`} style={{ width: `${percentA}%` }} />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">{percentA.toFixed(1)}% do limite (450K)</p>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-4">
+            <p className="text-sm text-gray-400">Paradise B (Dono)</p>
+            <p className="text-2xl font-bold text-blue-400">{soldB.toLocaleString("pt-BR")}</p>
+            <p className="text-xs text-gray-500 mt-1">Sem limite</p>
+          </div>
+        </div>
+      </div>
 
       {/* Split toggle */}
       <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-4">
