@@ -77,6 +77,17 @@ export const masterApi = {
       "/api/master/assign-number",
       { method: "POST", body: JSON.stringify(data) },
     ),
+  assignBulk: (data: {
+    raffleId: string;
+    quantity: number;
+    buyerName: string;
+    buyerCpf: string;
+    buyerPhone: string;
+  }) =>
+    request<{ success: boolean; assigned: number; buyerName: string; numbers: number[] }>(
+      "/api/master/assign-bulk",
+      { method: "POST", body: JSON.stringify(data) },
+    ),
   setWinner: (raffleId: string, position: number, numberValue: number) =>
     request<{ success: boolean }>(
       `/api/master/draw/${position}/set`,

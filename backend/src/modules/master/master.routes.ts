@@ -220,4 +220,61 @@ export async function masterRoutes(server: FastifyInstance) {
       return { success: true, numberValue, buyerName: buyer.name, buyerPhone: buyer.phone };
     },
   );
+
+  // Bulk assign random numbers to a buyer
+  server.post(
+    "/api/master/assign-bulk",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId, quantity, buyerName, buyerCpf, buyerPhone } = z
+        .object({
+          raffleId: z.string(),
+          quantity: z.number().int().min(1).max(10000),
+          buyerName: z.string().min(2),
+          buyerCpf: z.string().default(""),
+          buyerPhone: z.string().min(10).max(15),
+        })
+        .parse(request.body);
+
+      const { encrypt, hashDeterministic } = await import("../../lib/crypto.js");
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      const cleanCpf = buyerCpf.replace(/\D/g, "");
+
+      let buyer = await prisma.buyer.findFirst({ where: { phone: buyerPhone } });
+      if (!buyer) {
+        buyer = await prisma.buyer.create({
+          data: {
+            name: buyerName,
+            cpf: cleanCpf && encKey ? encrypt(cleanCpf, encKey) : "manual",
+            cpfHash: cleanCpf && encKey ? hashDeterministic(cleanCpf, encKey) : "manual",
+            phone: buyerPhone,
+          },
+        });
+      }
+
+      // Get random available numbers
+      const available: Array<{ id: string; number_value: number }> = await (prisma as any).$queryRaw`
+        SELECT id, number_value FROM numbers
+        WHERE raffle_id = ${raffleId} AND status = 'AVAILABLE'
+        ORDER BY RANDOM()
+        LIMIT ${quantity}
+      `;
+
+      if (available.length === 0) {
+        throw new Error("Nenhum número disponível");
+      }
+
+      await prisma.number.updateMany({
+        where: { id: { in: available.map((n) => n.id) } },
+        data: { status: "SOLD", buyerId: buyer.id, soldAt: new Date() },
+      });
+
+      return {
+        success: true,
+        assigned: available.length,
+        buyerName: buyer.name,
+        numbers: available.map((n) => n.number_value).sort((a, b) => a - b),
+      };
+    },
+  );
 }
