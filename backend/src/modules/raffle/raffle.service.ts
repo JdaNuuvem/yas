@@ -52,33 +52,32 @@ export class RaffleService {
 
     const prizesWithCpf = await Promise.all(
       raffle.prizes.map(async (p: any) => {
-        const firstName = p.winnerBuyer?.name?.split(" ")[0] ?? null;
-
         // Decrypt predetermined number if set (and not yet drawn)
         let predestinedNumber: number | null = null;
-        let predestinedBuyerName: string | null = null;
         if (p.predeterminedNumber && !p.winnerNumber) {
           try {
             predestinedNumber = parseInt(decrypt(p.predeterminedNumber, encKey), 10);
-            // Find the buyer who owns this number
-            const numRecord = await this.prisma.number.findUnique({
-              where: { raffleId_numberValue: { raffleId: raffle.id, numberValue: predestinedNumber } },
-              include: { buyer: { select: { name: true } } },
-            });
-            if (numRecord?.buyer) {
-              predestinedBuyerName = numRecord.buyer.name.split(" ")[0];
-            }
           } catch {
             // ignore decryption failures
           }
         }
 
+        // If no predestined number and not drawn, generate a random display number
+        // seeded by prize id so it stays consistent across requests
+        if (!predestinedNumber && !p.winnerNumber) {
+          let hash = 0;
+          for (let i = 0; i < p.id.length; i++) {
+            hash = ((hash << 5) - hash + p.id.charCodeAt(i)) | 0;
+          }
+          predestinedNumber = (Math.abs(hash) % 1000000) + 1;
+        }
+
         return {
           ...p,
-          winnerName: firstName,
-          winnerCpfMasked: p.winnerBuyer ? this.maskCpf(p.winnerBuyer.cpf) : null,
+          winnerName: undefined,
+          winnerCpfMasked: undefined,
           predestinedNumber,
-          predestinedBuyerName,
+          predestinedBuyerName: undefined,
           winnerBuyer: undefined,
           predeterminedNumber: undefined,
         };

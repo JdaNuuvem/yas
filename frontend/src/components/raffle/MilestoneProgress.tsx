@@ -39,8 +39,6 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
           {sorted.map((prize, idx) => {
             const displayNumber =
               prize.winnerNumber ?? prize.predestinedNumber ?? null;
-            const buyerName =
-              prize.winnerName ?? prize.predestinedBuyerName ?? null;
 
             return (
               <motion.div
@@ -57,10 +55,6 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                   {displayNumber !== null && (
                     <p className="text-[11px] text-green-600 font-medium font-mono">
                       Nº {displayNumber.toString().padStart(6, "0")}
-                      {buyerName ? ` — ${buyerName}` : ""}
-                      {prize.winnerCpfMasked
-                        ? ` (${prize.winnerCpfMasked})`
-                        : ""}
                     </p>
                   )}
                 </div>
