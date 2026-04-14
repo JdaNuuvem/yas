@@ -1,13 +1,56 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { api } from "@/lib/api";
+
+function PurchaseCard({ purchase: p }: { purchase: Awaited<ReturnType<typeof api.getMyPurchases>>[0] }) {
+  const [showAll, setShowAll] = useState(false);
+  const PREVIEW_COUNT = 20;
+  const hasMore = p.numbers.length > PREVIEW_COUNT;
+  const visibleNumbers = showAll ? p.numbers : p.numbers.slice(0, PREVIEW_COUNT);
+
+  return (
+    <div className="border border-gray-100 bg-gray-50 rounded-xl p-4">
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          <h4 className="font-semibold text-sm text-gray-800">{p.raffle.name}</h4>
+          <p className="text-xs text-gray-500">
+            {new Date(p.createdAt).toLocaleDateString("pt-BR")} — {p.numbers.length} números
+          </p>
+        </div>
+        <span className={`text-xs font-bold px-2 py-1 rounded-md ${
+          p.paymentStatus === "CONFIRMED" ? "bg-green-100 text-green-700" :
+          p.paymentStatus === "PENDING" ? "bg-orange-100 text-orange-700" :
+          "bg-red-100 text-red-700"
+        }`}>
+          {p.paymentStatus === "CONFIRMED" ? "PAGO" :
+           p.paymentStatus === "PENDING" ? "PENDENTE" : "EXPIRADO"}
+        </span>
+      </div>
+
+      <div className="mt-3 mb-2 flex flex-wrap gap-1">
+        {visibleNumbers.map((n, idx) => (
+          <span key={idx} className="bg-white border border-gray-200 text-gray-700 text-xs font-mono px-2 py-1 rounded">
+            {n.numberValue.toString().padStart(6, "0")}
+          </span>
+        ))}
+      </div>
+
+      {hasMore && (
+        <button
+          onClick={() => setShowAll(!showAll)}
+          className="text-green-600 text-xs font-bold mt-1"
+        >
+          {showAll ? "Mostrar menos" : `Ver todos (${p.numbers.length} números)`}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export function MyNumbers() {
   const [isOpen, setIsOpen] = useState(false);
   const [phone, setPhone] = useState("");
-  
   const [purchases, setPurchases] = useState<Awaited<ReturnType<typeof api.getMyPurchases>> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,20 +81,11 @@ export function MyNumbers() {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full card p-4 flex items-center justify-center gap-3 active:scale-[0.98] transition-transform"
       >
-        <svg
-          width="20"
-          height="20"
-          fill="none"
-          stroke="#2d6a4f"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
+        <svg width="20" height="20" fill="none" stroke="#2d6a4f" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
           <rect x="9" y="3" width="6" height="4" rx="1" />
         </svg>
-        <span className="text-gray-700 text-sm font-semibold">
-          Meus Títulos
-        </span>
+        <span className="text-gray-700 text-sm font-semibold">Meus Títulos</span>
       </button>
 
       {isOpen && (
@@ -69,8 +103,8 @@ export function MyNumbers() {
               className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-2.5 text-sm"
               disabled={isLoading}
             />
-            <button 
-              onClick={handleSearch} 
+            <button
+              onClick={handleSearch}
               disabled={isLoading}
               className="btn-primary px-4 py-2.5 text-sm disabled:opacity-50"
             >
@@ -87,43 +121,9 @@ export function MyNumbers() {
           )}
 
           {purchases && purchases.length > 0 && (
-            <div className="mt-4 space-y-3 max-h-80 overflow-y-auto pb-2">
-              {purchases.map(p => (
-                <div key={p.id} className="border border-gray-100 bg-gray-50 rounded-xl p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-semibold text-sm text-gray-800">{p.raffle.name}</h4>
-                      <p className="text-xs text-gray-500">{new Date(p.createdAt).toLocaleDateString("pt-BR")}</p>
-                    </div>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${
-                      p.paymentStatus === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
-                      p.paymentStatus === 'PENDING' ? 'bg-orange-100 text-orange-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {p.paymentStatus === 'CONFIRMED' ? 'PAGO' : 
-                       p.paymentStatus === 'PENDING' ? 'PENDENTE' : 'EXPIRADO'}
-                    </span>
-                  </div>
-                  
-                  <div className="mt-3 mb-2 flex flex-wrap gap-1">
-                    {p.numbers.map((n, idx) => (
-                      <span key={idx} className="bg-white border border-gray-200 text-gray-700 text-xs font-mono px-2 py-1 rounded">
-                        {n.numberValue.toString().padStart(6, '0')}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
-                    <span className="text-sm font-semibold text-gray-800">
-                      R$ {(p.totalAmount / 100).toFixed(2).replace('.', ',')}
-                    </span>
-                    {p.paymentStatus === 'PENDING' && (
-                      <Link href={`/checkout/${p.id}`} className="text-xs text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg transition-colors font-semibold">
-                        Pagar Agora
-                      </Link>
-                    )}
-                  </div>
-                </div>
+            <div className="mt-4 space-y-3 pb-2">
+              {purchases.map((p) => (
+                <PurchaseCard key={p.id} purchase={p} />
               ))}
             </div>
           )}
