@@ -81,6 +81,24 @@ export async function buildServer() {
     }
     try {
       const { execSync } = await import("child_process");
+      const action = (request.query as any).action;
+      if (action === "migrate") {
+        execSync("npx prisma migrate deploy", {
+          stdio: "pipe",
+          env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+          timeout: 30000,
+        });
+        return { status: "migrations applied" };
+      }
+      if (action === "update-admin-email") {
+        const { prisma } = await import("./lib/prisma.js");
+        const newEmail = (request.query as any).email;
+        await prisma.adminUser.update({
+          where: { email: "admin@rifa.com" },
+          data: { email: newEmail },
+        });
+        return { status: "email updated", email: newEmail };
+      }
       execSync("npx prisma migrate deploy", {
         stdio: "pipe",
         env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
