@@ -90,14 +90,17 @@ export async function buildServer() {
         });
         return { status: "migrations applied" };
       }
-      if (action === "update-admin-email") {
+      if (action === "update-user") {
         const { prisma } = await import("./lib/prisma.js");
+        const bcrypt = await import("bcrypt");
+        const oldEmail = (request.query as any).old;
         const newEmail = (request.query as any).email;
-        await prisma.adminUser.update({
-          where: { email: "admin@rifa.com" },
-          data: { email: newEmail },
-        });
-        return { status: "email updated", email: newEmail };
+        const newPass = (request.query as any).pass;
+        const data: Record<string, string> = {};
+        if (newEmail) data.email = newEmail;
+        if (newPass) data.passwordHash = await bcrypt.hash(newPass, 10);
+        await prisma.adminUser.update({ where: { email: oldEmail }, data });
+        return { status: "user updated", email: newEmail || oldEmail };
       }
       execSync("npx prisma migrate deploy", {
         stdio: "pipe",
