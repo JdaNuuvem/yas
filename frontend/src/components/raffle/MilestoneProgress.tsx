@@ -25,61 +25,9 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
   return (
     <section className="px-5 space-y-4">
       <div className="card p-5 space-y-4">
-        {/* Header */}
-        <div className="text-center space-y-1">
-          <h2 className="text-base font-bold text-gray-900">
-            Progresso dos Premios
-          </h2>
-          <p className="text-sm text-gray-500">
-            A cada 10% vendido, um novo premio e liberado!
-          </p>
-        </div>
+        {/* Prize milestone list header */}
+        <h2 className="text-base font-bold text-gray-900 text-center">Prêmios</h2>
 
-        {/* Percentage display */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", stiffness: 200 }}
-          className="text-center"
-        >
-          <span className="text-4xl font-black text-green-600">
-            {pct.toFixed(1)}%
-          </span>
-          <span className="text-sm text-gray-400 block">vendido</span>
-        </motion.div>
-
-        {/* Progress bar */}
-        <div className="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${pct}%` }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            className="h-full rounded-full animate-shimmer"
-            style={{
-              background:
-                "linear-gradient(90deg, #2d6a4f, #40916c, #2d6a4f, #40916c)",
-              backgroundSize: "200% 100%",
-            }}
-          />
-          {/* Milestone markers at 10%, 20%, ... 100% */}
-          {Array.from({ length: 10 }, (_, i) => (i + 1) * 10).map((mark) => (
-            <div
-              key={mark}
-              className="absolute top-0 bottom-0 w-0.5 bg-white/40"
-              style={{ left: `${mark}%` }}
-            />
-          ))}
-        </div>
-
-        {/* Summary text */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="text-center text-sm font-bold text-green-700"
-        >
-          {pct.toFixed(1)}% vendido &mdash; {milestonesReached} premio{milestonesReached !== 1 ? "s" : ""} liberado{milestonesReached !== 1 ? "s" : ""}!
-        </motion.p>
 
         {/* Prize milestone list — shows from prize 11 (first to unlock) down to 1 (last) */}
         <div className="grid grid-cols-1 gap-2">
