@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 
 interface MilestoneProgressProps {
   raffleId: string;
-  prizes: { position: number; name: string }[];
+  prizes: { position: number; name: string; winnerNumber: number | null }[];
 }
 
 export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) {
@@ -126,24 +126,30 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                     {prize.position}º Prêmio — {prize.name}
                   </p>
                   <p className="text-[11px] text-gray-400">
-                    {unlocked
-                      ? "Liberado!"
-                      : isNext
-                        ? `Próximo — falta ${(milestone - pct).toFixed(1)}%`
-                        : `Libera em ${milestoneLabel}`}
+                    {prize.winnerNumber
+                      ? `Ganhador: ${prize.winnerNumber.toString().padStart(6, "0")}`
+                      : unlocked
+                        ? "Liberado — aguardando sorteio"
+                        : isNext
+                          ? `Próximo — falta ${(milestone - pct).toFixed(1)}%`
+                          : `Libera em ${milestoneLabel}`}
                   </p>
                 </div>
 
-                {unlocked && (
+                {prize.winnerNumber ? (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 300, delay: 0.1 * idx }}
-                    className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full"
+                    className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full font-mono"
                   >
-                    ATIVO
+                    {prize.winnerNumber.toString().padStart(6, "0")}
                   </motion.span>
-                )}
+                ) : unlocked ? (
+                  <span className="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded-full">
+                    ATIVO
+                  </span>
+                ) : null}
               </motion.div>
             );
           })}
