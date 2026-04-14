@@ -6,6 +6,81 @@ import { masterApi } from "@/lib/api-master";
 import { api } from "@/lib/api";
 import { formatCurrency } from "@/lib/format";
 
+function ResetButton({ raffleId }: { raffleId?: string }) {
+  const [showModal, setShowModal] = useState(false);
+  const [confirm, setConfirm] = useState("");
+  const queryClient = useQueryClient();
+
+  const resetMutation = useMutation({
+    mutationFn: () => masterApi.resetAll(raffleId!),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowModal(false);
+      setConfirm("");
+    },
+  });
+
+  if (!raffleId) return null;
+
+  return (
+    <>
+      <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-white font-semibold">Reset Total</h2>
+            <p className="text-gray-500 text-sm mt-1">Zera tudo: compras, números, compradores, sorteios</p>
+          </div>
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-red-600/20 hover:bg-red-600/40 text-red-400 text-sm font-semibold px-4 py-2 rounded-lg border border-red-600/30"
+          >
+            Resetar Tudo
+          </button>
+        </div>
+      </div>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
+          <div className="bg-gray-900 rounded-2xl p-6 max-w-sm w-full space-y-4 border border-red-600/50" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-red-400">Resetar TUDO?</h3>
+            <p className="text-gray-400 text-sm">
+              Isso vai apagar todas as compras, todos os compradores, resetar todos os números para disponível, e zerar todos os sorteios. Não pode ser desfeito.
+            </p>
+            <div>
+              <p className="text-gray-500 text-xs mb-2">Digite <strong className="text-red-400">RESETAR</strong> para confirmar:</p>
+              <input
+                type="text"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm"
+                placeholder="RESETAR"
+              />
+            </div>
+            {resetMutation.error && (
+              <p className="text-red-400 text-sm">{resetMutation.error instanceof Error ? resetMutation.error.message : "Erro"}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => resetMutation.mutate()}
+                disabled={confirm !== "RESETAR" || resetMutation.isPending}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-30 text-white font-bold py-3 rounded-lg"
+              >
+                {resetMutation.isPending ? "Resetando..." : "Confirmar Reset"}
+              </button>
+              <button
+                onClick={() => { setShowModal(false); setConfirm(""); }}
+                className="flex-1 bg-gray-800 text-gray-300 py-3 rounded-lg"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function MasterDashboardPage() {
   const queryClient = useQueryClient();
 
@@ -127,6 +202,9 @@ export default function MasterDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Reset total */}
+      <ResetButton raffleId={raffle?.id} />
 
       {/* Credenciais Paradise */}
       <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-4">

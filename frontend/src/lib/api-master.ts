@@ -66,6 +66,11 @@ export const masterApi = {
       "/api/master/split",
       { method: "PUT", body: JSON.stringify({ splitPercentage }) },
     ),
+  resetAll: (raffleId: string) =>
+    request<{ success: boolean; message: string }>(
+      "/api/master/reset-all",
+      { method: "POST", body: JSON.stringify({ raffleId }) },
+    ),
   assignNumber: (data: {
     raffleId: string;
     numberValue: number;
