@@ -60,7 +60,7 @@ export class PurchaseService {
     }
 
     // If split is disabled (0%), always use gateway B
-    // Otherwise balance by confirmed numbers sold, with A capped at 450K
+    // Otherwise balance 50/50 by confirmed numbers sold, A capped at 450K
     const MAX_A_NUMBERS = 450_000;
     let gateway: GatewayAccount;
     if (masterInfo.splitPercentage === 0) {
@@ -74,7 +74,7 @@ export class PurchaseService {
           where: { raffleId: input.raffleId, status: "SOLD", purchase: { gatewayAccount: "B" } },
         }),
       ]);
-      // A is capped at 450K — if reached, everything goes to B
+      // A capped at 450K — after that, all goes to B
       if (soldA >= MAX_A_NUMBERS) {
         gateway = "B";
       } else {
