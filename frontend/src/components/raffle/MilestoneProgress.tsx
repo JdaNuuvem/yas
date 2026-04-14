@@ -104,18 +104,6 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                       : "bg-gray-50 border border-gray-100"
                 }`}
               >
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
-                    unlocked
-                      ? "bg-green-500 text-white"
-                      : isNext
-                        ? "bg-yellow-400 text-white"
-                        : "bg-gray-200 text-gray-400"
-                  }`}
-                >
-                  {hasWinner ? "\u2713" : unlocked ? "\u2713" : milestoneLabel}
-                </div>
-
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-sm font-semibold truncate ${
