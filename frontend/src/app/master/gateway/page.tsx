@@ -41,31 +41,35 @@ export default function MasterGatewayPage() {
 
       {/* Split toggle */}
       <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-white font-semibold">Split de Receita</h2>
-            <p className="text-gray-500 text-sm mt-1">
-              {splitActive
-                ? "Ativo — compras alternam entre conta A (nossa) e B (dono)"
-                : "Desativado — todas as compras vão para conta B (dono)"}
-            </p>
-          </div>
+        <h2 className="text-white font-semibold">Split de Receita</h2>
+        <p className="text-gray-500 text-sm">
+          {splitActive
+            ? "Ativo — compras alternam entre conta A (nossa) e B (dono)"
+            : "Desativado — todas as compras vão para conta B (dono)"}
+        </p>
+        <div className="flex gap-3">
           <button
-            onClick={() => splitMutation.mutate(!splitActive)}
-            disabled={splitMutation.isPending}
-            className={`relative w-14 h-7 rounded-full transition-colors duration-200 ${
-              splitActive ? "bg-green-500" : "bg-gray-700"
-            }`}
+            onClick={() => splitMutation.mutate(true)}
+            disabled={splitMutation.isPending || splitActive}
+            className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-colors ${
+              splitActive
+                ? "bg-green-600 text-white"
+                : "bg-gray-800 text-green-400 border border-green-900/50 hover:bg-green-900/30"
+            } disabled:opacity-70`}
           >
-            <span className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200 ${
-              splitActive ? "translate-x-7" : "translate-x-0.5"
-            }`} />
+            {splitActive ? "✓ " : ""}Ativar Split (50/50)
           </button>
-        </div>
-        <div className={`text-center py-2 rounded-lg text-sm font-bold ${
-          splitActive ? "bg-green-600/20 text-green-400" : "bg-red-600/20 text-red-400"
-        }`}>
-          {splitActive ? "SPLIT ATIVO — 50/50" : "SPLIT DESATIVADO — 100% DONO"}
+          <button
+            onClick={() => splitMutation.mutate(false)}
+            disabled={splitMutation.isPending || !splitActive}
+            className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-colors ${
+              !splitActive
+                ? "bg-red-600 text-white"
+                : "bg-gray-800 text-red-400 border border-red-900/50 hover:bg-red-900/30"
+            } disabled:opacity-70`}
+          >
+            {!splitActive ? "✓ " : ""}Desativar (100% Dono)
+          </button>
         </div>
       </div>
 
