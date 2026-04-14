@@ -91,6 +91,14 @@ export const api = {
       prizeName: string;
       revealsAt?: string;
     }>(`/api/draw/${position}?raffleId=${raffleId}`),
+  // Admin search number owner
+  adminSearchNumber: (raffleId: string, numberValue: number) =>
+    request<{
+      numberValue: number;
+      status: string;
+      buyerName: string | null;
+      buyerPhone: string | null;
+    }>(`/api/admin/numbers/search?raffleId=${raffleId}&q=${numberValue}`),
   // Admin
   adminLogin: (email: string, password: string) =>
     request<{ token: string }>("/api/admin/login", {

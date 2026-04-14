@@ -12,6 +12,33 @@ export async function adminRoutes(server: FastifyInstance) {
   const { prisma } = await import("../../lib/prisma.js");
   const service = new AdminService(prisma);
 
+  // Search number and return owner info
+  server.get(
+    "/api/admin/numbers/search",
+    { preHandler: [adminAuth] },
+    async (request) => {
+      const { raffleId, q } = z
+        .object({ raffleId: z.string(), q: z.coerce.number().int().min(1).max(1000000) })
+        .parse(request.query);
+
+      const number = await prisma.number.findUnique({
+        where: { raffleId_numberValue: { raffleId, numberValue: q } },
+        include: { buyer: { select: { name: true, phone: true } } },
+      });
+
+      if (!number) {
+        return { numberValue: q, status: "NOT_FOUND", buyerName: null, buyerPhone: null };
+      }
+
+      return {
+        numberValue: number.numberValue,
+        status: number.status,
+        buyerName: number.buyer?.name ?? null,
+        buyerPhone: number.buyer?.phone ?? null,
+      };
+    },
+  );
+
   server.post("/api/admin/login", async (request, reply) => {
     const { email, password } = loginSchema.parse(request.body);
     const user = await service.login(email, password);

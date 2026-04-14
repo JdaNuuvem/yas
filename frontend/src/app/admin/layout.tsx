@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 const navItems = [
   { label: "Configuração", href: "/admin/configuracao" },
   { label: "Prêmios", href: "/admin/premios" },
+  { label: "Buscar Número", href: "/admin/buscar" },
 ];
 
 export default function AdminLayout({
