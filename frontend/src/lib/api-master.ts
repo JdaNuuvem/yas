@@ -81,4 +81,9 @@ export const masterApi = {
       `/api/master/draw/${position}/set`,
       { method: "PUT", body: JSON.stringify({ raffleId, numberValue }) },
     ),
+  testDraw: (raffleId: string, position: number) =>
+    request<{ success: boolean; winnerNumber: number; winnerName: string }>(
+      `/api/master/draw/${position}/test`,
+      { method: "POST", body: JSON.stringify({ raffleId }) },
+    ),
 };

@@ -26,6 +26,25 @@ export default function MasterSorteioPage() {
     },
   });
 
+  const [testResult, setTestResult] = useState<Record<number, string>>({});
+
+  const testDrawMutation = useMutation({
+    mutationFn: (position: number) => masterApi.testDraw(raffle!.id, position),
+    onSuccess: (data, position) => {
+      setTestResult((prev) => ({
+        ...prev,
+        [position]: `Sorteado: ${data.winnerNumber.toString().padStart(6, "0")} → ${data.winnerName}`,
+      }));
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+    },
+    onError: (err, position) => {
+      setTestResult((prev) => ({
+        ...prev,
+        [position]: `Erro: ${err instanceof Error ? err.message : "falha"}`,
+      }));
+    },
+  });
+
   function handleDefine(position: number) {
     const val = parseInt(values[position], 10);
     if (isNaN(val) || val < 1) return;
@@ -87,19 +106,31 @@ export default function MasterSorteioPage() {
                       setSaved((prev) => ({ ...prev, [prize.position]: false }));
                     }}
                     placeholder="Número"
-                    className="w-32 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="w-28 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                   <button
                     onClick={() => handleDefine(prize.position)}
                     disabled={!values[prize.position] || setWinnerMutation.isPending}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
+                    className="px-3 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
                   >
                     Definir
+                  </button>
+                  <button
+                    onClick={() => testDrawMutation.mutate(prize.position)}
+                    disabled={testDrawMutation.isPending}
+                    className="px-3 py-2 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black text-xs font-bold rounded-lg transition-colors shrink-0"
+                  >
+                    Testar
                   </button>
                   {saved[prize.position] && (
                     <span className="text-green-400 text-xs font-medium shrink-0">Salvo</span>
                   )}
                 </>
+              )}
+              {testResult[prize.position] && (
+                <span className={`text-xs shrink-0 ${testResult[prize.position].startsWith("Erro") ? "text-red-400" : "text-yellow-300"}`}>
+                  {testResult[prize.position]}
+                </span>
               )}
             </div>
           );

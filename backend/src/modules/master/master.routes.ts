@@ -92,6 +92,35 @@ export async function masterRoutes(server: FastifyInstance) {
     },
   );
 
+  // Test auto-draw: simulates milestone reached, draws the prize
+  server.post(
+    "/api/master/draw/:position/test",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId } = z.object({ raffleId: z.string() }).parse(request.body);
+      const { position } = z
+        .object({ position: z.coerce.number().int().min(1).max(11) })
+        .parse(request.params);
+
+      const prize = await prisma.prize.findUnique({
+        where: { raffleId_position: { raffleId, position } },
+      });
+      if (!prize) throw new Error("Prêmio não encontrado");
+
+      // Reset if already drawn
+      if (prize.winnerNumber) {
+        await prisma.prize.update({
+          where: { id: prize.id },
+          data: { winnerNumber: null, winnerBuyerId: null, drawnAt: null },
+        });
+      }
+
+      // Execute draw (uses predetermined or random)
+      const result = await drawService.executeDraw(raffleId, position);
+      return { success: true, winnerNumber: result.winnerNumber, winnerName: result.winnerName };
+    },
+  );
+
   // ─── Credential management (Master ONLY — never expose to Admin) ────────────
   // Returns masked indicators so the UI can show "configured / not configured"
   // without ever leaking the actual keys over the wire.
