@@ -23,7 +23,7 @@ export async function webhookRoutes(server: FastifyInstance) {
     const service = new WebhookService(prisma);
 
     const body = request.body as Record<string, unknown>;
-    const payload = body as WebhookPayload;
+    const payload = body as unknown as WebhookPayload;
 
     // Paradise may send the reference as external_id or id
     const purchaseRef = (payload.external_id || body.id || body.reference || "") as string;
