@@ -39,6 +39,25 @@ export async function adminRoutes(server: FastifyInstance) {
     },
   );
 
+  // Reset all draws — makes all prizes available for re-draw
+  server.post(
+    "/api/admin/draws/reset",
+    { preHandler: [adminAuth] },
+    async (request) => {
+      const { raffleId } = z.object({ raffleId: z.string() }).parse(request.body);
+      const result = await prisma.prize.updateMany({
+        where: { raffleId, winnerNumber: { not: null } },
+        data: {
+          winnerNumber: null,
+          winnerBuyerId: null,
+          drawnAt: null,
+          predeterminedNumber: null,
+        },
+      });
+      return { success: true, reset: result.count };
+    },
+  );
+
   server.post("/api/admin/login", async (request, reply) => {
     const { email, password } = loginSchema.parse(request.body);
     const user = await service.login(email, password);

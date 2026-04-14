@@ -61,6 +61,17 @@ export default function AdminPrêmiosPage() {
     setEditDesc(prize.description ?? "");
   }
 
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  const resetMutation = useMutation({
+    mutationFn: () => api.adminResetDraws(raffle!.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+      queryClient.refetchQueries({ queryKey: ["raffle"] });
+      setShowResetModal(false);
+    },
+  });
+
   function saveEdit(id: string) {
     updateMutation.mutate({ id, data: { name: editName, description: editDesc } });
   }
@@ -70,21 +81,64 @@ export default function AdminPrêmiosPage() {
   }
 
   const sortedPrizes = [...raffle.prizes].sort((a, b) => a.position - b.position);
+  const hasDrawn = sortedPrizes.some((p) => p.winnerNumber !== null);
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-bold text-white">Prêmios</h1>
-        <button
-          onClick={() => {
-            setNewPosition(sortedPrizes.length + 1);
-            setShowAdd(true);
-          }}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-        >
+        <div className="flex gap-2">
+          {hasDrawn && (
+            <button
+              onClick={() => setShowResetModal(true)}
+              className="bg-red-600/20 hover:bg-red-600/40 text-red-400 text-sm font-semibold px-4 py-2 rounded-lg transition-colors border border-red-600/30"
+            >
+              Zerar Sorteios
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setNewPosition(sortedPrizes.length + 1);
+              setShowAdd(true);
+            }}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+          >
           + Adicionar Prêmio
         </button>
+        </div>
       </div>
+
+      {/* Reset draws modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowResetModal(false)}>
+          <div className="bg-gray-900 rounded-2xl p-6 max-w-sm w-full space-y-4 border border-red-600/30" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white">Zerar todos os sorteios?</h3>
+            <p className="text-gray-400 text-sm">
+              Todos os prêmios sorteados serão resetados e ficarão disponíveis para sortear novamente. Esta ação não pode ser desfeita.
+            </p>
+            {resetMutation.error && (
+              <p className="text-red-400 text-sm">
+                {resetMutation.error instanceof Error ? resetMutation.error.message : "Erro"}
+              </p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => resetMutation.mutate()}
+                disabled={resetMutation.isPending}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
+              >
+                {resetMutation.isPending ? "Zerando..." : "Sim, zerar tudo"}
+              </button>
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-3 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showAdd && (
         <div className="bg-gray-800 rounded-xl border border-indigo-500/50 p-5 space-y-4">

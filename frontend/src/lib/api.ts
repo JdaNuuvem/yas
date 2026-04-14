@@ -116,6 +116,11 @@ export const api = {
       page: number;
       limit: number;
     }>(`/api/admin/buyers?raffleId=${raffleId}&page=${page}`),
+  adminResetDraws: (raffleId: string) =>
+    request<{ success: boolean; reset: number }>(`/api/admin/draws/reset`, {
+      method: "POST",
+      body: JSON.stringify({ raffleId }),
+    }),
   adminTriggerDraw: (raffleId: string, position: number, numberValue: number) =>
     request<{ winnerNumber: number; drawnAt: string }>(
       `/api/admin/draw/${position}`,
