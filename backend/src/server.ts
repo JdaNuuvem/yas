@@ -73,6 +73,25 @@ export async function buildServer() {
 
   server.get("/health", async () => ({ status: "ok" }));
 
+  // One-time setup endpoint — runs migrations via raw SQL
+  server.get("/api/setup", async (request, reply) => {
+    const secret = (request.query as any).secret;
+    if (secret !== env.JWT_SECRET) {
+      return reply.status(404).send({ error: "Not found" });
+    }
+    try {
+      const { execSync } = await import("child_process");
+      execSync("npx prisma migrate deploy", {
+        stdio: "pipe",
+        env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+        timeout: 30000,
+      });
+      return { status: "migrations applied" };
+    } catch (e: any) {
+      return { status: "migration error", message: e.message?.substring(0, 500) };
+    }
+  });
+
   return server;
 }
 

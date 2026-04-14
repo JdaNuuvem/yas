@@ -20,4 +20,4 @@ RUN npx prisma generate
 ENV NODE_ENV=production
 ENV UV_THREADPOOL_SIZE=32
 EXPOSE 3001
-CMD ["node", "--max-old-space-size=768", "-e", "const{execSync}=require('child_process');try{console.log('Running migrations...');execSync('npx prisma migrate deploy',{stdio:'inherit',env:process.env})}catch(e){console.log('Migration skipped:',e.message)}console.log('Starting server...');require('./dist/server.js')"]
+CMD ["node", "--max-old-space-size=768", "dist/server.js"]
