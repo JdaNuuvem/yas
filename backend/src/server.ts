@@ -188,16 +188,16 @@ export async function buildServer() {
     const existing = await prisma.number.count({ where: { raffleId: raffle.id } });
     if (existing > 0) return { status: "already has numbers", count: existing };
 
-    const BATCH = 10000;
+    const BATCH = 5000;
     const TOTAL = 1000000;
     for (let i = 0; i < TOTAL; i += BATCH) {
-      const values = Array.from({ length: BATCH }, (_, j) => {
-        const num = i + j + 1;
-        return `('${raffle.id}', ${num}, 'AVAILABLE')`;
-      }).join(",");
-      await (prisma as any).$executeRawUnsafe(
-        `INSERT INTO numbers (raffle_id, number_value, status) VALUES ${values} ON CONFLICT DO NOTHING`
-      );
+      const data = Array.from({ length: BATCH }, (_, j) => ({
+        raffleId: raffle.id,
+        numberValue: i + j + 1,
+        status: "AVAILABLE" as const,
+      }));
+      await prisma.number.createMany({ data, skipDuplicates: true });
+      if ((i / BATCH) % 20 === 0) console.log(`Seeded ${i + BATCH} numbers...`);
     }
     const finalCount = await prisma.number.count({ where: { raffleId: raffle.id } });
     return { status: "numbers seeded", count: finalCount };
