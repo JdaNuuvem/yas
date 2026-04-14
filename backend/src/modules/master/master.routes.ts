@@ -92,32 +92,44 @@ export async function masterRoutes(server: FastifyInstance) {
     },
   );
 
-  // Test auto-draw: simulates milestone reached, draws the prize
+  // Simulate next milestone: finds the next undrawn prize and auto-draws it
   server.post(
-    "/api/master/draw/:position/test",
+    "/api/master/simulate-milestone",
     { preHandler: [masterAuth] },
     async (request) => {
       const { raffleId } = z.object({ raffleId: z.string() }).parse(request.body);
-      const { position } = z
-        .object({ position: z.coerce.number().int().min(1).max(11) })
-        .parse(request.params);
 
-      const prize = await prisma.prize.findUnique({
-        where: { raffleId_position: { raffleId, position } },
+      // Get all prizes ordered by position desc (11 first = first to draw)
+      const prizes = await prisma.prize.findMany({
+        where: { raffleId },
+        orderBy: { position: "desc" },
       });
-      if (!prize) throw new Error("Prêmio não encontrado");
 
-      // Reset if already drawn
-      if (prize.winnerNumber) {
-        await prisma.prize.update({
-          where: { id: prize.id },
-          data: { winnerNumber: null, winnerBuyerId: null, drawnAt: null },
-        });
+      // Find the next undrawn prize
+      let nextPrize = null;
+      let milestone = 0;
+      for (let i = 0; i < prizes.length; i++) {
+        if (!prizes[i].winnerNumber) {
+          nextPrize = prizes[i];
+          milestone = (i + 1) * 10;
+          break;
+        }
       }
 
-      // Execute draw (uses predetermined or random)
-      const result = await drawService.executeDraw(raffleId, position);
-      return { success: true, winnerNumber: result.winnerNumber, winnerName: result.winnerName };
+      if (!nextPrize) {
+        return { success: false, message: "Todos os prêmios já foram sorteados" };
+      }
+
+      // Execute draw
+      const result = await drawService.executeDraw(raffleId, nextPrize.position);
+      return {
+        success: true,
+        milestone: `${milestone}%`,
+        position: nextPrize.position,
+        prizeName: nextPrize.name,
+        winnerNumber: result.winnerNumber,
+        winnerName: result.winnerName,
+      };
     },
   );
 

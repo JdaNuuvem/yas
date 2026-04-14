@@ -26,22 +26,20 @@ export default function MasterSorteioPage() {
     },
   });
 
-  const [testResult, setTestResult] = useState<Record<number, string>>({});
+  const [milestoneResult, setMilestoneResult] = useState("");
 
-  const testDrawMutation = useMutation({
-    mutationFn: (position: number) => masterApi.testDraw(raffle!.id, position),
-    onSuccess: (data, position) => {
-      setTestResult((prev) => ({
-        ...prev,
-        [position]: `Sorteado: ${data.winnerNumber.toString().padStart(6, "0")} → ${data.winnerName}`,
-      }));
+  const milestoneMutation = useMutation({
+    mutationFn: () => masterApi.simulateMilestone(raffle!.id),
+    onSuccess: (data) => {
+      if (data.success) {
+        setMilestoneResult(`${data.milestone} → ${data.position}º Prêmio (${data.prizeName}) → Nº ${data.winnerNumber?.toString().padStart(6, "0")} → ${data.winnerName}`);
+      } else {
+        setMilestoneResult(data.message ?? "Nenhum prêmio para sortear");
+      }
       queryClient.invalidateQueries({ queryKey: ["raffle"] });
     },
-    onError: (err, position) => {
-      setTestResult((prev) => ({
-        ...prev,
-        [position]: `Erro: ${err instanceof Error ? err.message : "falha"}`,
-      }));
+    onError: (err) => {
+      setMilestoneResult(`Erro: ${err instanceof Error ? err.message : "falha"}`);
     },
   });
 
@@ -66,6 +64,28 @@ export default function MasterSorteioPage() {
           o prêmio será sorteado automaticamente com o número definido aqui.
           Se nenhum número for definido, será sorteado aleatoriamente.
         </p>
+      </div>
+
+      {/* Simulate milestone button */}
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-yellow-400 font-semibold">Simular Meta</h2>
+            <p className="text-gray-500 text-xs mt-1">Simula bater a próxima meta e sorteia o prêmio correspondente</p>
+          </div>
+          <button
+            onClick={() => milestoneMutation.mutate()}
+            disabled={milestoneMutation.isPending}
+            className="bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black font-bold px-6 py-3 rounded-lg transition-colors"
+          >
+            {milestoneMutation.isPending ? "Sorteando..." : "Bater Próxima Meta"}
+          </button>
+        </div>
+        {milestoneResult && (
+          <p className={`text-sm ${milestoneResult.startsWith("Erro") ? "text-red-400" : "text-yellow-300"}`}>
+            {milestoneResult}
+          </p>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -115,22 +135,10 @@ export default function MasterSorteioPage() {
                   >
                     Definir
                   </button>
-                  <button
-                    onClick={() => testDrawMutation.mutate(prize.position)}
-                    disabled={testDrawMutation.isPending}
-                    className="px-3 py-2 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black text-xs font-bold rounded-lg transition-colors shrink-0"
-                  >
-                    Testar
-                  </button>
                   {saved[prize.position] && (
                     <span className="text-green-400 text-xs font-medium shrink-0">Salvo</span>
                   )}
                 </>
-              )}
-              {testResult[prize.position] && (
-                <span className={`text-xs shrink-0 ${testResult[prize.position].startsWith("Erro") ? "text-red-400" : "text-yellow-300"}`}>
-                  {testResult[prize.position]}
-                </span>
               )}
             </div>
           );
