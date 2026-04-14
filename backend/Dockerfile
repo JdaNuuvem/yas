@@ -1,5 +1,6 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
+# Cache bust: v2
 COPY package*.json ./
 ENV NODE_ENV=development
 RUN npm install
