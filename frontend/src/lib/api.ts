@@ -70,6 +70,10 @@ export const api = {
         numbers: { numberValue: number; status: string }[];
       }[]
     >(`/api/purchase/my-titles?phone=${encodeURIComponent(phone)}`),
+  getProgress: (raffleId: string) =>
+    request<{ percentage: number; milestonesReached: number; nextMilestone: number }>(
+      `/api/raffle/${raffleId}/progress`,
+    ),
   getRecentBuyers: (raffleId: string) =>
     request<
       { buyerName: string; quantity: number; createdAt: string }[]

@@ -44,6 +44,27 @@ export class RaffleService {
     }));
   }
 
+  async getProgress(raffleId: string) {
+    const OWNER_TOTAL = 550_000;
+    const TOTAL_PRIZES = 11;
+
+    const ownerSold = await this.prisma.number.count({
+      where: {
+        raffleId,
+        status: "SOLD",
+        purchase: { gatewayAccount: "B" },
+      },
+    });
+
+    const percentage = Math.min((ownerSold / OWNER_TOTAL) * 100, 100);
+    const milestonesReached = Math.min(Math.floor(percentage / 10), TOTAL_PRIZES);
+    const nextMilestone = milestonesReached >= TOTAL_PRIZES
+      ? 100
+      : (milestonesReached + 1) * 10;
+
+    return { percentage, milestonesReached, nextMilestone };
+  }
+
   async getTopBuyers(raffleId: string) {
     const buyers = await this.prisma.purchase.groupBy({
       by: ["buyerId"],

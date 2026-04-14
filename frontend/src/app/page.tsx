@@ -15,6 +15,7 @@ import { WhatsAppButton } from "@/components/raffle/WhatsAppButton";
 import { Footer } from "@/components/raffle/Footer";
 import { Cart } from "@/components/raffle/Cart";
 import { AgeGate } from "@/components/raffle/AgeGate";
+import { MilestoneProgress } from "@/components/raffle/MilestoneProgress";
 import { useCart } from "@/hooks/useCart";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
 
@@ -67,6 +68,10 @@ export default function Home() {
     <div className="min-h-screen pb-28">
       <div className="max-w-lg mx-auto space-y-6">
         <HeroSection raffle={raffle} soldCount={raffle.soldCount} />
+
+        <AnimatedSection delay={0.05}>
+          <MilestoneProgress raffleId={raffle.id} prizes={raffle.prizes} />
+        </AnimatedSection>
 
         <AnimatedSection delay={0.1}>
           <MyNumbers />

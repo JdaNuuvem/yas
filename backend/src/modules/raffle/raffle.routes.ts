@@ -27,6 +27,13 @@ export async function raffleRoutes(server: FastifyInstance) {
     return cached(`top:${raffleId}`, 60000, () => service.getTopBuyers(raffleId));
   });
 
+  // Cache progress 30s
+  server.get("/api/raffle/:raffleId/progress", async (request, reply) => {
+    const { raffleId } = request.params as { raffleId: string };
+    reply.header("Cache-Control", "public, max-age=15, stale-while-revalidate=30");
+    return cached(`progress:${raffleId}`, 30000, () => service.getProgress(raffleId));
+  });
+
   server.put(
     "/api/admin/raffle/:raffleId",
     { preHandler: [adminAuth] },
