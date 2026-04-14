@@ -277,4 +277,40 @@ export async function masterRoutes(server: FastifyInstance) {
       };
     },
   );
+
+  // Full reset — clears all purchases, numbers back to AVAILABLE, remove buyers
+  server.post(
+    "/api/master/reset-all",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId } = z.object({ raffleId: z.string() }).parse(request.body);
+
+      // Reset prizes
+      await prisma.prize.updateMany({
+        where: { raffleId },
+        data: { winnerNumber: null, winnerBuyerId: null, drawnAt: null, predeterminedNumber: null },
+      });
+
+      // Reset all numbers to AVAILABLE
+      await prisma.number.updateMany({
+        where: { raffleId },
+        data: { status: "AVAILABLE", buyerId: null, purchaseId: null, reservedAt: null, soldAt: null },
+      });
+
+      // Delete all purchases
+      await prisma.purchase.deleteMany({ where: { raffleId } });
+
+      // Delete all buyers
+      await prisma.buyer.deleteMany({});
+
+      // Reset gateway to A
+      const config = await prisma.masterConfig.findFirstOrThrow();
+      await prisma.masterConfig.update({
+        where: { id: config.id },
+        data: { nextGateway: "A" },
+      });
+
+      return { success: true, message: "Tudo resetado" };
+    },
+  );
 }
