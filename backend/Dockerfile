@@ -10,9 +10,11 @@ RUN npm run build
 FROM node:22-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install --omit=dev && npm install prisma dotenv tsx
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 RUN npx prisma generate
 ENV NODE_ENV=production
 ENV UV_THREADPOOL_SIZE=32
