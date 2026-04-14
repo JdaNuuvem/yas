@@ -12,7 +12,7 @@ interface SlotMachineProps {
 export function SlotMachine({
   targetNumber,
   onComplete,
-  duration = 12000,
+  duration = 5000,
 }: SlotMachineProps) {
   const [displayNumber, setDisplayNumber] = useState(0);
   const [isDone, setIsDone] = useState(false);

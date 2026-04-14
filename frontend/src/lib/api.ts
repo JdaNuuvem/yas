@@ -83,9 +83,14 @@ export const api = {
       { buyerName: string; totalNumbers: number }[]
     >(`/api/raffle/${raffleId}/buyers/top`),
   getDrawData: (raffleId: string, position: number) =>
-    request<{ winnerNumber: number | null; drawnAt: string | null }>(
-      `/api/draw/${position}?raffleId=${raffleId}`,
-    ),
+    request<{
+      position: number;
+      status: "pending" | "animating" | "drawn";
+      winnerNumber?: number;
+      winnerName?: string;
+      prizeName: string;
+      revealsAt?: string;
+    }>(`/api/draw/${position}?raffleId=${raffleId}`),
   // Admin
   adminLogin: (email: string, password: string) =>
     request<{ token: string }>("/api/admin/login", {

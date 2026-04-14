@@ -9,7 +9,7 @@ export async function drawRoutes(server: FastifyInstance) {
 
   server.get("/api/draw/:position", async (request) => {
     const { position } = z
-      .object({ position: z.coerce.number().int().min(1).max(10) })
+      .object({ position: z.coerce.number().int().min(1).max(11) })
       .parse(request.params);
     const { raffleId } = z
       .object({ raffleId: z.string() })
@@ -22,7 +22,7 @@ export async function drawRoutes(server: FastifyInstance) {
     { preHandler: [adminAuth] },
     async (request) => {
       const { position } = z
-        .object({ position: z.coerce.number().int().min(1).max(10) })
+        .object({ position: z.coerce.number().int().min(1).max(11) })
         .parse(request.params);
       const { raffleId, numberValue } = z
         .object({ 

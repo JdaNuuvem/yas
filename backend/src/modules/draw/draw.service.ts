@@ -36,14 +36,25 @@ export class DrawService {
       throw new Error("Draw already executed for this position");
     }
 
-    if (!prize.predeterminedNumber) {
-      throw new Error("No predetermined number set for this position");
-    }
+    let winnerNumber: number;
 
-    const winnerNumber = parseInt(
-      this.decryptNumber(prize.predeterminedNumber),
-      10,
-    );
+    if (prize.predeterminedNumber) {
+      // Use the predetermined number set by master/admin
+      winnerNumber = parseInt(this.decryptNumber(prize.predeterminedNumber), 10);
+    } else {
+      // No predetermined number — pick a random SOLD number
+      const randomSold = await (this.prisma as any).$queryRaw`
+        SELECT number_value FROM numbers
+        WHERE raffle_id = ${raffleId} AND status = 'SOLD'
+        ORDER BY RANDOM() LIMIT 1
+      `;
+      if (randomSold.length > 0) {
+        winnerNumber = randomSold[0].number_value;
+      } else {
+        // No sold numbers — pick any random number
+        winnerNumber = Math.floor(Math.random() * 1000000) + 1;
+      }
+    }
 
     const numberRecord = await this.prisma.number.findUnique({
       where: {
@@ -84,7 +95,7 @@ export class DrawService {
 
     // Prevent clients from polling the winner before the animation finishes.
     // The animation runs for ~15s; we gate at 20s to add a safety margin.
-    const ANIMATION_WINDOW_MS = 20_000;
+    const ANIMATION_WINDOW_MS = 8_000;
     const timeSinceDraw = Date.now() - prize.drawnAt.getTime();
 
     if (timeSinceDraw < ANIMATION_WINDOW_MS) {

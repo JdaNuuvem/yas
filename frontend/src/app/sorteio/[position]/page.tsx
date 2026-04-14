@@ -29,19 +29,19 @@ export default function DrawPage() {
   const prize = raffle?.prizes.find((p) => p.position === position);
 
   const winnerNumber = drawData?.winnerNumber ?? null;
+  const winnerName = drawData?.winnerName ?? "Ganhador";
 
-  // Auto-transition from pending to spinning when draw data arrives
-  if (phase === "pending" && winnerNumber !== null) {
+  // Auto-transition based on draw status
+  if (phase === "pending" && drawData?.status === "drawn" && winnerNumber !== null) {
+    setPhase("spinning");
+  }
+  if (phase === "pending" && drawData?.status === "animating") {
     setPhase("spinning");
   }
 
   const handleSlotComplete = useCallback(() => {
     setPhase("revealed");
   }, []);
-
-  const winnerName = prize?.winnerNumber !== null
-    ? "Ganhador"
-    : "Ganhador";
 
   if (!raffle) {
     return (
