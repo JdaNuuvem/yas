@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { MasterService } from "./master.service.js";
 import { DrawService } from "../draw/draw.service.js";
-import { masterAuth, masterIpGuard } from "../../middleware/auth.js";
+import { masterAuth } from "../../middleware/auth.js";
 import { z } from "zod";
 
 export async function masterRoutes(server: FastifyInstance) {
@@ -13,7 +13,7 @@ export async function masterRoutes(server: FastifyInstance) {
   // Non-whitelisted IPs receive 404 to avoid discoverability of the endpoint.
   server.post(
     "/api/master/login",
-    { preHandler: [masterIpGuard] },
+    {},
     async (request) => {
       const { email, password } = z
         .object({ email: z.string().email(), password: z.string() })
@@ -30,7 +30,7 @@ export async function masterRoutes(server: FastifyInstance) {
 
   server.get(
     "/api/master/dashboard",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async (request) => {
       const { raffleId } = z
         .object({ raffleId: z.string() })
@@ -41,7 +41,7 @@ export async function masterRoutes(server: FastifyInstance) {
 
   server.get(
     "/api/master/gateway/status",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async () => {
       return masterService.getGatewayStatus();
     },
@@ -49,7 +49,7 @@ export async function masterRoutes(server: FastifyInstance) {
 
   server.put(
     "/api/master/gateway/override",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async (request) => {
       const { gateway } = z
         .object({ gateway: z.enum(["A", "B"]) })
@@ -60,7 +60,7 @@ export async function masterRoutes(server: FastifyInstance) {
 
   server.put(
     "/api/master/split",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async (request) => {
       const { splitPercentage } = z
         .object({ splitPercentage: z.number().int().min(0).max(100) })
@@ -76,7 +76,7 @@ export async function masterRoutes(server: FastifyInstance) {
 
   server.put(
     "/api/master/draw/:position/set",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async (request) => {
       const { raffleId, numberValue } = z
         .object({
@@ -97,7 +97,7 @@ export async function masterRoutes(server: FastifyInstance) {
   // without ever leaking the actual keys over the wire.
   server.get(
     "/api/master/credentials",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async () => {
       const config = await prisma.masterConfig.findFirstOrThrow();
       return {
@@ -112,7 +112,7 @@ export async function masterRoutes(server: FastifyInstance) {
   // Encryption happens inside MasterService to keep the route thin.
   server.put(
     "/api/master/credentials",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async (request) => {
       const input = z
         .object({
@@ -133,7 +133,7 @@ export async function masterRoutes(server: FastifyInstance) {
   // Assign number to buyer (master only)
   server.post(
     "/api/master/assign-number",
-    { preHandler: [masterIpGuard, masterAuth] },
+    { preHandler: [masterAuth] },
     async (request) => {
       const { raffleId, numberValue, buyerName, buyerPhone } = z
         .object({
