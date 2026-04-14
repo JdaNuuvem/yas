@@ -50,19 +50,20 @@ export class WebhookService {
       });
 
       const percentage = (ownerSold / OWNER_TOTAL) * 100;
-      const milestonesReached = Math.min(Math.floor(percentage / 10), TOTAL_PRIZES);
+      // 10% = 1 milestone, 20% = 2, ..., 100% = 10, bonus = 11 (triggers at 100%)
+      let milestonesReached = Math.min(Math.floor(percentage / 10), 10);
+      // Bonus prize (11th milestone) triggers as soon as 100% is reached
+      if (percentage >= 100) milestonesReached = TOTAL_PRIZES;
 
-      // Get all prizes for this raffle
       const prizes = await this.prisma.prize.findMany({
         where: { raffleId },
         orderBy: { position: "desc" }, // 11 first, 1 last
       });
 
-      // Check each milestone: prize 11 at 10%, prize 10 at 20%, ..., prize 1 at 110% (bonus)
+      // prize 11 at milestone 1 (10%), ..., prize 2 at milestone 10 (100%), prize 1 (bonus) at milestone 11 (100%)
       for (let i = 0; i < prizes.length; i++) {
         const prize = prizes[i];
-        const prizeIndex = i; // 0 = prize 11, 1 = prize 10, etc.
-        const requiredMilestones = prizeIndex + 1;
+        const requiredMilestones = i + 1;
 
         if (milestonesReached >= requiredMilestones && !prize.winnerNumber) {
           // This prize should be drawn — auto-draw it
