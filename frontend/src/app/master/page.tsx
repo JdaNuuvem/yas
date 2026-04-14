@@ -47,7 +47,6 @@ export default function MasterDashboardPage() {
       setForm({
         paradiseASecret: "",
         paradiseBSecret: "",
-        paradiseBWebhookSecret: "",
       });
     },
   });
