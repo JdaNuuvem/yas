@@ -10,14 +10,20 @@ export class RaffleService {
     });
     if (!raffle) return null;
 
-    // Only count numbers sold via gateway B (owner) — matches progress bar
-    const soldCount = await this.prisma.number.count({
+    // Count real owner sales (gateway B)
+    const realSold = await this.prisma.number.count({
       where: {
         raffleId: raffle.id,
         status: "SOLD",
         purchase: { gatewayAccount: "B" },
       },
     });
+
+    // Visual mapping: 550K real → 1M visual
+    // When 55K real are sold (10%), visual shows 100K (10% of 1M)
+    const REAL_TOTAL = 550_000;
+    const VISUAL_TOTAL = 1_000_000;
+    const soldCount = Math.round(realSold * (VISUAL_TOTAL / REAL_TOTAL));
 
     // Don't send base64 image in the main response — too heavy (4MB+)
     const hasImage = !!raffle.mainImageUrl;
