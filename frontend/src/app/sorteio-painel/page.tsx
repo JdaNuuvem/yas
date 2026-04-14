@@ -115,31 +115,15 @@ export default function SorteioPainelPage() {
 
                 <div className="flex items-center gap-3">
                   {!isDrawn && (
-                    <input
-                      type="number"
-                      min={1}
-                      max={1000000}
-                      placeholder="Número (opcional)"
-                      className="w-44 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 placeholder:text-gray-600"
-                      value={inputValues[prize.position] || ""}
-                      onChange={(e) =>
-                        setInputValues({
-                          ...inputValues,
-                          [prize.position]: e.target.value,
-                        })
-                      }
-                    />
+                    <span />
                   )}
 
                   <button
                     onClick={() => {
-                      const val = inputValues[prize.position]
-                        ? parseInt(inputValues[prize.position], 10)
-                        : 0;
                       drawMutation.mutate({
                         raffleId: raffle.id,
                         position: prize.position,
-                        numberValue: val || 0,
+                        numberValue: 0,
                       });
                     }}
                     disabled={
