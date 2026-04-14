@@ -70,6 +70,7 @@ export const masterApi = {
     raffleId: string;
     numberValue: number;
     buyerName: string;
+    buyerCpf: string;
     buyerPhone: string;
   }) =>
     request<{ success: boolean; numberValue: number; buyerName: string; buyerPhone: string }>(

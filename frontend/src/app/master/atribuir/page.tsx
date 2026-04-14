@@ -20,6 +20,7 @@ export default function MasterAtribuirPage() {
 
   const [numberValue, setNumberValue] = useState("");
   const [buyerName, setBuyerName] = useState("");
+  const [buyerCpf, setBuyerCpf] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("");
   const [history, setHistory] = useState<AssignResult[]>([]);
 
@@ -45,6 +46,7 @@ export default function MasterAtribuirPage() {
       raffleId: raffle.id,
       numberValue: num,
       buyerName: buyerName.trim(),
+      buyerCpf: buyerCpf.replace(/\D/g, ""),
       buyerPhone: buyerPhone.replace(/\D/g, ""),
     });
   }
@@ -86,6 +88,21 @@ export default function MasterAtribuirPage() {
             onChange={(e) => setBuyerName(e.target.value.slice(0, 100))}
             placeholder="Nome completo"
             maxLength={100}
+            className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            CPF
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={buyerCpf}
+            onChange={(e) => setBuyerCpf(e.target.value.replace(/\D/g, "").slice(0, 11))}
+            placeholder="00000000000"
+            maxLength={11}
             className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
           />
         </div>
