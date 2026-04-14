@@ -4,6 +4,7 @@ COPY package*.json ./
 ENV NODE_ENV=development
 RUN npm install
 COPY . .
+RUN npx prisma generate
 RUN npm run build
 
 FROM node:22-alpine
