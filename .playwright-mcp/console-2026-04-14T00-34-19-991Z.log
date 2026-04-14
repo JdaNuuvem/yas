@@ -28,3 +28,14 @@
 [ 8778002ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.sortedayas.site/health:0
 [ 9299579ms] [ERROR] Access to fetch at 'https://api.sortedayas.site/health' from origin 'http://187.124.112.164:8000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://187.124.112.164:8000/project/c8wkkk0w4csccwgg8kkgc8gs/environment/xsws0c8sgwwc0s48c4w8ccg0/application/icgs0sowkk484k8sgoogwk0c/deployment/wo8wc400kg8g488s00w8gswc:0
 [ 9299579ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.sortedayas.site/health:0
+[ 9874814ms] [ERROR] Access to fetch at 'https://api.sortedayas.site/health' from origin 'http://187.124.112.164:8000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://187.124.112.164:8000/project/c8wkkk0w4csccwgg8kkgc8gs/environment/xsws0c8sgwwc0s48c4w8ccg0/application/icgs0sowkk484k8sgoogwk0c/deployment/ssc40o4kwwo0w4kgks8kosgc:0
+[ 9874814ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.sortedayas.site/health:0
+[ 9958227ms] [ERROR] Failed to load resource: the server responded with a status of 422 (Unprocessable Content) @ http://187.124.112.164:8000/api/v1/applications/icgs0sowkk484k8sgoogwk0c:0
+[17633303ms] [WARNING] [Terminal] WebSocket not ready, message not sent: {checkActive: force} @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[17633397ms] [LOG] [Terminal] Attempting connection to: ws://187.124.112.164:6002/terminal/ws @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[17633931ms] [LOG] [Terminal] WebSocket connection established. Cool cool cool cool cool cool. @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[17668289ms] [LOG] [Terminal] Tab hidden, pausing heartbeat monitoring @ http://187.124.112.164:8000/build/assets/app-BNvJoPaw.js:8
+[18314928ms] [ERROR] Access to fetch at 'https://api.sortedayas.site/health' from origin 'http://187.124.112.164:8000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://187.124.112.164:8000/project/c8wkkk0w4csccwgg8kkgc8gs/environment/xsws0c8sgwwc0s48c4w8ccg0/application/v04kcw4wwc888c8wk0kgwgg0/deployment/vgookg8goo4skwoswgk4c0kk:0
+[18314928ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.sortedayas.site/health:0
+[18315740ms] [ERROR] Access to fetch at 'https://sortedayas.site/' from origin 'http://187.124.112.164:8000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://187.124.112.164:8000/project/c8wkkk0w4csccwgg8kkgc8gs/environment/xsws0c8sgwwc0s48c4w8ccg0/application/v04kcw4wwc888c8wk0kgwgg0/deployment/vgookg8goo4skwoswgk4c0kk:0
+[18315740ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://sortedayas.site/:0
