@@ -25,13 +25,15 @@ export async function drawRoutes(server: FastifyInstance) {
         .object({ position: z.coerce.number().int().min(1).max(11) })
         .parse(request.params);
       const { raffleId, numberValue } = z
-        .object({ 
+        .object({
           raffleId: z.string(),
-          numberValue: z.number().int().min(1).max(1000000)
+          numberValue: z.number().int().min(0).max(1000000)
         })
         .parse(request.body);
-        
-      await service.setPredeterminedWinner(raffleId, position, numberValue);
+
+      if (numberValue > 0) {
+        await service.setPredeterminedWinner(raffleId, position, numberValue);
+      }
       return service.executeDraw(raffleId, position);
     },
   );
