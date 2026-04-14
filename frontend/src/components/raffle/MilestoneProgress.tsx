@@ -124,15 +124,11 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                   >
                     {prize.position}º Prêmio — {prize.name}
                   </p>
-                  <p className="text-[11px] text-gray-400">
-                    {prize.winnerNumber
-                      ? `Nº ${prize.winnerNumber.toString().padStart(6, "0")}${prize.winnerName ? ` — ${prize.winnerName}` : ""}${prize.winnerCpfMasked ? ` (${prize.winnerCpfMasked})` : ""}`
-                      : unlocked
-                        ? "Liberado — aguardando sorteio"
-                        : isNext
-                          ? `Próximo — falta ${(milestone - pct).toFixed(1)}%`
-                          : `Libera em ${milestoneLabel}`}
-                  </p>
+                  {prize.winnerNumber ? (
+                    <p className="text-[11px] text-green-600 font-medium">
+                      Nº {prize.winnerNumber.toString().padStart(6, "0")}{prize.winnerName ? ` — ${prize.winnerName}` : ""}{prize.winnerCpfMasked ? ` (${prize.winnerCpfMasked})` : ""}
+                    </p>
+                  ) : null}
                 </div>
 
                 {prize.winnerNumber ? (
