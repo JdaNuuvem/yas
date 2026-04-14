@@ -59,20 +59,11 @@ export class PurchaseService {
       throw new Error("ENCRYPTION_KEY não configurada no servidor.");
     }
 
-    // If split is disabled (0%), always use gateway B (owner only)
-    // Otherwise alternate: use current gateway and flip for next purchase
-    let gateway: GatewayAccount;
-    if (masterInfo.splitPercentage === 0) {
-      gateway = "B";
-    } else {
-      gateway = masterInfo.nextGateway;
-      // Atomically flip for the next purchase
-      const nextG = gateway === "A" ? "B" : "A";
-      await this.prisma.masterConfig.update({
-        where: { id: masterInfo.id },
-        data: { nextGateway: nextG },
-      });
-    }
+    // If split is disabled (0%), always use gateway B
+    // Otherwise use current nextGateway (flips only when webhook confirms payment)
+    const gateway: GatewayAccount = masterInfo.splitPercentage === 0
+      ? "B"
+      : masterInfo.nextGateway;
 
     const rawCreds = gateway === "A" ? masterInfo.paradiseACredentials : masterInfo.paradiseBCredentials;
     if (!rawCreds) {

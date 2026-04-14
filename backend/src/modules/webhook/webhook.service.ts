@@ -26,7 +26,15 @@ export class WebhookService {
         data: { status: "SOLD", soldAt: new Date() },
       });
 
-      // Gateway flip now happens at purchase creation, not here
+      // Flip gateway only when payment is confirmed (split active)
+      const config = await tx.masterConfig.findFirstOrThrow();
+      if (config.splitPercentage > 0) {
+        const nextGateway = config.nextGateway === "A" ? "B" : "A";
+        await tx.masterConfig.update({
+          where: { id: config.id },
+          data: { nextGateway },
+        });
+      }
     });
 
     // After confirming, check if we crossed a milestone — auto-draw prize
