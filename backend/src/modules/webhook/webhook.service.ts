@@ -1,4 +1,8 @@
 import type { PrismaClient } from "@prisma/client";
+import { encrypt, decrypt } from "../../lib/crypto.js";
+
+const OWNER_TOTAL = 550_000;
+const TOTAL_PRIZES = 11;
 
 export class WebhookService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -8,9 +12,6 @@ export class WebhookService {
       where: { id: purchaseId },
     });
 
-    // Guard: Only PENDING purchases can be confirmed.
-    // If it's FAILED or EXPIRED, numbers might have been released already.
-    // Confirming it now would result in an inconsistent state.
     if (!purchase || purchase.paymentStatus !== "PENDING") {
       return;
     }
@@ -25,7 +26,7 @@ export class WebhookService {
         data: { status: "SOLD", soldAt: new Date() },
       });
 
-      // Flip gateway only if split is active (splitPercentage > 0)
+      // Flip gateway only if split is active
       const config = await tx.masterConfig.findFirstOrThrow();
       if (config.splitPercentage > 0) {
         const nextGateway = config.nextGateway === "A" ? "B" : "A";
@@ -34,6 +35,78 @@ export class WebhookService {
           data: { nextGateway },
         });
       }
+    });
+
+    // After confirming, check if we crossed a milestone — auto-draw prize
+    if (purchase.gatewayAccount === "B") {
+      await this.checkAndAutoDraw(purchase.raffleId);
+    }
+  }
+
+  private async checkAndAutoDraw(raffleId: string): Promise<void> {
+    try {
+      const ownerSold = await this.prisma.number.count({
+        where: { raffleId, status: "SOLD", purchase: { gatewayAccount: "B" } },
+      });
+
+      const percentage = (ownerSold / OWNER_TOTAL) * 100;
+      const milestonesReached = Math.min(Math.floor(percentage / 10), TOTAL_PRIZES);
+
+      // Get all prizes for this raffle
+      const prizes = await this.prisma.prize.findMany({
+        where: { raffleId },
+        orderBy: { position: "desc" }, // 11 first, 1 last
+      });
+
+      // Check each milestone: prize 11 at 10%, prize 10 at 20%, ..., prize 1 at 110% (bonus)
+      for (let i = 0; i < prizes.length; i++) {
+        const prize = prizes[i];
+        const prizeIndex = i; // 0 = prize 11, 1 = prize 10, etc.
+        const requiredMilestones = prizeIndex + 1;
+
+        if (milestonesReached >= requiredMilestones && !prize.winnerNumber) {
+          // This prize should be drawn — auto-draw it
+          await this.autoDrawPrize(raffleId, prize.id, prize.predeterminedNumber);
+          console.log(`[AUTO-DRAW] Prize ${prize.position} (${prize.name}) drawn at ${percentage.toFixed(1)}%`);
+        }
+      }
+    } catch (e) {
+      console.log("[AUTO-DRAW] Error:", e instanceof Error ? e.message : e);
+    }
+  }
+
+  private async autoDrawPrize(raffleId: string, prizeId: string, predeterminedNumber: string | null): Promise<void> {
+    let winnerNumber: number;
+
+    if (predeterminedNumber) {
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      winnerNumber = parseInt(decrypt(predeterminedNumber, encKey), 10);
+    } else {
+      // Pick a random SOLD number from gateway B
+      const randomSold = await (this.prisma as any).$queryRaw`
+        SELECT number_value FROM numbers
+        WHERE raffle_id = ${raffleId} AND status = 'SOLD'
+        ORDER BY RANDOM() LIMIT 1
+      `;
+      if (randomSold.length > 0) {
+        winnerNumber = randomSold[0].number_value;
+      } else {
+        return; // No sold numbers — skip
+      }
+    }
+
+    const numberRecord = await this.prisma.number.findUnique({
+      where: { raffleId_numberValue: { raffleId, numberValue: winnerNumber } },
+      include: { buyer: { select: { id: true } } },
+    });
+
+    await this.prisma.prize.update({
+      where: { id: prizeId },
+      data: {
+        winnerNumber,
+        winnerBuyerId: numberRecord?.buyer?.id ?? null,
+        drawnAt: new Date(),
+      },
     });
   }
 
