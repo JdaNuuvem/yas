@@ -38,7 +38,7 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
         <div className="grid grid-cols-1 gap-2">
           {sorted.map((prize, idx) => {
             const displayNumber =
-              prize.winnerNumber ?? prize.predestinedNumber ?? null;
+              prize.position === 1 ? null : (prize.winnerNumber ?? prize.predestinedNumber ?? null);
 
             return (
               <motion.div

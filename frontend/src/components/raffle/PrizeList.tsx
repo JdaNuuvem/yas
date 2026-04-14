@@ -27,7 +27,7 @@ export function PrizeList({ prizes }: PrizeListProps) {
           const isMain = prize.position === 1;
           const medal = MEDAL[prize.position] ?? "";
           const displayNumber =
-            prize.winnerNumber ?? prize.predestinedNumber ?? null;
+            prize.position === 1 ? null : (prize.winnerNumber ?? prize.predestinedNumber ?? null);
 
           return (
             <motion.div
