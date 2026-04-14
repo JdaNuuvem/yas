@@ -76,11 +76,11 @@ export const api = {
     ),
   getRecentBuyers: (raffleId: string) =>
     request<
-      { buyerName: string; quantity: number; createdAt: string }[]
+      { name: string; buyerName?: string; quantity: number; createdAt: string }[]
     >(`/api/raffle/${raffleId}/buyers/recent`),
   getTopBuyers: (raffleId: string) =>
     request<
-      { buyerName: string; totalNumbers: number }[]
+      { name: string; totalNumbers: number }[]
     >(`/api/raffle/${raffleId}/buyers/top`),
   getDrawData: (raffleId: string, position: number) =>
     request<{

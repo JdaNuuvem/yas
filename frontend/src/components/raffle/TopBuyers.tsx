@@ -26,7 +26,7 @@ export function TopBuyers({ raffleId }: TopBuyersProps) {
       <div className="card divide-y divide-gray-100">
         {buyers.slice(0, 5).map((buyer, idx) => (
           <motion.div
-            key={`${buyer.buyerName}-${idx}`}
+            key={`${buyer.name}-${idx}`}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -48,7 +48,7 @@ export function TopBuyers({ raffleId }: TopBuyersProps) {
               {idx + 1}
             </span>
             <span className="text-gray-600 text-sm flex-1 truncate">
-              {maskName(buyer.buyerName)}
+              {maskName(buyer.name)}
             </span>
             <span className="text-green-600 text-xs font-bold">
               {buyer.totalNumbers}
