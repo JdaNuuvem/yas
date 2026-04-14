@@ -69,10 +69,6 @@ export default function Home() {
       <div className="max-w-lg mx-auto space-y-6">
         <HeroSection raffle={raffle} soldCount={raffle.soldCount} />
 
-        <AnimatedSection delay={0.05}>
-          <MilestoneProgress raffleId={raffle.id} prizes={raffle.prizes} />
-        </AnimatedSection>
-
         <AnimatedSection delay={0.1}>
           <MyNumbers />
         </AnimatedSection>
@@ -83,6 +79,10 @@ export default function Home() {
             pricePerNumber={raffle.numberPrice}
             minPurchase={raffle.minPurchase}
           />
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.2}>
+          <MilestoneProgress raffleId={raffle.id} prizes={raffle.prizes} />
         </AnimatedSection>
 
         <AnimatedSection delay={0.1}>
