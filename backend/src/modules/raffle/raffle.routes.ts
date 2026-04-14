@@ -34,6 +34,27 @@ export async function raffleRoutes(server: FastifyInstance) {
     return cached(`progress:${raffleId}`, 30000, () => service.getProgress(raffleId));
   });
 
+  // Serve raffle image as binary (cached 1 hour)
+  server.get("/api/raffle/:raffleId/image", async (request, reply) => {
+    const { raffleId } = request.params as { raffleId: string };
+    const base64 = await cached(`image:${raffleId}`, 3600000, () => service.getImage(raffleId));
+    if (!base64) {
+      return reply.status(404).send({ error: "No image" });
+    }
+    // base64 format: data:image/jpeg;base64,/9j/4AAQ...
+    const match = base64.match(/^data:([^;]+);base64,(.+)$/);
+    if (match) {
+      const contentType = match[1];
+      const buffer = Buffer.from(match[2], "base64");
+      reply.header("Content-Type", contentType);
+      reply.header("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+      return reply.send(buffer);
+    }
+    // Fallback — return as-is
+    reply.header("Cache-Control", "public, max-age=3600");
+    return reply.send(base64);
+  });
+
   server.put(
     "/api/admin/raffle/:raffleId",
     { preHandler: [adminAuth] },

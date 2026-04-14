@@ -12,21 +12,24 @@ interface HeroSectionProps {
   soldCount: number;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+
 export function HeroSection({ raffle, soldCount: realCount }: HeroSectionProps) {
   const soldCount = useSoldCount(realCount);
   const hasImage = !!raffle.mainImageUrl;
+  const imageUrl = hasImage && raffle.mainImageUrl!.startsWith("/")
+    ? `${API_URL}${raffle.mainImageUrl}`
+    : raffle.mainImageUrl;
 
   return (
     <section>
       {/* Image area */}
       <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden">
         {hasImage ? (
-          <Image
-            src={raffle.mainImageUrl!}
+          <img
+            src={imageUrl!}
             alt={raffle.name}
-            fill
-            className="object-cover"
-            priority
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">

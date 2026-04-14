@@ -14,7 +14,21 @@ export class RaffleService {
       where: { raffleId: raffle.id, status: "SOLD" },
     });
 
-    return { ...raffle, soldCount };
+    // Don't send base64 image in the main response — too heavy (4MB+)
+    const hasImage = !!raffle.mainImageUrl;
+    return {
+      ...raffle,
+      mainImageUrl: hasImage ? `/api/raffle/${raffle.id}/image` : null,
+      soldCount,
+    };
+  }
+
+  async getImage(raffleId: string) {
+    const raffle = await this.prisma.raffle.findUnique({
+      where: { id: raffleId },
+      select: { mainImageUrl: true },
+    });
+    return raffle?.mainImageUrl ?? null;
   }
 
   async update(
