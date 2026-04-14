@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -27,17 +27,19 @@ export default function DrawPage() {
   });
 
   const prize = raffle?.prizes.find((p) => p.position === position);
-
   const winnerNumber = drawData?.winnerNumber ?? null;
   const winnerName = drawData?.winnerName ?? "Ganhador";
+  const drawStatus = drawData?.status;
 
-  // Auto-transition based on draw status
-  if (phase === "pending" && drawData?.status === "drawn" && winnerNumber !== null) {
-    setPhase("spinning");
-  }
-  if (phase === "pending" && drawData?.status === "animating") {
-    setPhase("spinning");
-  }
+  useEffect(() => {
+    if (phase !== "pending") return;
+    if (drawStatus === "drawn" && winnerNumber !== null) {
+      setPhase("spinning");
+    }
+    if (drawStatus === "animating") {
+      setPhase("spinning");
+    }
+  }, [phase, drawStatus, winnerNumber]);
 
   const handleSlotComplete = useCallback(() => {
     setPhase("revealed");
