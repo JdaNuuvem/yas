@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { api } from "@/lib/api";
 import { SlotMachine } from "@/components/draw/SlotMachine";
@@ -13,6 +13,7 @@ type DrawPhase = "waiting" | "ready" | "spinning" | "revealed";
 export default function DrawPage() {
   const params = useParams<{ position: string }>();
   const position = Number(params.position);
+  const queryClient = useQueryClient();
   const [phase, setPhase] = useState<DrawPhase>("waiting");
 
   const { data: raffle } = useQuery({
@@ -126,13 +127,37 @@ export default function DrawPage() {
         {/* Winner revealed */}
         {phase === "revealed" && winnerNumber !== null && prize && (
           <>
-            <Confetti />
+            {winnerName !== "Numero nao vendido" && <Confetti />}
             <WinnerReveal
               number={winnerNumber}
               winnerName={winnerName}
               prizeName={prize.name}
               position={position}
             />
+            {winnerName === "Numero nao vendido" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-center space-y-4"
+              >
+                <p className="text-red-400 text-sm">
+                  Este número não foi vendido. Sorteie novamente.
+                </p>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setPhase("waiting");
+                    queryClient.invalidateQueries({ queryKey: ["draw", position] });
+                    // Trigger re-draw on backend
+                    api.adminTriggerDraw(raffle.id, position, 0);
+                  }}
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-8 py-4 rounded-xl text-lg"
+                >
+                  Sortear Novamente
+                </motion.button>
+              </motion.div>
+            )}
           </>
         )}
       </div>

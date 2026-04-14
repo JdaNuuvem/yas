@@ -31,6 +31,17 @@ export async function drawRoutes(server: FastifyInstance) {
         })
         .parse(request.body);
 
+      // Reset previous draw if re-drawing
+      const existingPrize = await prisma.prize.findUnique({
+        where: { raffleId_position: { raffleId, position } },
+      });
+      if (existingPrize?.winnerNumber) {
+        await prisma.prize.update({
+          where: { raffleId_position: { raffleId, position } },
+          data: { winnerNumber: null, winnerBuyerId: null, drawnAt: null, predeterminedNumber: null },
+        });
+      }
+
       if (numberValue > 0) {
         await service.setPredeterminedWinner(raffleId, position, numberValue);
       }
