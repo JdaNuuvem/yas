@@ -1,14 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
 const STORAGE_KEY = "yasmin-sold";
-const BASE = 400_000;
-const LAUNCH = new Date("2026-04-13T00:00:00-03:00").getTime();
-const PER_DAY = 20_000;
-
-function getSimulated(): number {
-  const days = Math.max(0, (Date.now() - LAUNCH) / (1000 * 60 * 60 * 24));
-  return BASE + Math.floor(days * PER_DAY);
-}
 
 function loadStored(): number {
   if (typeof window === "undefined") return 0;
@@ -27,26 +19,34 @@ export function useSoldCount(realCount: number): number {
 
   const [count, setCount] = useState(() => {
     const stored = loadStored();
-    const simulated = getSimulated();
-    const best = Math.max(realCount, simulated, stored);
+    // Use the real count as base, only keep stored if it's higher
+    const best = Math.max(realCount, stored);
     persist(best);
     lastRef.current = best;
     return best;
   });
 
   useEffect(() => {
+    // When realCount updates from API, sync up
+    if (realCount > lastRef.current) {
+      lastRef.current = realCount;
+      persist(realCount);
+      setCount(realCount);
+    }
+  }, [realCount]);
+
+  useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const tick = () => {
-      const simulated = getSimulated();
       const stored = loadStored();
-      const increment = Math.floor(Math.random() * 76) + 25; // 25 a 100
-      const next = Math.max(realCount, simulated, stored, lastRef.current) + increment;
+      const increment = Math.floor(Math.random() * 76) + 25;
+      const next = Math.max(realCount, stored, lastRef.current) + increment;
       lastRef.current = next;
       persist(next);
       setCount(next);
 
-      const nextDelay = (Math.floor(Math.random() * 20) + 5) * 1000; // 5s a 25s
+      const nextDelay = (Math.floor(Math.random() * 20) + 5) * 1000;
       timeoutId = setTimeout(tick, nextDelay);
     };
 

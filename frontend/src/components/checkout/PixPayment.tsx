@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { formatCurrency } from "@/lib/format";
+
+const PIX_EXPIRY_SECONDS = 5 * 60; // 5 minutes
 
 interface PixPaymentProps {
   qrCode: string;
@@ -18,8 +20,35 @@ export function PixPayment({
   purchaseId,
 }: PixPaymentProps) {
   const [copied, setCopied] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(PIX_EXPIRY_SECONDS);
+
+  const isExpired = secondsLeft <= 0;
+  const isUrgent = secondsLeft > 0 && secondsLeft < 60;
+
+  useEffect(() => {
+    if (isExpired) return;
+
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isExpired]);
+
+  const formatTime = useCallback((totalSeconds: number): string => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }, []);
 
   async function handleCopy() {
+    if (isExpired) return;
     try {
       await navigator.clipboard.writeText(qrCode);
       setCopied(true);
@@ -59,7 +88,31 @@ export function PixPayment({
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl p-5 inline-block mx-auto border border-gray-100 shadow-sm">
+      {/* Countdown Timer */}
+      <div className="flex items-center justify-center gap-2">
+        {isExpired ? (
+          <span className="text-red-600 font-bold text-lg">
+            PIX expirado
+          </span>
+        ) : (
+          <>
+            <span className="text-gray-500 text-sm">Expira em</span>
+            <span
+              className={`font-mono font-bold text-lg ${
+                isUrgent ? "text-red-600" : "text-gray-800"
+              }`}
+            >
+              {formatTime(secondsLeft)}
+            </span>
+          </>
+        )}
+      </div>
+
+      <div
+        className={`bg-white rounded-2xl p-5 inline-block mx-auto border border-gray-100 shadow-sm ${
+          isExpired ? "opacity-40" : ""
+        }`}
+      >
         <QRCodeSVG
           value={qrCode}
           size={220}
@@ -76,9 +129,16 @@ export function PixPayment({
 
         <button
           onClick={handleCopy}
-          className="w-full btn-outline py-3.5 text-sm"
+          disabled={isExpired}
+          className={`w-full btn-outline py-3.5 text-sm ${
+            isExpired ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          {copied ? "Copiado!" : "Copiar código PIX"}
+          {isExpired
+            ? "PIX expirado"
+            : copied
+              ? "Copiado!"
+              : "Copiar código PIX"}
         </button>
 
         <p className="text-gray-300 text-[11px]">ID: {purchaseId}</p>
