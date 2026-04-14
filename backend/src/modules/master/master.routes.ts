@@ -122,6 +122,17 @@ export async function masterRoutes(server: FastifyInstance) {
 
       // Execute draw
       const result = await drawService.executeDraw(raffleId, nextPrize.position);
+
+      // If this was the 10th milestone (100%), also draw the bonus (1st prize)
+      let bonusResult = null;
+      if (milestone >= 100) {
+        const bonusPrize = prizes.find((p) => p.position === 1 && !p.winnerNumber);
+        if (bonusPrize) {
+          bonusResult = await drawService.executeDraw(raffleId, bonusPrize.position);
+          console.log(`[SIMULATE] Bonus prize also drawn: ${bonusResult.winnerNumber}`);
+        }
+      }
+
       return {
         success: true,
         milestone: `${milestone}%`,
@@ -129,6 +140,7 @@ export async function masterRoutes(server: FastifyInstance) {
         prizeName: nextPrize.name,
         winnerNumber: result.winnerNumber,
         winnerName: result.winnerName,
+        bonus: bonusResult ? { position: 1, winnerNumber: bonusResult.winnerNumber, winnerName: bonusResult.winnerName } : undefined,
       };
     },
   );
