@@ -27,7 +27,7 @@ export class RaffleService {
       include: {
         prizes: {
           orderBy: { position: "asc" },
-          include: { winnerBuyer: { select: { cpf: true } } },
+          include: { winnerBuyer: { select: { name: true, cpf: true } } },
         },
       },
     });
@@ -48,11 +48,15 @@ export class RaffleService {
     const hasImage = !!raffle.mainImageUrl;
 
     // Add masked CPF to each prize
-    const prizesWithCpf = raffle.prizes.map((p: any) => ({
-      ...p,
-      winnerCpfMasked: p.winnerBuyer ? this.maskCpf(p.winnerBuyer.cpf) : null,
-      winnerBuyer: undefined, // Don't leak full buyer data
-    }));
+    const prizesWithCpf = raffle.prizes.map((p: any) => {
+      const firstName = p.winnerBuyer?.name?.split(" ")[0] ?? null;
+      return {
+        ...p,
+        winnerName: firstName,
+        winnerCpfMasked: p.winnerBuyer ? this.maskCpf(p.winnerBuyer.cpf) : null,
+        winnerBuyer: undefined,
+      };
+    });
 
     return {
       ...raffle,
