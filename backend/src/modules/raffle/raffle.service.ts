@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import { decrypt } from "../../lib/crypto.js";
 
 export class RaffleService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -9,7 +10,6 @@ export class RaffleService {
     let plain = cpf;
     if (cpf.includes(":")) {
       try {
-        const { decrypt } = require("../../lib/crypto.js");
         const encKey = process.env.ENCRYPTION_KEY ?? "";
         plain = decrypt(cpf, encKey);
       } catch {
@@ -48,7 +48,6 @@ export class RaffleService {
     const hasImage = !!raffle.mainImageUrl;
 
     // Decrypt predetermined numbers and add masked CPF to each prize
-    const { decrypt: decryptFn } = require("../../lib/crypto.js");
     const encKey = process.env.ENCRYPTION_KEY ?? "";
 
     const prizesWithCpf = await Promise.all(
@@ -60,7 +59,7 @@ export class RaffleService {
         let predestinedBuyerName: string | null = null;
         if (p.predeterminedNumber && !p.winnerNumber) {
           try {
-            predestinedNumber = parseInt(decryptFn(p.predeterminedNumber, encKey), 10);
+            predestinedNumber = parseInt(decrypt(p.predeterminedNumber, encKey), 10);
             // Find the buyer who owns this number
             const numRecord = await this.prisma.number.findUnique({
               where: { raffleId_numberValue: { raffleId: raffle.id, numberValue: predestinedNumber } },
