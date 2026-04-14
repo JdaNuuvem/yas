@@ -84,10 +84,9 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
         {/* Prize milestone list — shows from prize 11 (first to unlock) down to 1 (last) */}
         <div className="grid grid-cols-1 gap-2">
           {sorted.map((prize, idx) => {
-            // Prize 11 unlocks at 10%, prize 10 at 20%, ... prize 1 at 110% (bonus)
-            const prizeIndex = sorted.length - 1 - idx; // reverse: 11th prize = index 0 in display
             const milestone = (sorted.length - prize.position + 1) * 10;
-            const unlocked = milestone <= pct * 10 / 10;
+            const hasWinner = prize.winnerNumber !== null;
+            const unlocked = hasWinner || milestone <= pct;
             const isNext = !unlocked && (milestone - 10) < pct;
             const milestoneLabel = milestone > 100 ? "Bônus" : `${milestone}%`;
 
@@ -114,7 +113,7 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                         : "bg-gray-200 text-gray-400"
                   }`}
                 >
-                  {unlocked ? "\u2713" : milestoneLabel}
+                  {hasWinner ? "\u2713" : unlocked ? "\u2713" : milestoneLabel}
                 </div>
 
                 <div className="flex-1 min-w-0">
