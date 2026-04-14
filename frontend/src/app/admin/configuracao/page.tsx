@@ -28,13 +28,20 @@ export default function AdminConfiguraçãoPage() {
     queryFn: () => api.adminGetGatewayKeys(),
   });
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+
   useEffect(() => {
     if (raffle) {
       setName(raffle.name);
       setDescription(raffle.description);
-      setImagePreview(raffle.mainImageUrl);
+      // Convert relative image URL to full URL for preview
+      if (raffle.mainImageUrl?.startsWith("/")) {
+        setImagePreview(`${API_URL}${raffle.mainImageUrl}`);
+      } else {
+        setImagePreview(raffle.mainImageUrl);
+      }
     }
-  }, [raffle]);
+  }, [raffle, API_URL]);
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -53,8 +60,14 @@ export default function AdminConfiguraçãoPage() {
   }
 
   const raffleMutation = useMutation({
-    mutationFn: () =>
-      api.updateRaffle(raffle!.id, { name, description, mainImageUrl: imagePreview }),
+    mutationFn: () => {
+      // Only send image if it's a new base64 upload (not the existing URL)
+      const isNewImage = imagePreview?.startsWith("data:");
+      const data: Record<string, unknown> = { name, description };
+      if (isNewImage) data.mainImageUrl = imagePreview;
+      if (!imagePreview) data.mainImageUrl = null;
+      return api.updateRaffle(raffle!.id, data as any);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["raffle"] });
       setSuccess(true);
