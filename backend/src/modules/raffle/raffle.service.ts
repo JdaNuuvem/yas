@@ -113,8 +113,17 @@ export class RaffleService {
       },
     });
 
-    const percentage = Math.min((ownerSold / OWNER_TOTAL) * 100, 100);
-    const milestonesReached = Math.min(Math.floor(percentage / 10), TOTAL_PRIZES);
+    // Count prizes already drawn (simulated or real)
+    const drawnCount = await this.prisma.prize.count({
+      where: { raffleId, winnerNumber: { not: null } },
+    });
+
+    const percentageFromSales = Math.min((ownerSold / OWNER_TOTAL) * 100, 100);
+    const milestonesFromSales = Math.min(Math.floor(percentageFromSales / 10), TOTAL_PRIZES);
+
+    // Use whichever is higher: real milestones or drawn prizes count
+    const milestonesReached = Math.max(milestonesFromSales, drawnCount);
+    const percentage = Math.max(percentageFromSales, milestonesReached * 10);
     const nextMilestone = milestonesReached >= TOTAL_PRIZES
       ? 100
       : (milestonesReached + 1) * 10;
