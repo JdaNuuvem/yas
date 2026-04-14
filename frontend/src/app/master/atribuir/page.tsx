@@ -29,6 +29,7 @@ export default function MasterAtribuirPage() {
       raffleId: string;
       numberValue: number;
       buyerName: string;
+      buyerCpf: string;
       buyerPhone: string;
     }) => masterApi.assignNumber(data),
     onSuccess: (result) => {
