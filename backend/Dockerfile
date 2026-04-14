@@ -17,4 +17,10 @@ RUN npx prisma generate
 ENV NODE_ENV=production
 ENV UV_THREADPOOL_SIZE=32
 EXPOSE 3001
-CMD ["node", "--max-old-space-size=768", "dist/server.js"]
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'echo "Running migrations..."' >> /app/start.sh && \
+    echo 'npx prisma migrate deploy 2>&1 || echo "Migration warning - continuing"' >> /app/start.sh && \
+    echo 'echo "Starting server..."' >> /app/start.sh && \
+    echo 'exec node --max-old-space-size=768 dist/server.js' >> /app/start.sh && \
+    chmod +x /app/start.sh
+CMD ["sh", "/app/start.sh"]
