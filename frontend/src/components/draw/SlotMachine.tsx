@@ -12,7 +12,7 @@ interface SlotMachineProps {
 export function SlotMachine({
   targetNumber,
   onComplete,
-  duration = 5000,
+  duration = 8000,
 }: SlotMachineProps) {
   const [displayNumber, setDisplayNumber] = useState(0);
   const [isDone, setIsDone] = useState(false);
@@ -96,7 +96,7 @@ export function SlotMachine({
             : { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
         }
       >
-        <p className="text-7xl md:text-9xl font-mono font-bold tabular-nums tracking-wider text-center">
+        <p className="text-4xl sm:text-6xl md:text-8xl font-mono font-bold tabular-nums tracking-wider text-center">
           <span className={isDone ? "text-green-400" : "text-white"}>
             {padNumber(displayNumber)}
           </span>

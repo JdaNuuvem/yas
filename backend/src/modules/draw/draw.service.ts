@@ -95,7 +95,7 @@ export class DrawService {
 
     // Prevent clients from polling the winner before the animation finishes.
     // The animation runs for ~15s; we gate at 20s to add a safety margin.
-    const ANIMATION_WINDOW_MS = 8_000;
+    const ANIMATION_WINDOW_MS = 12_000;
     const timeSinceDraw = Date.now() - prize.drawnAt.getTime();
 
     if (timeSinceDraw < ANIMATION_WINDOW_MS) {
