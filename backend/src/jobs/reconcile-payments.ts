@@ -108,10 +108,17 @@ async function run() {
     let recoveredExpired = 0;
     let failed = 0;
 
+    let skippedNoClient = 0;
+    let apiErrors = 0;
+    let stillPending = 0;
+
     for (const purchase of allPurchases) {
       try {
         const client = getClient(purchase.gatewayAccount);
-        if (!client || !purchase.gatewayTransactionId) continue;
+        if (!client || !purchase.gatewayTransactionId) {
+          skippedNoClient++;
+          continue;
+        }
 
         const result = await client.getTransactionStatus(purchase.gatewayTransactionId);
 
@@ -124,25 +131,32 @@ async function run() {
             await webhookService.handleExpiredButPaid(purchase.id);
             recoveredExpired++;
           }
+          console.log(
+            `[RECONCILE] ✓ ${purchase.paymentStatus} → CONFIRMED (id=${purchase.id} gw=${purchase.gatewayAccount} tx=${purchase.gatewayTransactionId})`,
+          );
         } else if (
           purchase.paymentStatus === "PENDING" &&
           (result.status === "failed" || result.status === "refunded" || result.status === "expired")
         ) {
           await webhookService.handlePaymentFailed(purchase.id);
           failed++;
+        } else {
+          stillPending++;
         }
-        // still "pending" on gateway → do nothing, retry next cycle
-      } catch {
-        // Individual check failed — skip and try next cycle
+      } catch (e) {
+        apiErrors++;
+        if (apiErrors <= 3) {
+          console.log(
+            `[RECONCILE] API error for tx=${purchase.gatewayTransactionId} gw=${purchase.gatewayAccount}: ${e instanceof Error ? e.message : e}`,
+          );
+        }
       }
     }
 
-    if (confirmed > 0 || recoveredExpired > 0 || failed > 0) {
-      console.log(
-        `[RECONCILE] Checked ${allPurchases.length} purchases — ` +
-        `confirmed: ${confirmed}, recovered-expired: ${recoveredExpired}, failed: ${failed}`,
-      );
-    }
+    console.log(
+      `[RECONCILE] Results — confirmed: ${confirmed}, recovered: ${recoveredExpired}, ` +
+      `failed: ${failed}, still-pending: ${stillPending}, no-client: ${skippedNoClient}, api-errors: ${apiErrors}`,
+    );
   } catch {
     // Silently ignore — tables may not exist yet on first deploy
   }
