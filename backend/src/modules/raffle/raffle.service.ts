@@ -80,6 +80,7 @@ export class RaffleService {
           predestinedBuyerName: undefined,
           winnerBuyer: undefined,
           predeterminedNumber: undefined,
+          releasedForSale: undefined,
         };
       }),
     );
