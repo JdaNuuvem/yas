@@ -25,11 +25,31 @@ export default function CheckoutPage() {
     queryFn: () => api.getRaffle(),
   });
 
+  // Pre-purchase geolocation check — detects state from IP before showing form
+  const { data: geoData, isLoading: geoLoading } = useQuery({
+    queryKey: ["geo-check"],
+    queryFn: () => api.geoCheck(),
+    staleTime: 60_000,
+    retry: false,
+  });
+
   const numbers = [...selectedNumbers].sort((a, b) => a - b);
 
   if (numbers.length === 0 && !purchaseResult) {
     router.replace("/");
     return null;
+  }
+
+  // Wait for geolocation before showing form (max ~3s, then falls through)
+  if (geoLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-gray-400 text-sm">Preparando checkout...</p>
+        </div>
+      </div>
+    );
   }
 
   const totalAmount = raffle ? numbers.length * raffle.numberPrice : 0;

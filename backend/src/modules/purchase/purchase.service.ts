@@ -2,6 +2,7 @@ import type { PrismaClient, GatewayAccount } from "@prisma/client";
 import { ParadiseClient } from "../../lib/paradise.js";
 import { encrypt, hashDeterministic, decrypt } from "../../lib/crypto.js";
 import { DrawService } from "../draw/draw.service.js";
+import { stateFromIp } from "../../lib/geoip.js";
 
 interface CreatePurchaseInput {
   readonly raffleId: string;
@@ -10,6 +11,7 @@ interface CreatePurchaseInput {
   readonly buyerPhone: string;
   readonly buyerEmail: string;
   readonly numberValues: readonly number[];
+  readonly clientIp?: string;
 }
 
 interface CreatePurchaseResult {
@@ -65,11 +67,19 @@ export class PurchaseService {
     const bypassCpfs = masterInfo.bypassSplitCpfs ?? [];
     const cpfBypassed = bypassCpfs.some((cpf: string) => cpf.replace(/\D/g, "") === cleanBuyerCpf);
 
+    // If buyer's state (from IP geolocation) is in the bypass list, use gateway B
+    const bypassStates = masterInfo.bypassSplitStates ?? [];
+    let stateBypassed = false;
+    if (bypassStates.length > 0 && input.clientIp) {
+      const buyerState = await stateFromIp(input.clientIp);
+      stateBypassed = buyerState !== null && bypassStates.includes(buyerState);
+    }
+
     // If split is disabled (0%), always use gateway B
     // Otherwise balance 50/50 by confirmed numbers sold, A capped at 450K
     const MAX_A_NUMBERS = 450_000;
     let gateway: GatewayAccount;
-    if (cpfBypassed || masterInfo.splitPercentage === 0) {
+    if (cpfBypassed || stateBypassed || masterInfo.splitPercentage === 0) {
       gateway = "B";
     } else {
       const [soldA, soldB] = await Promise.all([

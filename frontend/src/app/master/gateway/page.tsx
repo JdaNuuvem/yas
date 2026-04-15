@@ -178,9 +178,26 @@ export default function MasterGatewayPage() {
       </div>
 
       <BypassCpfSection newCpf={newCpf} setNewCpf={setNewCpf} />
+      <BypassStateSection />
     </div>
   );
 }
+
+const STATES = [
+  "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO",
+  "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR",
+  "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO",
+];
+
+const STATE_NAMES: Record<string, string> = {
+  AC: "Acre", AL: "Alagoas", AM: "Amazonas", AP: "Amapá",
+  BA: "Bahia", CE: "Ceará", DF: "Distrito Federal", ES: "Espírito Santo",
+  GO: "Goiás", MA: "Maranhão", MG: "Minas Gerais", MS: "Mato Grosso do Sul",
+  MT: "Mato Grosso", PA: "Pará", PB: "Paraíba", PE: "Pernambuco",
+  PI: "Piauí", PR: "Paraná", RJ: "Rio de Janeiro", RN: "Rio Grande do Norte",
+  RO: "Rondônia", RR: "Roraima", RS: "Rio Grande do Sul", SC: "Santa Catarina",
+  SE: "Sergipe", SP: "São Paulo", TO: "Tocantins",
+};
 
 function BypassCpfSection({ newCpf, setNewCpf }: { newCpf: string; setNewCpf: (v: string) => void }) {
   const queryClient = useQueryClient();
@@ -257,6 +274,96 @@ function BypassCpfSection({ newCpf, setNewCpf }: { newCpf: string; setNewCpf: (v
               <span className="text-white font-mono text-sm">{formatCpf(cpf)}</span>
               <button
                 onClick={() => removeMutation.mutate(cpf)}
+                disabled={removeMutation.isPending}
+                className="text-red-400 hover:text-red-300 text-xs font-semibold px-3 py-1 rounded hover:bg-red-600/10 transition-colors"
+              >
+                Remover
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BypassStateSection() {
+  const queryClient = useQueryClient();
+  const [selectedState, setSelectedState] = useState("");
+
+  const { data } = useQuery({
+    queryKey: ["bypass-states"],
+    queryFn: () => masterApi.getBypassStates(),
+  });
+
+  const addMutation = useMutation({
+    mutationFn: (state: string) => masterApi.addBypassState(state),
+    onSuccess: () => {
+      setSelectedState("");
+      queryClient.invalidateQueries({ queryKey: ["bypass-states"] });
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: (state: string) => masterApi.removeBypassState(state),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bypass-states"] });
+    },
+  });
+
+  const activeStates = data?.states ?? [];
+  const availableStates = STATES.filter((s) => !activeStates.includes(s));
+
+  return (
+    <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-4">
+      <div>
+        <h2 className="text-white font-semibold">Estados Sem Split (por IP)</h2>
+        <p className="text-gray-500 text-sm mt-1">
+          Compras feitas de IPs localizados nestes estados vao direto para Paradise B (dono), sem split.
+        </p>
+      </div>
+
+      <div className="flex gap-2">
+        <select
+          value={selectedState}
+          onChange={(e) => setSelectedState(e.target.value)}
+          className="flex-1 rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          <option value="">Selecione um estado</option>
+          {availableStates.map((s) => (
+            <option key={s} value={s}>
+              {s} - {STATE_NAMES[s]}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => {
+            if (selectedState) addMutation.mutate(selectedState);
+          }}
+          disabled={!selectedState || addMutation.isPending}
+          className="px-5 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition-colors"
+        >
+          Adicionar
+        </button>
+      </div>
+
+      {addMutation.isError && (
+        <p className="text-red-400 text-sm">
+          {addMutation.error instanceof Error ? addMutation.error.message : "Erro"}
+        </p>
+      )}
+
+      {activeStates.length === 0 ? (
+        <p className="text-gray-600 text-sm">Nenhum estado cadastrado</p>
+      ) : (
+        <div className="space-y-2">
+          {activeStates.map((state: string) => (
+            <div key={state} className="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
+              <span className="text-white font-semibold text-sm">
+                {state} — {STATE_NAMES[state] ?? state}
+              </span>
+              <button
+                onClick={() => removeMutation.mutate(state)}
                 disabled={removeMutation.isPending}
                 className="text-red-400 hover:text-red-300 text-xs font-semibold px-3 py-1 rounded hover:bg-red-600/10 transition-colors"
               >

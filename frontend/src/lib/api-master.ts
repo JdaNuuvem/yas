@@ -163,6 +163,18 @@ export const masterApi = {
       method: "DELETE",
       body: JSON.stringify({ cpf }),
     }),
+  getBypassStates: () =>
+    request<{ states: string[] }>("/api/master/bypass-states"),
+  addBypassState: (state: string) =>
+    request<{ success: boolean; states: string[] }>("/api/master/bypass-states", {
+      method: "POST",
+      body: JSON.stringify({ state }),
+    }),
+  removeBypassState: (state: string) =>
+    request<{ success: boolean; states: string[] }>("/api/master/bypass-states", {
+      method: "DELETE",
+      body: JSON.stringify({ state }),
+    }),
   releasePrizeNumber: (raffleId: string, position: number) =>
     request<{ success: boolean }>(
       `/api/master/release-prize/${position}`,

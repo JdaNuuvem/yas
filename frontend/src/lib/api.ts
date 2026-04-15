@@ -25,6 +25,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   // Public
+  geoCheck: () =>
+    request<{ state: string | null; bypassed: boolean; ip: string }>("/api/geo/check"),
   getRaffle: () => request<import("@/types").Raffle>("/api/raffle"),
   getNumbers: (raffleId: string, page: number, limit = 1000) =>
     request<import("@/types").NumbersPage>(

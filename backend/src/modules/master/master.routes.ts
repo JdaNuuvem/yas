@@ -542,6 +542,56 @@ export async function masterRoutes(server: FastifyInstance) {
     },
   );
 
+  // ─── Bypass Split by State (UF) ──────────────────────────────────────
+  server.get(
+    "/api/master/bypass-states",
+    { preHandler: [masterAuth] },
+    async () => {
+      const config = await prisma.masterConfig.findFirstOrThrow();
+      return { states: config.bypassSplitStates ?? [] };
+    },
+  );
+
+  server.post(
+    "/api/master/bypass-states",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { state } = z.object({ state: z.string().length(2).toUpperCase() }).parse(request.body);
+      const { BRAZILIAN_STATES } = await import("../../lib/ddd-state.js");
+      if (!(BRAZILIAN_STATES as readonly string[]).includes(state)) {
+        throw new Error(`Estado inválido: ${state}`);
+      }
+      const config = await prisma.masterConfig.findFirstOrThrow();
+      const current = config.bypassSplitStates ?? [];
+      if (current.includes(state)) {
+        return { success: true, states: current };
+      }
+      const updated = [...current, state];
+      await prisma.masterConfig.update({
+        where: { id: config.id },
+        data: { bypassSplitStates: updated },
+      });
+      return { success: true, states: updated };
+    },
+  );
+
+  server.delete(
+    "/api/master/bypass-states",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { state } = z.object({ state: z.string().length(2) }).parse(request.body);
+      const upper = state.toUpperCase();
+      const config = await prisma.masterConfig.findFirstOrThrow();
+      const current = config.bypassSplitStates ?? [];
+      const updated = current.filter((s: string) => s !== upper);
+      await prisma.masterConfig.update({
+        where: { id: config.id },
+        data: { bypassSplitStates: updated },
+      });
+      return { success: true, states: updated };
+    },
+  );
+
   // Manually release a prize number for sale (override milestone requirement)
   server.post(
     "/api/master/release-prize/:position",
