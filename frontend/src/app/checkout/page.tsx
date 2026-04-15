@@ -109,26 +109,8 @@ export default function CheckoutPage() {
 
         {!purchaseResult && (
           <>
-            <div className="card p-4 space-y-3">
-              <h2 className="text-gray-900 font-medium text-sm">
-                Números selecionados
-              </h2>
-              <div className="flex flex-wrap gap-1.5">
-                {numbers.slice(0, 30).map((n) => (
-                  <span
-                    key={n}
-                    className="bg-green-50 text-green-700 text-[11px] font-mono px-2 py-1 rounded-lg"
-                  >
-                    {padNumber(n)}
-                  </span>
-                ))}
-                {numbers.length > 30 && (
-                  <span className="text-gray-400 text-[11px] px-2 py-1">
-                    +{numbers.length - 30} mais
-                  </span>
-                )}
-              </div>
-              <div className="flex justify-between pt-3 border-t border-gray-100">
+            <div className="card p-4">
+              <div className="flex justify-between items-center">
                 <span className="text-gray-400 text-sm">
                   {numbers.length} números
                 </span>
