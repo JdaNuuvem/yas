@@ -38,7 +38,9 @@ export async function webhookRoutes(server: FastifyInstance) {
     }
 
     if (status === "approved") {
+      // Try normal confirmation first; if purchase was already expired, recover it
       await service.handlePaymentConfirmed(purchaseRef);
+      await service.handleExpiredButPaid(purchaseRef);
       console.log(`[WEBHOOK] Payment confirmed for ${purchaseRef}`);
     } else if (status === "failed" || status === "refunded" || status === "expired") {
       await service.handlePaymentFailed(purchaseRef);

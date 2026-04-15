@@ -16,18 +16,24 @@ export class WebhookService {
       return;
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      await tx.purchase.update({
-        where: { id: purchaseId },
+    const confirmed = await this.prisma.$transaction(async (tx) => {
+      // Atomically claim — only succeeds if still PENDING (prevents race with expiry job)
+      const updated = await tx.purchase.updateMany({
+        where: { id: purchaseId, paymentStatus: "PENDING" },
         data: { paymentStatus: "CONFIRMED", confirmedAt: new Date() },
       });
+
+      if (updated.count === 0) return false; // Expiry job got there first
+
       await tx.number.updateMany({
         where: { purchaseId, status: "RESERVED" },
         data: { status: "SOLD", soldAt: new Date() },
       });
 
-      // Gateway is balanced by counting confirmed payments (no flip needed)
+      return true;
     });
+
+    if (!confirmed) return;
 
     // After confirming, check if we crossed a milestone — auto-draw prize
     if (purchase.gatewayAccount === "B") {
@@ -101,6 +107,74 @@ export class WebhookService {
         drawnAt: new Date(),
       },
     });
+  }
+
+  /**
+   * Re-confirm an EXPIRED purchase whose payment actually succeeded on the gateway.
+   * The original numbers were already released, so we assign new random AVAILABLE ones.
+   */
+  async handleExpiredButPaid(purchaseId: string): Promise<void> {
+    const purchase = await this.prisma.purchase.findUnique({
+      where: { id: purchaseId },
+    });
+
+    if (!purchase || purchase.paymentStatus !== "EXPIRED") return;
+
+    const recovered = await this.prisma.$transaction(async (tx) => {
+      // Atomically claim — only one concurrent caller can flip EXPIRED→CONFIRMED
+      const claimed = await tx.purchase.updateMany({
+        where: { id: purchaseId, paymentStatus: "EXPIRED" },
+        data: { paymentStatus: "CONFIRMED", confirmedAt: new Date() },
+      });
+
+      if (claimed.count === 0) return false; // Already recovered by another process
+
+      // Grab random AVAILABLE numbers to replace the released ones
+      const available: Array<{ id: string }> = await tx.$queryRaw`
+        SELECT id FROM numbers
+        WHERE raffle_id = ${purchase.raffleId}
+          AND status = 'AVAILABLE'
+        ORDER BY RANDOM()
+        LIMIT ${purchase.quantity}
+        FOR UPDATE SKIP LOCKED
+      `;
+
+      if (available.length === 0) {
+        // No numbers available right now — revert so the job retries later
+        await tx.purchase.updateMany({
+          where: { id: purchaseId },
+          data: { paymentStatus: "EXPIRED", confirmedAt: null },
+        });
+        return false;
+      }
+
+      const assignCount = available.length;
+      const ids = available.map((r) => r.id);
+
+      await tx.number.updateMany({
+        where: { id: { in: ids } },
+        data: {
+          status: "SOLD",
+          soldAt: new Date(),
+          buyerId: purchase.buyerId,
+          purchaseId: purchase.id,
+        },
+      });
+
+      // Update quantity to reflect how many were actually assigned
+      if (assignCount !== purchase.quantity) {
+        await tx.purchase.update({
+          where: { id: purchaseId },
+          data: { quantity: assignCount },
+        });
+      }
+
+      return true;
+    });
+
+    if (recovered && purchase.gatewayAccount === "B") {
+      await this.checkAndAutoDraw(purchase.raffleId);
+    }
   }
 
   async handlePaymentFailed(purchaseId: string): Promise<void> {

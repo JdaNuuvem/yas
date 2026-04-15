@@ -22,8 +22,9 @@ if (process.env.SENTRY_DSN) {
   });
 }
 
-// Start reservation expiry job
+// Start background jobs
 import("./jobs/expire-reservations.js");
+import("./jobs/reconcile-payments.js");
 
 export async function buildServer() {
   const server = Fastify({

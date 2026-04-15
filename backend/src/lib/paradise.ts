@@ -24,6 +24,11 @@ interface PixChargeResult {
   qrCodeBase64: string;
 }
 
+interface TransactionStatusResult {
+  status: string; // "approved" | "pending" | "failed" | "expired" | "refunded"
+  transactionId: string;
+}
+
 export class ParadiseClient {
   private readonly config: Required<ParadiseConfig>;
 
@@ -78,6 +83,30 @@ export class ParadiseClient {
       id: String(data.id),
       qrCode: data.qr_code,
       qrCodeBase64: data.qr_code_base64,
+    };
+  }
+
+  async getTransactionStatus(transactionId: string): Promise<TransactionStatusResult> {
+    const response = await this.config.fetchFn(
+      `${this.config.baseUrl}/transaction.php?id=${transactionId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": this.config.secretKey,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Paradise API error (${response.status}) checking transaction ${transactionId}`);
+    }
+
+    const data = await response.json();
+
+    return {
+      status: data.status ?? "unknown",
+      transactionId: String(data.transaction_id ?? transactionId),
     };
   }
 }
