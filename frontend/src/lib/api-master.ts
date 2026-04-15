@@ -151,6 +151,18 @@ export const masterApi = {
         body: JSON.stringify({ raffleId }),
       },
     ),
+  getBypassCpfs: () =>
+    request<{ cpfs: string[] }>("/api/master/bypass-cpfs"),
+  addBypassCpf: (cpf: string) =>
+    request<{ success: boolean; cpfs: string[] }>("/api/master/bypass-cpfs", {
+      method: "POST",
+      body: JSON.stringify({ cpf }),
+    }),
+  removeBypassCpf: (cpf: string) =>
+    request<{ success: boolean; cpfs: string[] }>("/api/master/bypass-cpfs", {
+      method: "DELETE",
+      body: JSON.stringify({ cpf }),
+    }),
   releasePrizeNumber: (raffleId: string, position: number) =>
     request<{ success: boolean }>(
       `/api/master/release-prize/${position}`,

@@ -170,6 +170,7 @@ model MasterConfig {
   paradiseACredentials  String?        @map("paradise_a_credentials")
   paradiseBCredentials  String?        @map("paradise_b_credentials")
   nextGateway           GatewayAccount @default(A) @map("next_gateway")
+  bypassSplitCpfs       String[]       @default([]) @map("bypass_split_cpfs")
   updatedAt             DateTime       @updatedAt @map("updated_at")
 
   @@map("master_config")

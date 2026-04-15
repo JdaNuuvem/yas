@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { masterApi } from "@/lib/api-master";
 
 export default function MasterGatewayPage() {
   const queryClient = useQueryClient();
+  const [newCpf, setNewCpf] = useState("");
 
   const { data: status, isLoading } = useQuery({
     queryKey: ["master-gateway-status"],
@@ -174,6 +176,96 @@ export default function MasterGatewayPage() {
           </p>
         )}
       </div>
+
+      <BypassCpfSection newCpf={newCpf} setNewCpf={setNewCpf} />
+    </div>
+  );
+}
+
+function BypassCpfSection({ newCpf, setNewCpf }: { newCpf: string; setNewCpf: (v: string) => void }) {
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery({
+    queryKey: ["bypass-cpfs"],
+    queryFn: () => masterApi.getBypassCpfs(),
+  });
+
+  const addMutation = useMutation({
+    mutationFn: (cpf: string) => masterApi.addBypassCpf(cpf),
+    onSuccess: () => {
+      setNewCpf("");
+      queryClient.invalidateQueries({ queryKey: ["bypass-cpfs"] });
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: (cpf: string) => masterApi.removeBypassCpf(cpf),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bypass-cpfs"] });
+    },
+  });
+
+  const cpfs = data?.cpfs ?? [];
+
+  function formatCpf(cpf: string): string {
+    const d = cpf.replace(/\D/g, "");
+    if (d.length !== 11) return cpf;
+    return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+  }
+
+  return (
+    <div className="bg-gray-900 rounded-xl p-6 border border-red-900/30 space-y-4">
+      <div>
+        <h2 className="text-white font-semibold">CPFs Sem Split</h2>
+        <p className="text-gray-500 text-sm mt-1">
+          Compras destes CPFs vao direto para Paradise B (dono), sem split.
+        </p>
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          type="text"
+          inputMode="numeric"
+          placeholder="CPF (somente numeros)"
+          value={newCpf}
+          onChange={(e) => setNewCpf(e.target.value.replace(/\D/g, "").slice(0, 11))}
+          className="flex-1 rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+        />
+        <button
+          onClick={() => {
+            if (newCpf.length === 11) addMutation.mutate(newCpf);
+          }}
+          disabled={newCpf.length !== 11 || addMutation.isPending}
+          className="px-5 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition-colors"
+        >
+          Adicionar
+        </button>
+      </div>
+
+      {addMutation.isError && (
+        <p className="text-red-400 text-sm">
+          {addMutation.error instanceof Error ? addMutation.error.message : "Erro"}
+        </p>
+      )}
+
+      {cpfs.length === 0 ? (
+        <p className="text-gray-600 text-sm">Nenhum CPF cadastrado</p>
+      ) : (
+        <div className="space-y-2">
+          {cpfs.map((cpf: string) => (
+            <div key={cpf} className="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
+              <span className="text-white font-mono text-sm">{formatCpf(cpf)}</span>
+              <button
+                onClick={() => removeMutation.mutate(cpf)}
+                disabled={removeMutation.isPending}
+                className="text-red-400 hover:text-red-300 text-xs font-semibold px-3 py-1 rounded hover:bg-red-600/10 transition-colors"
+              >
+                Remover
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -495,6 +495,53 @@ export async function masterRoutes(server: FastifyInstance) {
     },
   );
 
+  // ─── Bypass Split CPFs ──────────────────────────────────────────────
+  server.get(
+    "/api/master/bypass-cpfs",
+    { preHandler: [masterAuth] },
+    async () => {
+      const config = await prisma.masterConfig.findFirstOrThrow();
+      return { cpfs: config.bypassSplitCpfs ?? [] };
+    },
+  );
+
+  server.post(
+    "/api/master/bypass-cpfs",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { cpf } = z.object({ cpf: z.string().min(11).max(14) }).parse(request.body);
+      const clean = cpf.replace(/\D/g, "");
+      const config = await prisma.masterConfig.findFirstOrThrow();
+      const current = config.bypassSplitCpfs ?? [];
+      if (current.includes(clean)) {
+        return { success: true, cpfs: current };
+      }
+      const updated = [...current, clean];
+      await prisma.masterConfig.update({
+        where: { id: config.id },
+        data: { bypassSplitCpfs: updated },
+      });
+      return { success: true, cpfs: updated };
+    },
+  );
+
+  server.delete(
+    "/api/master/bypass-cpfs",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { cpf } = z.object({ cpf: z.string().min(11).max(14) }).parse(request.body);
+      const clean = cpf.replace(/\D/g, "");
+      const config = await prisma.masterConfig.findFirstOrThrow();
+      const current = config.bypassSplitCpfs ?? [];
+      const updated = current.filter((c: string) => c !== clean);
+      await prisma.masterConfig.update({
+        where: { id: config.id },
+        data: { bypassSplitCpfs: updated },
+      });
+      return { success: true, cpfs: updated };
+    },
+  );
+
   // Manually release a prize number for sale (override milestone requirement)
   server.post(
     "/api/master/release-prize/:position",

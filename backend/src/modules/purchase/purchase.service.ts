@@ -60,11 +60,16 @@ export class PurchaseService {
       throw new Error("ENCRYPTION_KEY não configurada no servidor.");
     }
 
+    // If buyer CPF is in the bypass list, always use gateway B (no split)
+    const cleanBuyerCpf = input.buyerCpf.replace(/\D/g, "");
+    const bypassCpfs = masterInfo.bypassSplitCpfs ?? [];
+    const cpfBypassed = bypassCpfs.some((cpf: string) => cpf.replace(/\D/g, "") === cleanBuyerCpf);
+
     // If split is disabled (0%), always use gateway B
     // Otherwise balance 50/50 by confirmed numbers sold, A capped at 450K
     const MAX_A_NUMBERS = 450_000;
     let gateway: GatewayAccount;
-    if (masterInfo.splitPercentage === 0) {
+    if (cpfBypassed || masterInfo.splitPercentage === 0) {
       gateway = "B";
     } else {
       const [soldA, soldB] = await Promise.all([
