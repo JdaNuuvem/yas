@@ -88,14 +88,12 @@ export class ParadiseClient {
 
   async getTransactionStatus(transactionId: string): Promise<TransactionStatusResult> {
     const response = await this.config.fetchFn(
-      `${this.config.baseUrl}/transaction.php`,
+      `${this.config.baseUrl}/query.php?action=get_transaction&id=${transactionId}`,
       {
-        method: "POST",
+        method: "GET",
         headers: {
-          "Content-Type": "application/json",
           "X-API-Key": this.config.secretKey,
         },
-        body: JSON.stringify({ action: "status", transaction_id: transactionId }),
       },
     );
 
@@ -107,7 +105,7 @@ export class ParadiseClient {
 
     return {
       status: data.status ?? "unknown",
-      transactionId: String(data.transaction_id ?? transactionId),
+      transactionId: String(data.id ?? transactionId),
     };
   }
 }
