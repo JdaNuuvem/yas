@@ -19,7 +19,7 @@ import { decrypt } from "../lib/crypto.js";
 const INTERVAL_MS = 2 * 60 * 1000;       // 2 minutes
 const PENDING_MIN_AGE_MS = 2 * 60 * 1000; // skip PENDING < 2 min (webhook may still come)
 const PENDING_MAX_AGE_MS = 55 * 60 * 1000; // skip PENDING > 55 min (expiry job handles)
-const EXPIRED_MAX_AGE_MS = 24 * 60 * 60 * 1000; // check EXPIRED up to 24h old
+const EXPIRED_MAX_AGE_MS = 72 * 60 * 60 * 1000; // check EXPIRED up to 72h old
 const BATCH_SIZE = 50;
 
 async function run() {
@@ -70,6 +70,11 @@ async function run() {
     });
 
     const allPurchases = [...pendingPurchases, ...expiredPurchases];
+
+    console.log(
+      `[RECONCILE] Scanning — pending: ${pendingPurchases.length}, expired: ${expiredPurchases.length}`,
+    );
+
     if (allPurchases.length === 0) return;
 
     // Load gateway credentials once per account
