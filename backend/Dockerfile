@@ -22,4 +22,4 @@ COPY --from=builder /app/prisma.config.ts ./
 COPY --from=builder /app/tsconfig.json ./
 RUN npx prisma generate
 EXPOSE 3001
-CMD ["node", "--max-old-space-size=768", "dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node --max-old-space-size=768 dist/server.js"]
