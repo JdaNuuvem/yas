@@ -8,6 +8,7 @@ const navItems = [
   { label: "Configuração", href: "/admin/configuracao" },
   { label: "Prêmios", href: "/admin/premios" },
   { label: "Buscar Número", href: "/admin/buscar" },
+  { label: "Atribuir Números", href: "/admin/atribuir" },
 ];
 
 export default function AdminLayout({

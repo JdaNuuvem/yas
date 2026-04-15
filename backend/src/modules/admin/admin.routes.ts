@@ -169,6 +169,112 @@ export async function adminRoutes(server: FastifyInstance) {
     },
   );
 
+  // Assign single number to buyer
+  server.post(
+    "/api/admin/assign-number",
+    { preHandler: [adminAuth] },
+    async (request) => {
+      const { raffleId, numberValue, buyerName, buyerCpf, buyerPhone } = z
+        .object({
+          raffleId: z.string(),
+          numberValue: z.number().int().min(1).max(1000000),
+          buyerName: z.string().min(2),
+          buyerCpf: z.string().default(""),
+          buyerPhone: z.string().min(10).max(15),
+        })
+        .parse(request.body);
+
+      const { encrypt, hashDeterministic } = await import("../../lib/crypto.js");
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      const cleanCpf = buyerCpf.replace(/\D/g, "");
+
+      let buyer = await prisma.buyer.findFirst({ where: { phone: buyerPhone } });
+      if (!buyer) {
+        buyer = await prisma.buyer.create({
+          data: {
+            name: buyerName,
+            cpf: cleanCpf && encKey ? encrypt(cleanCpf, encKey) : "manual",
+            cpfHash: cleanCpf && encKey ? hashDeterministic(cleanCpf, encKey) : "manual",
+            phone: buyerPhone,
+          },
+        });
+      }
+
+      const number = await prisma.number.findUnique({
+        where: { raffleId_numberValue: { raffleId, numberValue } },
+        include: { buyer: { select: { name: true, phone: true } } },
+      });
+      if (!number) throw new Error(`Número ${numberValue} não encontrado nesta rifa`);
+      if (number.status !== "AVAILABLE") {
+        const ownerInfo = number.buyer ? ` — pertence a ${number.buyer.name} (${number.buyer.phone})` : "";
+        throw new Error(`Número ${numberValue} já está ${number.status === "SOLD" ? "vendido" : "reservado"}${ownerInfo}.`);
+      }
+
+      await prisma.number.update({
+        where: { id: number.id },
+        data: { status: "SOLD", buyerId: buyer.id, soldAt: new Date() },
+      });
+
+      return { success: true, numberValue, buyerName: buyer.name, buyerPhone: buyer.phone };
+    },
+  );
+
+  // Bulk assign random numbers to buyer
+  server.post(
+    "/api/admin/assign-bulk",
+    { preHandler: [adminAuth] },
+    async (request) => {
+      const { raffleId, quantity, buyerName, buyerCpf, buyerPhone } = z
+        .object({
+          raffleId: z.string(),
+          quantity: z.number().int().min(1).max(10000),
+          buyerName: z.string().min(2),
+          buyerCpf: z.string().default(""),
+          buyerPhone: z.string().min(10).max(15),
+        })
+        .parse(request.body);
+
+      const { encrypt, hashDeterministic } = await import("../../lib/crypto.js");
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      const cleanCpf = buyerCpf.replace(/\D/g, "");
+
+      let buyer = await prisma.buyer.findFirst({ where: { phone: buyerPhone } });
+      if (!buyer) {
+        buyer = await prisma.buyer.create({
+          data: {
+            name: buyerName,
+            cpf: cleanCpf && encKey ? encrypt(cleanCpf, encKey) : "manual",
+            cpfHash: cleanCpf && encKey ? hashDeterministic(cleanCpf, encKey) : "manual",
+            phone: buyerPhone,
+          },
+        });
+      }
+
+      const available: Array<{ id: string; number_value: number }> = await (prisma as any).$queryRaw`
+        SELECT id, number_value FROM numbers
+        WHERE raffle_id = ${raffleId} AND status = 'AVAILABLE'
+        ORDER BY RANDOM()
+        LIMIT ${quantity}
+      `;
+
+      if (available.length === 0) {
+        throw new Error("Nenhum número disponível");
+      }
+
+      await prisma.number.updateMany({
+        where: { id: { in: available.map((n) => n.id) } },
+        data: { status: "SOLD", buyerId: buyer.id, soldAt: new Date() },
+      });
+
+      return {
+        success: true,
+        assigned: available.length,
+        buyerName: buyer.name,
+        numbers: available.map((n) => n.number_value).sort((a, b) => a - b),
+      };
+    },
+  );
+
   // CRUD prizes
   server.post(
     "/api/admin/prizes",
