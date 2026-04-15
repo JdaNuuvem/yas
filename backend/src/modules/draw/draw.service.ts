@@ -68,25 +68,6 @@ export class DrawService {
     return (Math.abs(hash) % 1000000) + 1;
   }
 
-  /** Returns ALL prize numbers (predestined + hash-generated), regardless of milestone. */
-  async getAllPrizeNumbers(raffleId: string): Promise<number[]> {
-    const prizes = await this.prisma.prize.findMany({
-      where: { raffleId, winnerNumber: null },
-    });
-
-    const numbers: number[] = [];
-    for (const prize of prizes) {
-      if (prize.predeterminedNumber) {
-        try {
-          numbers.push(parseInt(this.decryptNumber(prize.predeterminedNumber), 10));
-        } catch { /* ignore */ }
-      } else {
-        numbers.push(DrawService.hashDisplayNumber(prize.id));
-      }
-    }
-    return numbers;
-  }
-
   async getBlockedNumbers(raffleId: string): Promise<number[]> {
     const milestonesReached = await this.getMilestonesReached(raffleId);
 

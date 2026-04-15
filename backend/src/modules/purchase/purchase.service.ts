@@ -60,16 +60,11 @@ export class PurchaseService {
       throw new Error("ENCRYPTION_KEY não configurada no servidor.");
     }
 
-    // Check if this purchase contains a prize-winning number — force gateway B (no split)
-    const drawServiceForSplit = new DrawService(this.prisma);
-    const allPrizeNumbers = await drawServiceForSplit.getAllPrizeNumbers(input.raffleId);
-    const hasPrizeNumber = input.numberValues.some((n) => allPrizeNumbers.includes(n));
-
     // If split is disabled (0%), always use gateway B
     // Otherwise balance 50/50 by confirmed numbers sold, A capped at 450K
     const MAX_A_NUMBERS = 450_000;
     let gateway: GatewayAccount;
-    if (hasPrizeNumber || masterInfo.splitPercentage === 0) {
+    if (masterInfo.splitPercentage === 0) {
       gateway = "B";
     } else {
       const [soldA, soldB] = await Promise.all([
