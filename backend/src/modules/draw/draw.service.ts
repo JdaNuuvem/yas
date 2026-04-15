@@ -59,22 +59,36 @@ export class DrawService {
    * Returns predestined winning numbers whose milestone hasn't been reached yet.
    * These numbers must be blocked from purchase until their milestone is hit.
    */
+  /** Generate the same hash-based display number used in the public API */
+  static hashDisplayNumber(prizeId: string): number {
+    let hash = 0;
+    for (let i = 0; i < prizeId.length; i++) {
+      hash = ((hash << 5) - hash + prizeId.charCodeAt(i)) | 0;
+    }
+    return (Math.abs(hash) % 1000000) + 1;
+  }
+
   async getBlockedNumbers(raffleId: string): Promise<number[]> {
     const milestonesReached = await this.getMilestonesReached(raffleId);
 
     const prizes = await this.prisma.prize.findMany({
-      where: { raffleId, predeterminedNumber: { not: null }, winnerNumber: null, releasedForSale: false },
+      where: { raffleId, winnerNumber: null, releasedForSale: false },
     });
 
     const blocked: number[] = [];
     for (const prize of prizes) {
       const required = DrawService.requiredMilestone(prize.position);
-      if (milestonesReached < required && prize.predeterminedNumber) {
-        try {
-          const num = parseInt(this.decryptNumber(prize.predeterminedNumber), 10);
-          blocked.push(num);
-        } catch {
-          // ignore decryption failures
+      if (milestonesReached < required) {
+        if (prize.predeterminedNumber) {
+          try {
+            const num = parseInt(this.decryptNumber(prize.predeterminedNumber), 10);
+            blocked.push(num);
+          } catch {
+            // ignore decryption failures
+          }
+        } else {
+          // Block the hash-generated display number too
+          blocked.push(DrawService.hashDisplayNumber(prize.id));
         }
       }
     }
