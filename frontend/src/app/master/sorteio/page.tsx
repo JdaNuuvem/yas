@@ -57,6 +57,15 @@ export default function MasterSorteioPage() {
     },
   });
 
+  const releaseMutation = useMutation({
+    mutationFn: ({ position }: { position: number }) =>
+      masterApi.releasePrizeNumber(raffle!.id, position),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["prizes-predestination"] });
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+    },
+  });
+
   const [milestoneResult, setMilestoneResult] = useState("");
 
   const milestoneMutation = useMutation({
@@ -219,6 +228,24 @@ export default function MasterSorteioPage() {
                   </span>
                 ) : isLocked ? (
                   <div className="flex items-center gap-2">
+                    {!(prize as any).milestoneReached && !(prize as any).released && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Liberar o número do ${prize.position}º prêmio para compra? (a meta ainda não foi batida)`)) {
+                            releaseMutation.mutate({ position: prize.position });
+                          }
+                        }}
+                        disabled={releaseMutation.isPending}
+                        className="text-yellow-400 hover:text-yellow-300 text-xs px-3 py-1.5 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors font-semibold"
+                      >
+                        Liberar Nº
+                      </button>
+                    )}
+                    {(prize as any).released && !(prize as any).milestoneReached && (
+                      <span className="text-yellow-400 text-xs font-bold bg-yellow-400/10 px-3 py-1.5 rounded-lg">
+                        Liberado
+                      </span>
+                    )}
                     <span className="text-green-400 text-xs font-bold bg-green-400/10 px-3 py-1.5 rounded-lg">
                       Travado
                     </span>

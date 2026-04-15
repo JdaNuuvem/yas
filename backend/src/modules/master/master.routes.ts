@@ -304,6 +304,8 @@ export async function masterRoutes(server: FastifyInstance) {
         orderBy: { position: "asc" },
       });
 
+      const milestonesReached = await drawService.getMilestonesReached(raffleId);
+
       const result = await Promise.all(
         prizes.map(async (prize) => {
           let predestinedNumber: number | null = null;
@@ -335,6 +337,10 @@ export async function masterRoutes(server: FastifyInstance) {
             }
           }
 
+          const { DrawService: DS } = await import("../draw/draw.service.js");
+          const requiredMilestone = DS.requiredMilestone(prize.position);
+          const milestoneReached = milestonesReached >= requiredMilestone;
+
           return {
             id: prize.id,
             position: prize.position,
@@ -345,6 +351,9 @@ export async function masterRoutes(server: FastifyInstance) {
             locked,
             drawn: !!prize.winnerNumber,
             winnerNumber: prize.winnerNumber,
+            milestoneReached,
+            requiredMilestone,
+            released: prize.releasedForSale ?? false,
           };
         }),
       );
@@ -480,6 +489,25 @@ export async function masterRoutes(server: FastifyInstance) {
       await prisma.prize.update({
         where: { raffleId_position: { raffleId, position } },
         data: { predeterminedNumber: null },
+      });
+
+      return { success: true };
+    },
+  );
+
+  // Manually release a prize number for sale (override milestone requirement)
+  server.post(
+    "/api/master/release-prize/:position",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId } = z.object({ raffleId: z.string() }).parse(request.body);
+      const { position } = z
+        .object({ position: z.coerce.number().int().min(1).max(11) })
+        .parse(request.params);
+
+      await prisma.prize.update({
+        where: { raffleId_position: { raffleId, position } },
+        data: { releasedForSale: true },
       });
 
       return { success: true };

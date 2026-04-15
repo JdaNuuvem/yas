@@ -1,6 +1,7 @@
 import type { PrismaClient, GatewayAccount } from "@prisma/client";
 import { ParadiseClient } from "../../lib/paradise.js";
 import { encrypt, hashDeterministic, decrypt } from "../../lib/crypto.js";
+import { DrawService } from "../draw/draw.service.js";
 
 interface CreatePurchaseInput {
   readonly raffleId: string;
@@ -102,6 +103,21 @@ export class PurchaseService {
     // 3. Find or create buyer
     const buyer = await this.findOrCreateBuyer(input);
 
+    // 3b. Filter out blocked predestined numbers (milestone not yet reached)
+    const drawService = new DrawService(this.prisma);
+    const blockedNumbers = await drawService.getBlockedNumbers(input.raffleId);
+    const filteredNumberValues = blockedNumbers.length > 0
+      ? input.numberValues.filter((n) => !blockedNumbers.includes(n))
+      : [...input.numberValues];
+
+    if (filteredNumberValues.length === 0) {
+      throw new Error("Nenhum número disponível para compra.");
+    }
+
+    const filteredQuantity = filteredNumberValues.length;
+    const filteredTotalAmount = filteredQuantity * pricePerNumber;
+    const filteredTotalAmountCents = Math.round(filteredTotalAmount * 100);
+
     // 4. Reserve numbers atomically using SELECT FOR UPDATE SKIP LOCKED.
     //    This prevents race conditions where two concurrent purchases grab the same
     //    numbers: FOR UPDATE locks the rows, SKIP LOCKED skips already-locked ones
@@ -111,14 +127,14 @@ export class PurchaseService {
       const lockedRows: Array<{ id: string }> = await tx.$queryRaw`
         SELECT id FROM numbers
         WHERE raffle_id = ${input.raffleId}
-          AND number_value = ANY(${input.numberValues}::int[])
+          AND number_value = ANY(${filteredNumberValues}::int[])
           AND status = 'AVAILABLE'
         FOR UPDATE SKIP LOCKED
       `;
 
-      if (lockedRows.length !== quantity) {
+      if (lockedRows.length !== filteredQuantity) {
         throw new Error(
-          `Only ${lockedRows.length} of ${quantity} requested numbers are available`,
+          `Only ${lockedRows.length} of ${filteredQuantity} requested numbers are available`,
         );
       }
 
@@ -137,8 +153,8 @@ export class PurchaseService {
         data: {
           raffleId: input.raffleId,
           buyerId: buyer.id,
-          quantity,
-          totalAmount,
+          quantity: filteredQuantity,
+          totalAmount: filteredTotalAmount,
           gatewayAccount: gateway,
           paymentStatus: "PENDING",
           numbers: {
@@ -151,8 +167,8 @@ export class PurchaseService {
     // 5. Create PIX charge via the current gateway
     const cleanCpf = input.buyerCpf.replace(/\D/g, "");
     const charge = await paradiseClient.createPixCharge({
-      amount: totalAmountCents,
-      description: `Rifa - ${quantity} números`,
+      amount: filteredTotalAmountCents,
+      description: `Rifa - ${filteredQuantity} números`,
       reference: purchase.id,
       customer: {
         name: input.buyerName,
@@ -176,8 +192,8 @@ export class PurchaseService {
       purchaseId: purchase.id,
       qrCode: charge.qrCode,
       qrCodeText: charge.qrCodeBase64,
-      quantity,
-      totalAmount,
+      quantity: filteredQuantity,
+      totalAmount: filteredTotalAmount,
     };
   }
 

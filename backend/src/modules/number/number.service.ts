@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import { DrawService } from "../draw/draw.service.js";
 
 interface GetNumbersOptions {
   page: number;
@@ -8,7 +9,11 @@ interface GetNumbersOptions {
 }
 
 export class NumberService {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly drawService: DrawService;
+
+  constructor(private readonly prisma: PrismaClient) {
+    this.drawService = new DrawService(prisma);
+  }
 
   async getNumbers(raffleId: string, options: GetNumbersOptions) {
     const { page, limit, status, buyerId } = options;
@@ -34,6 +39,19 @@ export class NumberService {
   }
 
   async getRandomAvailable(raffleId: string, quantity: number): Promise<number[]> {
+    const blocked = await this.drawService.getBlockedNumbers(raffleId);
+
+    if (blocked.length > 0) {
+      const rows = await (this.prisma as any).$queryRaw`
+        SELECT number_value FROM numbers
+        WHERE raffle_id = ${raffleId} AND status = 'AVAILABLE'
+          AND number_value != ALL(${blocked}::int[])
+        ORDER BY RANDOM()
+        LIMIT ${quantity}
+      `;
+      return rows.map((r: any) => r.number_value);
+    }
+
     const rows = await (this.prisma as any).$queryRaw`
       SELECT number_value FROM numbers
       WHERE raffle_id = ${raffleId} AND status = 'AVAILABLE'

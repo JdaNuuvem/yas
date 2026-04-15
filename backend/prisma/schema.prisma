@@ -81,6 +81,7 @@ model Prize {
   winnerBuyerId       String?   @map("winner_buyer_id")
   drawnAt             DateTime? @map("drawn_at")
   predeterminedNumber String?   @map("predetermined_number")
+  releasedForSale     Boolean   @default(false) @map("released_for_sale")
 
   raffle      Raffle @relation(fields: [raffleId], references: [id])
   winnerBuyer Buyer? @relation(fields: [winnerBuyerId], references: [id])

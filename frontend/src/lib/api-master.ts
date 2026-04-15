@@ -151,4 +151,12 @@ export const masterApi = {
         body: JSON.stringify({ raffleId }),
       },
     ),
+  releasePrizeNumber: (raffleId: string, position: number) =>
+    request<{ success: boolean }>(
+      `/api/master/release-prize/${position}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ raffleId }),
+      },
+    ),
 };

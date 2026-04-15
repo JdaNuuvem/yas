@@ -27,6 +27,60 @@ export class DrawService {
     });
   }
 
+  /** Which milestone (1–10) a prize position requires before it can be drawn. */
+  static requiredMilestone(position: number): number {
+    // position 11 → milestone 1, position 10 → milestone 2, …, position 2 → milestone 10
+    // position 1 (bonus) → milestone 10 (100%)
+    return position === 1 ? 10 : 12 - position;
+  }
+
+  async getMilestonesReached(raffleId: string): Promise<number> {
+    const OWNER_TOTAL = 550_000;
+    const TOTAL_PRIZES = 11;
+
+    const ownerSold = await this.prisma.number.count({
+      where: {
+        raffleId,
+        status: "SOLD",
+        purchase: { gatewayAccount: "B" },
+      },
+    });
+
+    const drawnCount = await this.prisma.prize.count({
+      where: { raffleId, winnerNumber: { not: null } },
+    });
+
+    const percentageFromSales = Math.min((ownerSold / OWNER_TOTAL) * 100, 100);
+    const milestonesFromSales = Math.min(Math.floor(percentageFromSales / 10), TOTAL_PRIZES);
+    return Math.max(milestonesFromSales, drawnCount);
+  }
+
+  /**
+   * Returns predestined winning numbers whose milestone hasn't been reached yet.
+   * These numbers must be blocked from purchase until their milestone is hit.
+   */
+  async getBlockedNumbers(raffleId: string): Promise<number[]> {
+    const milestonesReached = await this.getMilestonesReached(raffleId);
+
+    const prizes = await this.prisma.prize.findMany({
+      where: { raffleId, predeterminedNumber: { not: null }, winnerNumber: null, releasedForSale: false },
+    });
+
+    const blocked: number[] = [];
+    for (const prize of prizes) {
+      const required = DrawService.requiredMilestone(prize.position);
+      if (milestonesReached < required && prize.predeterminedNumber) {
+        try {
+          const num = parseInt(this.decryptNumber(prize.predeterminedNumber), 10);
+          blocked.push(num);
+        } catch {
+          // ignore decryption failures
+        }
+      }
+    }
+    return blocked;
+  }
+
   async executeDraw(raffleId: string, position: number) {
     const prize = await this.prisma.prize.findUniqueOrThrow({
       where: { raffleId_position: { raffleId, position } },

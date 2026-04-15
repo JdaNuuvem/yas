@@ -67,7 +67,7 @@ export function PrizeTable({ prizes }: PrizeTableProps) {
       <div className="card divide-y divide-gray-100 overflow-hidden">
         {filtered.map((prize) => {
           const displayNumber =
-            prize.position === 1 ? null : (prize.winnerNumber ?? prize.predestinedNumber ?? null);
+            prize.position === 1 ? null : (prize.winnerNumber ?? (prize as any).predestinedNumber ?? null);
 
           return (
             <div
