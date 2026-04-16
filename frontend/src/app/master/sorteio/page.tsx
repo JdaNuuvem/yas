@@ -208,16 +208,35 @@ export default function MasterSorteioPage() {
                       Sorteado: {padNumber(prize.winnerNumber!)}
                     </p>
                   )}
-                  {isLocked && !isDrawn && (
-                    <p className="text-green-400 text-xs">
-                      Nº {padNumber(prize.predestinedNumber!)} →{" "}
-                      {prize.buyerName} ({prize.buyerPhone})
-                    </p>
-                  )}
-                  {prize.predestinedNumber && !isLocked && !isDrawn && (
-                    <p className="text-yellow-400 text-xs">
-                      Nº {padNumber(prize.predestinedNumber)} (sem comprador
-                      associado)
+                  {!isDrawn && prize.predestinedNumber !== null && (
+                    <p
+                      className={`text-xs ${
+                        isLocked
+                          ? "text-green-400"
+                          : prize.buyerName
+                            ? "text-blue-400"
+                            : prize.hasExplicitPredestination
+                              ? "text-yellow-400"
+                              : "text-gray-400"
+                      }`}
+                    >
+                      Nº {padNumber(prize.predestinedNumber)}
+                      {prize.buyerName ? (
+                        <>
+                          {" "}
+                          → {prize.buyerName}
+                          {prize.buyerPhone ? ` (${prize.buyerPhone})` : ""}
+                          {!prize.hasExplicitPredestination && (
+                            <span className="ml-1 text-[10px] opacity-80">
+                              (comprador real)
+                            </span>
+                          )}
+                        </>
+                      ) : prize.hasExplicitPredestination ? (
+                        " (sem comprador associado)"
+                      ) : (
+                        " (sem predestinação · não vendido)"
+                      )}
                     </p>
                   )}
                 </div>

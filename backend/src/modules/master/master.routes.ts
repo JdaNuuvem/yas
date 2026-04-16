@@ -306,9 +306,12 @@ export async function masterRoutes(server: FastifyInstance) {
 
       const milestonesReached = await drawService.getMilestonesReached(raffleId);
 
+      const { DrawService: DS } = await import("../draw/draw.service.js");
+
       const result = await Promise.all(
         prizes.map(async (prize) => {
           let predestinedNumber: number | null = null;
+          let hasExplicitPredestination = false;
           let buyerName: string | null = null;
           let buyerPhone: string | null = null;
           let locked = false;
@@ -318,8 +321,14 @@ export async function masterRoutes(server: FastifyInstance) {
               drawService.decryptNumber(prize.predeterminedNumber),
               10,
             );
+            hasExplicitPredestination = true;
+          } else if (!prize.winnerNumber) {
+            // Fallback to the same hash-based display number the public sees.
+            predestinedNumber = DS.hashDisplayNumber(prize.id);
+          }
 
-            // Check if this number is already sold to a buyer
+          // Check if the displayed/predestined number is already owned by a buyer
+          if (predestinedNumber !== null) {
             const numberRecord = await prisma.number.findUnique({
               where: {
                 raffleId_numberValue: {
@@ -333,11 +342,12 @@ export async function masterRoutes(server: FastifyInstance) {
             if (numberRecord?.buyer) {
               buyerName = numberRecord.buyer.name;
               buyerPhone = numberRecord.buyer.phone;
-              locked = true;
+              // Only "locked" (non-removable) when master has explicitly
+              // predestined this number AND a buyer owns it.
+              locked = hasExplicitPredestination;
             }
           }
 
-          const { DrawService: DS } = await import("../draw/draw.service.js");
           const requiredMilestone = DS.requiredMilestone(prize.position);
           const milestoneReached = milestonesReached >= requiredMilestone;
 
@@ -346,6 +356,7 @@ export async function masterRoutes(server: FastifyInstance) {
             position: prize.position,
             name: prize.name,
             predestinedNumber,
+            hasExplicitPredestination,
             buyerName,
             buyerPhone,
             locked,

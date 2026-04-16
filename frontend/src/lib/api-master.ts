@@ -118,11 +118,14 @@ export const masterApi = {
         position: number;
         name: string;
         predestinedNumber: number | null;
+        hasExplicitPredestination: boolean;
         buyerName: string | null;
         buyerPhone: string | null;
         locked: boolean;
         drawn: boolean;
         winnerNumber: number | null;
+        milestoneReached?: boolean;
+        released?: boolean;
       }>
     >(`/api/master/prizes-predestination?raffleId=${raffleId}`),
   predestinePrize: (data: {
