@@ -283,6 +283,7 @@ export default function MasterSorteioPage() {
           const isLocked = prize.locked;
           const isExpanded = expandedPosition === prize.position;
           const form = getForm(prize.position);
+          const isNonDrawable = prize.position === 1; // 1º prêmio não é sorteado por número
 
           return (
             <div
@@ -313,12 +314,17 @@ export default function MasterSorteioPage() {
                   <p className="text-sm font-medium text-white truncate">
                     {prize.name}
                   </p>
-                  {isDrawn && (
+                  {isNonDrawable && (
+                    <p className="text-purple-300 text-xs font-semibold">
+                      Não é sorteado por número
+                    </p>
+                  )}
+                  {isDrawn && !isNonDrawable && (
                     <p className="text-gray-500 text-xs">
                       Sorteado: {padNumber(prize.winnerNumber!)}
                     </p>
                   )}
-                  {!isDrawn && prize.predestinedNumber !== null && (() => {
+                  {!isNonDrawable && !isDrawn && prize.predestinedNumber !== null && (() => {
                     const isSold = prize.numberStatus === "SOLD";
                     const isReserved = prize.numberStatus === "RESERVED";
                     const isTaken = isSold || isReserved || !!prize.buyerName;
@@ -359,7 +365,11 @@ export default function MasterSorteioPage() {
                   })()}
                 </div>
 
-                {isDrawn ? (
+                {isNonDrawable ? (
+                  <span className="text-purple-300 text-xs font-bold bg-purple-500/10 px-3 py-1.5 rounded-lg border border-purple-500/30">
+                    Premiação externa
+                  </span>
+                ) : isDrawn ? (
                   <div className="flex items-center gap-2 flex-wrap justify-end">
                     <span className="text-gray-500 text-xs font-bold bg-gray-700/30 px-3 py-1.5 rounded-lg">
                       Sorteado

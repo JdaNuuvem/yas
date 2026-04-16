@@ -334,21 +334,27 @@ export default function AdminPrêmiosPage() {
                     {prize.description && (
                       <p className="text-gray-400 text-sm">{prize.description}</p>
                     )}
+                    {/* Prêmio 1 não é sorteado por número */}
+                    {prize.position === 1 && (
+                      <span className="text-purple-300 text-xs font-semibold">
+                        Premiação externa — não sorteada por número
+                      </span>
+                    )}
                     {/* Status: oculto / solto / revelado */}
-                    {prize.winnerName && (
+                    {prize.position !== 1 && prize.winnerName && (
                       <span className="text-green-400 text-xs font-medium">
                         Revelado — ganhador: {prize.winnerName}
                       </span>
                     )}
-                    {prize.drawnAt && !prize.winnerName && (
+                    {prize.position !== 1 && prize.drawnAt && !prize.winnerName && (
                       <span className="text-green-400 text-xs font-medium">Revelado</span>
                     )}
-                    {!prize.drawnAt && prize.released && (
+                    {prize.position !== 1 && !prize.drawnAt && prize.released && (
                       <span className="text-yellow-400 text-xs font-medium">
                         Solto — aguardando revelação
                       </span>
                     )}
-                    {!prize.drawnAt && !prize.released && (
+                    {prize.position !== 1 && !prize.drawnAt && !prize.released && (
                       <span className="text-gray-500 text-xs font-medium">
                         Oculto
                       </span>
@@ -356,7 +362,7 @@ export default function AdminPrêmiosPage() {
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0 flex-wrap justify-end">
-                  {!prize.drawnAt && !prize.released && (
+                  {prize.position !== 1 && !prize.drawnAt && !prize.released && (
                     <button
                       onClick={() => {
                         setReleaseError(null);
@@ -369,7 +375,7 @@ export default function AdminPrêmiosPage() {
                       {releasingId === prize.id ? "Soltando..." : "Soltar Prêmio"}
                     </button>
                   )}
-                  {!prize.drawnAt && prize.released && (
+                  {prize.position !== 1 && !prize.drawnAt && prize.released && (
                     <button
                       onClick={() => {
                         setRevealError(null);

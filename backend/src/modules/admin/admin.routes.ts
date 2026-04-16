@@ -323,6 +323,12 @@ export async function adminRoutes(server: FastifyInstance) {
         where: { raffleId_position: { raffleId, position } },
       });
 
+      if (prize.position === 1) {
+        throw new Error(
+          "O 1º prêmio não é sorteado por número (premiação externa).",
+        );
+      }
+
       if (prize.winnerNumber) {
         throw new Error("Este prêmio já foi revelado.");
       }
@@ -400,6 +406,11 @@ export async function adminRoutes(server: FastifyInstance) {
       const prize = await prisma.prize.findUnique({ where: { id } });
       if (!prize) {
         throw new Error("Prêmio não encontrado.");
+      }
+      if (prize.position === 1) {
+        throw new Error(
+          "O 1º prêmio não é sorteado por número (premiação externa).",
+        );
       }
       if (prize.releasedForSale) {
         return { success: true, alreadyReleased: true };
