@@ -28,6 +28,12 @@ export default function AdminConfiguraçãoPage() {
     queryFn: () => api.adminGetGatewayKeys(),
   });
 
+  const { data: progress } = useQuery({
+    queryKey: ["progress", raffle?.id],
+    queryFn: () => api.getProgress(raffle!.id),
+    enabled: !!raffle,
+  });
+
   const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
   useEffect(() => {
@@ -92,6 +98,52 @@ export default function AdminConfiguraçãoPage() {
   return (
     <div className="space-y-8 max-w-2xl">
       <h1 className="text-2xl font-bold text-white">Configuração</h1>
+
+      {/* Progress card */}
+      {progress && (
+        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Progresso das Metas</h2>
+            <span className="text-indigo-400 text-sm font-bold">
+              {progress.milestonesReached} de 11 metas
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Progresso atual</span>
+              <span className="text-white font-bold">{progress.percentage.toFixed(1)}%</span>
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+              <div
+                className="bg-indigo-500 h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(progress.percentage, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {progress.nextMilestone <= 100 && (
+            <div className="flex items-center justify-between bg-gray-900/50 rounded-lg px-4 py-3">
+              <div>
+                <p className="text-gray-400 text-xs">Próxima meta</p>
+                <p className="text-white font-semibold">{progress.nextMilestone}%</p>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-400 text-xs">Faltam</p>
+                <p className="text-yellow-400 font-bold text-lg">
+                  {(progress.nextMilestone - progress.percentage).toFixed(1)}%
+                </p>
+              </div>
+            </div>
+          )}
+
+          {progress.nextMilestone > 100 && (
+            <p className="text-green-400 text-sm font-medium text-center">
+              Todas as metas foram atingidas!
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Raffle settings */}
       <form
