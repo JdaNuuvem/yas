@@ -26,7 +26,7 @@ export function QuantitySelector({
   pricePerNumber,
   minPurchase,
 }: QuantitySelectorProps) {
-  const [customQty, setCustomQty] = useState(25);
+  const [customQty, setCustomQty] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
   const selectedNumbers = useCart((s) => s.selectedNumbers);
   const addMany = useCart((s) => s.addMany);
@@ -49,7 +49,7 @@ export function QuantitySelector({
   );
 
   const increment = () => setCustomQty((q) => Math.min(q + 5, 100000));
-  const decrement = () => setCustomQty((q) => Math.max(q - 5, 25));
+  const decrement = () => setCustomQty((q) => Math.max(q - 5, 50));
 
   const count = selectedNumbers.length;
   const total = count * pricePerNumber;
