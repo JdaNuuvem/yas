@@ -18,6 +18,7 @@ import { AgeGate } from "@/components/raffle/AgeGate";
 import { MilestoneProgress } from "@/components/raffle/MilestoneProgress";
 import { useCart } from "@/hooks/useCart";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
+import Link from "next/link";
 
 export default function Home() {
   const {
@@ -103,6 +104,17 @@ export default function Home() {
 
         <AnimatedSection>
           <TopBuyers raffleId={raffle.id} />
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <div className="px-5">
+            <Link
+              href="/reclamacao"
+              className="block w-full py-3 text-center text-sm text-red-500 hover:text-red-600 border border-red-200 hover:border-red-300 rounded-xl transition-colors"
+            >
+              Tive um problema com minha compra
+            </Link>
+          </div>
         </AnimatedSection>
 
         <AnimatedSection>
