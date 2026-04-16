@@ -66,6 +66,24 @@ export default function MasterSorteioPage() {
     },
   });
 
+  const [releaseSelectPosition, setReleaseSelectPosition] = useState<string>("");
+  const [releaseSelectResult, setReleaseSelectResult] = useState<string | null>(null);
+  const releaseSelectedMutation = useMutation({
+    mutationFn: (position: number) =>
+      masterApi.releasePrizeNumber(raffle!.id, position),
+    onSuccess: (_data, position) => {
+      setReleaseSelectResult(`✓ ${position}º prêmio solto`);
+      setReleaseSelectPosition("");
+      queryClient.invalidateQueries({ queryKey: ["prizes-predestination"] });
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+    },
+    onError: (err) => {
+      setReleaseSelectResult(
+        `Erro: ${err instanceof Error ? err.message : "falha ao soltar"}`,
+      );
+    },
+  });
+
   const [forceError, setForceError] = useState<string | null>(null);
   const forceMutation = useMutation({
     mutationFn: ({ position, numberValue }: { position: number; numberValue: number | null }) =>
@@ -230,6 +248,63 @@ export default function MasterSorteioPage() {
           <p className="text-red-400 text-sm">{winnerError}</p>
         </div>
       )}
+
+      {/* Soltar prêmio manualmente */}
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-5 space-y-3">
+        <div>
+          <h2 className="text-yellow-400 font-semibold">Soltar Prêmio</h2>
+          <p className="text-gray-500 text-xs mt-1">
+            Libera manualmente um prêmio (marca como "solto" — expõe o número
+            publicamente e desbloqueia venda). Útil quando um prêmio deveria
+            ter sido liberado e não foi.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={releaseSelectPosition}
+            onChange={(e) => {
+              setReleaseSelectPosition(e.target.value);
+              setReleaseSelectResult(null);
+            }}
+            disabled={releaseSelectedMutation.isPending}
+            className="flex-1 min-w-[200px] rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          >
+            <option value="">Selecione o prêmio</option>
+            {prizes
+              .filter((p) => !p.drawn && p.position !== 1 && !(p as any).released)
+              .map((p) => (
+                <option key={p.position} value={p.position}>
+                  {p.position}º — {p.name}
+                </option>
+              ))}
+          </select>
+          <button
+            onClick={() => {
+              const pos = parseInt(releaseSelectPosition, 10);
+              if (!pos) return;
+              if (!confirm(`Soltar o ${pos}º prêmio?`)) return;
+              setReleaseSelectResult(null);
+              releaseSelectedMutation.mutate(pos);
+            }}
+            disabled={!releaseSelectPosition || releaseSelectedMutation.isPending}
+            className="bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black font-bold px-5 py-2 rounded-lg transition-colors shrink-0"
+          >
+            {releaseSelectedMutation.isPending ? "Soltando..." : "Soltar Prêmio"}
+          </button>
+        </div>
+        {releaseSelectResult && (
+          <p
+            className={`text-sm ${releaseSelectResult.startsWith("Erro") ? "text-red-400" : "text-yellow-300"}`}
+          >
+            {releaseSelectResult}
+          </p>
+        )}
+        {prizes.filter((p) => !p.drawn && p.position !== 1 && !(p as any).released).length === 0 && (
+          <p className="text-xs text-gray-500 italic">
+            Todos os prêmios já foram soltos ou sorteados.
+          </p>
+        )}
+      </div>
 
       {/* Liberar número atribuído indevidamente */}
       <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 space-y-3">
