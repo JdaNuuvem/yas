@@ -36,13 +36,13 @@ export async function complaintRoutes(server: FastifyInstance) {
     return { success: true, complaintId: complaint.id };
   });
 
-  // Admin — list pending complaints
+  // Admin — list complaints by status
   server.get(
     "/api/admin/complaints",
     { preHandler: [adminAuth] },
     async (request) => {
       const { status } = z
-        .object({ status: z.enum(["PENDING", "RESOLVED"]).default("PENDING") })
+        .object({ status: z.enum(["PENDING", "ACCEPTED", "REJECTED"]).default("PENDING") })
         .parse(request.query);
 
       const complaints = await prisma.complaint.findMany({
@@ -54,16 +54,87 @@ export async function complaintRoutes(server: FastifyInstance) {
     },
   );
 
-  // Admin — resolve a complaint
+  // Admin — accept complaint: assign random numbers to buyer
   server.put(
-    "/api/admin/complaints/:id/resolve",
+    "/api/admin/complaints/:id/accept",
     { preHandler: [adminAuth] },
     async (request) => {
       const { id } = z.object({ id: z.string() }).parse(request.params);
 
+      const complaint = await prisma.complaint.findUniqueOrThrow({ where: { id } });
+      if (complaint.status !== "PENDING") {
+        throw new Error("Esta reclamação já foi processada.");
+      }
+
+      // Find active raffle
+      const raffle = await prisma.raffle.findFirstOrThrow({ where: { status: "ACTIVE" } });
+
+      // Find or create buyer by phone
+      const { encrypt, hashDeterministic } = await import("../../lib/crypto.js");
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      const cleanCpf = complaint.cpf.replace(/\D/g, "");
+
+      let buyer = await prisma.buyer.findFirst({ where: { phone: complaint.phone } });
+      if (!buyer) {
+        buyer = await prisma.buyer.create({
+          data: {
+            name: complaint.name,
+            cpf: cleanCpf && encKey ? encrypt(cleanCpf, encKey) : "manual",
+            cpfHash: cleanCpf && encKey ? hashDeterministic(cleanCpf, encKey) : "manual",
+            phone: complaint.phone,
+          },
+        });
+      }
+
+      // Pick random available numbers
+      const quantity = complaint.codesQuantity;
+      const available: Array<{ id: string; number_value: number }> = await (prisma as any).$queryRaw`
+        SELECT id, number_value FROM numbers
+        WHERE raffle_id = ${raffle.id} AND status = 'AVAILABLE'
+        ORDER BY RANDOM()
+        LIMIT ${quantity}
+      `;
+
+      if (available.length === 0) {
+        throw new Error("Nenhum número disponível para atribuir.");
+      }
+
+      // Assign numbers to buyer
+      await prisma.number.updateMany({
+        where: { id: { in: available.map((n) => n.id) } },
+        data: { status: "SOLD", buyerId: buyer.id, soldAt: new Date() },
+      });
+
+      // Mark complaint as accepted
       await prisma.complaint.update({
         where: { id },
-        data: { status: "RESOLVED", resolvedAt: new Date() },
+        data: { status: "ACCEPTED", resolvedAt: new Date() },
+      });
+
+      return {
+        success: true,
+        assigned: available.length,
+        buyerName: buyer.name,
+        numbers: available.map((n) => n.number_value).sort((a, b) => a - b),
+      };
+    },
+  );
+
+  // Admin — reject complaint
+  server.put(
+    "/api/admin/complaints/:id/reject",
+    { preHandler: [adminAuth] },
+    async (request) => {
+      const { id } = z.object({ id: z.string() }).parse(request.params);
+
+      const complaint = await prisma.complaint.findUniqueOrThrow({ where: { id } });
+      if (complaint.status !== "PENDING") {
+        throw new Error("Esta reclamação já foi processada.");
+      }
+
+      await prisma.complaint.update({
+        where: { id },
+        data: { status: "REJECTED", resolvedAt: new Date() },
       });
 
       return { success: true };

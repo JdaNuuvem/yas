@@ -186,12 +186,17 @@ export const api = {
       body: JSON.stringify(data),
     }),
   // Admin complaints
-  adminGetComplaints: (status: "PENDING" | "RESOLVED" = "PENDING") =>
+  adminGetComplaints: (status: "PENDING" | "ACCEPTED" | "REJECTED" = "PENDING") =>
     request<import("@/types").Complaint[]>(
       `/api/admin/complaints?status=${status}`,
     ),
-  adminResolveComplaint: (id: string) =>
-    request<{ success: boolean }>(`/api/admin/complaints/${id}/resolve`, {
+  adminAcceptComplaint: (id: string) =>
+    request<{ success: boolean; assigned: number; buyerName: string }>(
+      `/api/admin/complaints/${id}/accept`,
+      { method: "PUT" },
+    ),
+  adminRejectComplaint: (id: string) =>
+    request<{ success: boolean }>(`/api/admin/complaints/${id}/reject`, {
       method: "PUT",
     }),
   // Admin gateway keys

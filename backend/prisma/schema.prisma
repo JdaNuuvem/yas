@@ -166,7 +166,8 @@ model AdminUser {
 
 enum ComplaintStatus {
   PENDING
-  RESOLVED
+  ACCEPTED
+  REJECTED
 
   @@map("complaint_status")
 }

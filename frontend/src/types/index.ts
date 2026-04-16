@@ -58,7 +58,7 @@ export interface Complaint {
   codesQuantity: number;
   description: string;
   proofImage: string | null;
-  status: "PENDING" | "RESOLVED";
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
   createdAt: string;
   resolvedAt: string | null;
 }

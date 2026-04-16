@@ -7,8 +7,9 @@ import type { Complaint } from "@/types";
 export default function ReclamacoesPage() {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [resolving, setResolving] = useState<string | null>(null);
+  const [processing, setProcessing] = useState<string | null>(null);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ id: string; msg: string; type: "success" | "error" } | null>(null);
 
   const fetchComplaints = useCallback(async () => {
     try {
@@ -25,15 +26,45 @@ export default function ReclamacoesPage() {
     fetchComplaints();
   }, [fetchComplaints]);
 
-  async function handleResolve(id: string) {
-    setResolving(id);
+  async function handleAccept(id: string) {
+    setProcessing(id);
+    setFeedback(null);
     try {
-      await api.adminResolveComplaint(id);
-      setComplaints((prev) => prev.filter((c) => c.id !== id));
-    } catch {
-      // ignore
+      const result = await api.adminAcceptComplaint(id);
+      setFeedback({
+        id,
+        msg: `${result.assigned} números atribuídos para ${result.buyerName}`,
+        type: "success",
+      });
+      setTimeout(() => {
+        setComplaints((prev) => prev.filter((c) => c.id !== id));
+        setFeedback(null);
+      }, 3000);
+    } catch (err) {
+      setFeedback({
+        id,
+        msg: err instanceof Error ? err.message : "Erro ao aceitar",
+        type: "error",
+      });
     } finally {
-      setResolving(null);
+      setProcessing(null);
+    }
+  }
+
+  async function handleReject(id: string) {
+    setProcessing(id);
+    setFeedback(null);
+    try {
+      await api.adminRejectComplaint(id);
+      setComplaints((prev) => prev.filter((c) => c.id !== id));
+    } catch (err) {
+      setFeedback({
+        id,
+        msg: err instanceof Error ? err.message : "Erro ao rejeitar",
+        type: "error",
+      });
+    } finally {
+      setProcessing(null);
     }
   }
 
@@ -92,7 +123,7 @@ export default function ReclamacoesPage() {
                 </div>
                 <div>
                   <span className="text-gray-500 text-xs block">Qtd. códigos</span>
-                  <span className="text-gray-200">{c.codesQuantity}</span>
+                  <span className="text-white font-bold text-lg">{c.codesQuantity}</span>
                 </div>
                 {c.transactionId && (
                   <div>
@@ -133,14 +164,36 @@ export default function ReclamacoesPage() {
                 </div>
               )}
 
-              {/* Resolve button */}
-              <button
-                onClick={() => handleResolve(c.id)}
-                disabled={resolving === c.id}
-                className="w-full py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                {resolving === c.id ? "Resolvendo..." : "Marcar como resolvido"}
-              </button>
+              {/* Feedback */}
+              {feedback?.id === c.id && (
+                <div className={`rounded-lg px-4 py-2 text-sm ${
+                  feedback.type === "success"
+                    ? "bg-green-500/10 text-green-400 border border-green-500/30"
+                    : "bg-red-500/10 text-red-400 border border-red-500/30"
+                }`}>
+                  {feedback.msg}
+                </div>
+              )}
+
+              {/* Accept / Reject buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleAccept(c.id)}
+                  disabled={processing === c.id}
+                  className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  {processing === c.id ? "Processando..." : `Aceitar (${c.codesQuantity} números)`}
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm("Rejeitar esta reclamação?")) handleReject(c.id);
+                  }}
+                  disabled={processing === c.id}
+                  className="flex-1 py-2.5 bg-red-600/20 hover:bg-red-600/40 disabled:opacity-50 text-red-400 text-sm font-medium rounded-lg transition-colors border border-red-600/30"
+                >
+                  Rejeitar
+                </button>
+              </div>
             </div>
           ))}
         </div>
