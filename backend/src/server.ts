@@ -172,7 +172,7 @@ export async function buildServer() {
             status: "ACTIVE",
             totalNumbers: 1000000,
             numberPrice: 0.20,
-            minPurchase: 10.00,
+            minPurchase: 5.00,
             themeColors: { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#FFD700" },
           },
         });
@@ -270,7 +270,7 @@ async function autoSeedIfNeeded(): Promise<void> {
           status: "ACTIVE",
           totalNumbers: 1000000,
           numberPrice: 0.20,
-          minPurchase: 10.00,
+          minPurchase: 5.00,
           themeColors: { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#FFD700" },
         },
       });

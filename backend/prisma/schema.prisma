@@ -59,7 +59,7 @@ model Raffle {
   status        RaffleStatus @default(DRAFT) @map("status")
   totalNumbers  Int          @default(1000000) @map("total_numbers")
   numberPrice   Decimal      @default(0.20) @map("number_price") @db.Decimal(10, 2)
-  minPurchase   Decimal      @default(10.00) @map("min_purchase") @db.Decimal(10, 2)
+  minPurchase   Decimal      @default(5.00) @map("min_purchase") @db.Decimal(10, 2)
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
 
