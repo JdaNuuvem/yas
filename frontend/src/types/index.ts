@@ -20,6 +20,7 @@ export interface Prize {
   description: string;
   imageUrl: string | null;
   winnerNumber: number | null;
+  winnerName: string | null;
   drawnAt: string | null;
   predestinedNumber: number | null;
   predestinedBuyerName: string | null;

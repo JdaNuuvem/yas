@@ -82,11 +82,15 @@ export function PrizeTable({ prizes }: PrizeTableProps) {
                   {prize.name}
                 </p>
               </div>
-              {displayNumber !== null && (
+              {prize.winnerName ? (
+                <span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full shrink-0">
+                  {prize.winnerName}
+                </span>
+              ) : displayNumber !== null ? (
                 <span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full font-mono shrink-0">
                   {formatNumber(displayNumber)}
                 </span>
-              )}
+              ) : null}
             </div>
           );
         })}

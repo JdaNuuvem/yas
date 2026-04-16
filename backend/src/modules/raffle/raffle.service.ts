@@ -74,7 +74,7 @@ export class RaffleService {
 
         return {
           ...p,
-          winnerName: undefined,
+          winnerName: p.winnerNumber ? (p.winnerBuyer?.name ?? null) : undefined,
           winnerCpfMasked: undefined,
           predestinedNumber,
           predestinedBuyerName: undefined,

@@ -62,6 +62,20 @@ export default function AdminPrêmiosPage() {
   }
 
   const [showResetModal, setShowResetModal] = useState(false);
+  const [drawingPosition, setDrawingPosition] = useState<number | null>(null);
+
+  const drawMutation = useMutation({
+    mutationFn: ({ position }: { position: number }) =>
+      api.adminTriggerDraw(raffle!.id, position, 0),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+      queryClient.refetchQueries({ queryKey: ["raffle"] });
+      setDrawingPosition(null);
+    },
+    onError: () => {
+      setDrawingPosition(null);
+    },
+  });
 
   const resetMutation = useMutation({
     mutationFn: () => api.adminResetDraws(raffle!.id),
@@ -252,12 +266,29 @@ export default function AdminPrêmiosPage() {
                     {prize.description && (
                       <p className="text-gray-400 text-sm">{prize.description}</p>
                     )}
-                    {prize.drawnAt && (
+                    {prize.drawnAt && prize.winnerName && (
+                      <span className="text-green-400 text-xs font-medium">
+                        Ganhador: {prize.winnerName}
+                      </span>
+                    )}
+                    {prize.drawnAt && !prize.winnerName && (
                       <span className="text-green-400 text-xs font-medium">Sorteado</span>
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex gap-2 shrink-0 flex-wrap justify-end">
+                  {!prize.drawnAt && (
+                    <button
+                      onClick={() => {
+                        setDrawingPosition(prize.position);
+                        drawMutation.mutate({ position: prize.position });
+                      }}
+                      disabled={drawingPosition === prize.position}
+                      className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      {drawingPosition === prize.position ? "Sorteando..." : "Revelar Ganhador"}
+                    </button>
+                  )}
                   <button
                     onClick={() => startEdit(prize)}
                     className="text-indigo-400 hover:text-indigo-300 text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-indigo-600/10 transition-colors"
