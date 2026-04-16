@@ -305,6 +305,69 @@ export async function adminRoutes(server: FastifyInstance) {
     },
   );
 
+  // Reveal winner — looks up who owns the prize's displayed number and marks prize as drawn
+  server.post(
+    "/api/admin/draw/:position/reveal",
+    { preHandler: [adminAuth] },
+    async (request) => {
+      const { DrawService } = await import("../draw/draw.service.js");
+      const drawService = new DrawService(prisma);
+      const { raffleId } = z
+        .object({ raffleId: z.string() })
+        .parse(request.body);
+      const { position } = z
+        .object({ position: z.coerce.number().int().min(1).max(11) })
+        .parse(request.params);
+
+      const prize = await prisma.prize.findUniqueOrThrow({
+        where: { raffleId_position: { raffleId, position } },
+      });
+
+      if (prize.winnerNumber) {
+        throw new Error("Este prêmio já foi revelado.");
+      }
+
+      // Determine the display number (same logic as raffle.service getActive)
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      let displayNumber: number;
+      if (prize.predeterminedNumber) {
+        const { decrypt } = await import("../../lib/crypto.js");
+        displayNumber = parseInt(decrypt(prize.predeterminedNumber, encKey), 10);
+      } else {
+        displayNumber = DrawService.hashDisplayNumber(prize.id);
+      }
+
+      // Check if this number is SOLD and has a buyer
+      const numberRecord = await prisma.number.findUnique({
+        where: { raffleId_numberValue: { raffleId, numberValue: displayNumber } },
+        include: { buyer: { select: { id: true, name: true, phone: true } } },
+      });
+
+      if (!numberRecord || numberRecord.status !== "SOLD" || !numberRecord.buyer) {
+        throw new Error(
+          `O número ${String(displayNumber).padStart(6, "0")} ainda não foi vendido. Aguarde a venda para revelar o ganhador.`,
+        );
+      }
+
+      // Mark prize as drawn with this number's owner
+      await prisma.prize.update({
+        where: { raffleId_position: { raffleId, position } },
+        data: {
+          winnerNumber: displayNumber,
+          winnerBuyerId: numberRecord.buyer.id,
+          drawnAt: new Date(),
+        },
+      });
+
+      return {
+        position,
+        winnerNumber: displayNumber,
+        winnerName: numberRecord.buyer.name,
+        prizeName: prize.name,
+      };
+    },
+  );
+
   // Predetermine draw winner (admin can set this)
   server.put(
     "/api/admin/draw/:position/set",

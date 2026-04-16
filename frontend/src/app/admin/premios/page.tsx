@@ -62,18 +62,21 @@ export default function AdminPrêmiosPage() {
   }
 
   const [showResetModal, setShowResetModal] = useState(false);
-  const [drawingPosition, setDrawingPosition] = useState<number | null>(null);
+  const [revealingPosition, setRevealingPosition] = useState<number | null>(null);
+  const [revealError, setRevealError] = useState<string | null>(null);
 
-  const drawMutation = useMutation({
+  const revealMutation = useMutation({
     mutationFn: ({ position }: { position: number }) =>
-      api.adminTriggerDraw(raffle!.id, position, 0),
+      api.adminRevealWinner(raffle!.id, position),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["raffle"] });
       queryClient.refetchQueries({ queryKey: ["raffle"] });
-      setDrawingPosition(null);
+      setRevealingPosition(null);
+      setRevealError(null);
     },
-    onError: () => {
-      setDrawingPosition(null);
+    onError: (err) => {
+      setRevealError(err instanceof Error ? err.message : "Erro ao revelar");
+      setRevealingPosition(null);
     },
   });
 
@@ -212,6 +215,12 @@ export default function AdminPrêmiosPage() {
         </div>
       )}
 
+      {revealError && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
+          <p className="text-yellow-400 text-sm">{revealError}</p>
+        </div>
+      )}
+
       <div className="space-y-3">
         {sortedPrizes.map((prize) => (
           <div
@@ -266,13 +275,18 @@ export default function AdminPrêmiosPage() {
                     {prize.description && (
                       <p className="text-gray-400 text-sm">{prize.description}</p>
                     )}
-                    {prize.drawnAt && prize.winnerName && (
+                    {prize.predestinedNumber && !prize.winnerNumber && (
+                      <span className="text-yellow-400 text-xs font-mono">
+                        Nº {String(prize.predestinedNumber).padStart(6, "0")}
+                      </span>
+                    )}
+                    {prize.winnerName && (
                       <span className="text-green-400 text-xs font-medium">
-                        Ganhador: {prize.winnerName}
+                        Ganhador: {prize.winnerName} — Nº {String(prize.winnerNumber).padStart(6, "0")}
                       </span>
                     )}
                     {prize.drawnAt && !prize.winnerName && (
-                      <span className="text-green-400 text-xs font-medium">Sorteado</span>
+                      <span className="text-green-400 text-xs font-medium">Revelado</span>
                     )}
                   </div>
                 </div>
@@ -280,13 +294,14 @@ export default function AdminPrêmiosPage() {
                   {!prize.drawnAt && (
                     <button
                       onClick={() => {
-                        setDrawingPosition(prize.position);
-                        drawMutation.mutate({ position: prize.position });
+                        setRevealError(null);
+                        setRevealingPosition(prize.position);
+                        revealMutation.mutate({ position: prize.position });
                       }}
-                      disabled={drawingPosition === prize.position}
+                      disabled={revealingPosition === prize.position}
                       className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
                     >
-                      {drawingPosition === prize.position ? "Sorteando..." : "Revelar Ganhador"}
+                      {revealingPosition === prize.position ? "Revelando..." : "Revelar Ganhador"}
                     </button>
                   )}
                   <button

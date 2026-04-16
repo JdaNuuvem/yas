@@ -140,6 +140,15 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+  // Admin reveal winner — uses displayed number, finds buyer
+  adminRevealWinner: (raffleId: string, position: number) =>
+    request<{ winnerNumber: number; winnerName: string; prizeName: string }>(
+      `/api/admin/draw/${position}/reveal`,
+      {
+        method: "POST",
+        body: JSON.stringify({ raffleId }),
+      },
+    ),
   // Admin set predetermined winner (proxied through admin endpoint)
   adminSetWinner: (raffleId: string, position: number, numberValue: number) =>
     request<{ success: boolean }>(`/api/admin/draw/${position}/set`, {
