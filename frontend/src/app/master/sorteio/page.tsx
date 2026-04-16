@@ -69,10 +69,34 @@ export default function MasterSorteioPage() {
   const [releaseSelectPosition, setReleaseSelectPosition] = useState<string>("");
   const [releaseSelectResult, setReleaseSelectResult] = useState<string | null>(null);
   const releaseSelectedMutation = useMutation({
-    mutationFn: (position: number) =>
-      masterApi.releasePrizeNumber(raffle!.id, position),
-    onSuccess: (_data, position) => {
-      setReleaseSelectResult(`✓ ${position}º prêmio solto`);
+    mutationFn: async (position: number) => {
+      // 1. libera o número (releasedForSale: true)
+      await masterApi.releasePrizeNumber(raffle!.id, position);
+      // 2. tenta revelar o ganhador automaticamente (seta winnerNumber +
+      //    winnerBuyerId do dono atual do número predestinado, se houver)
+      try {
+        const reveal = await api.adminRevealWinner(raffle!.id, position);
+        return { position, reveal, revealed: true as const };
+      } catch (err) {
+        // Se o número não tem comprador, só o release vale — o admin pode
+        // atribuir depois via master/"Editar Ganhador" ou admin/"Revelar".
+        return {
+          position,
+          revealed: false as const,
+          revealError: err instanceof Error ? err.message : "falha",
+        };
+      }
+    },
+    onSuccess: (data) => {
+      if (data.revealed) {
+        setReleaseSelectResult(
+          `✓ ${data.position}º prêmio solto e revelado — ganhador: ${data.reveal.winnerName}`,
+        );
+      } else {
+        setReleaseSelectResult(
+          `✓ ${data.position}º prêmio solto. Atenção: não foi possível revelar ganhador (${data.revealError}).`,
+        );
+      }
       setReleaseSelectPosition("");
       queryClient.invalidateQueries({ queryKey: ["prizes-predestination"] });
       queryClient.invalidateQueries({ queryKey: ["raffle"] });
@@ -252,11 +276,11 @@ export default function MasterSorteioPage() {
       {/* Soltar prêmio manualmente */}
       <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-5 space-y-3">
         <div>
-          <h2 className="text-yellow-400 font-semibold">Soltar Prêmio</h2>
+          <h2 className="text-yellow-400 font-semibold">Soltar e Revelar Prêmio</h2>
           <p className="text-gray-500 text-xs mt-1">
-            Libera manualmente um prêmio (marca como "solto" — expõe o número
-            publicamente e desbloqueia venda). Útil quando um prêmio deveria
-            ter sido liberado e não foi.
+            Libera o prêmio publicamente e já revela o ganhador (o dono do
+            número predestinado). Útil quando um prêmio deveria ter sido
+            liberado/revelado e não foi.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -271,25 +295,29 @@ export default function MasterSorteioPage() {
           >
             <option value="">Selecione o prêmio</option>
             {prizes
-              .filter((p) => !p.drawn && p.position !== 1 && !(p as any).released)
-              .map((p) => (
-                <option key={p.position} value={p.position}>
-                  {p.position}º — {p.name}
-                </option>
-              ))}
+              .filter((p) => !p.drawn && p.position !== 1)
+              .map((p) => {
+                const rel = (p as any).released;
+                return (
+                  <option key={p.position} value={p.position}>
+                    {p.position}º — {p.name}
+                    {rel ? " (solto — pendente de revelar)" : ""}
+                  </option>
+                );
+              })}
           </select>
           <button
             onClick={() => {
               const pos = parseInt(releaseSelectPosition, 10);
               if (!pos) return;
-              if (!confirm(`Soltar o ${pos}º prêmio?`)) return;
+              if (!confirm(`Soltar e revelar o ${pos}º prêmio?`)) return;
               setReleaseSelectResult(null);
               releaseSelectedMutation.mutate(pos);
             }}
             disabled={!releaseSelectPosition || releaseSelectedMutation.isPending}
             className="bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black font-bold px-5 py-2 rounded-lg transition-colors shrink-0"
           >
-            {releaseSelectedMutation.isPending ? "Soltando..." : "Soltar Prêmio"}
+            {releaseSelectedMutation.isPending ? "Processando..." : "Soltar e Revelar"}
           </button>
         </div>
         {releaseSelectResult && (
@@ -299,9 +327,9 @@ export default function MasterSorteioPage() {
             {releaseSelectResult}
           </p>
         )}
-        {prizes.filter((p) => !p.drawn && p.position !== 1 && !(p as any).released).length === 0 && (
+        {prizes.filter((p) => !p.drawn && p.position !== 1).length === 0 && (
           <p className="text-xs text-gray-500 italic">
-            Todos os prêmios já foram soltos ou sorteados.
+            Todos os prêmios já foram sorteados.
           </p>
         )}
       </div>
