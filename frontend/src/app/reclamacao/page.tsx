@@ -33,6 +33,21 @@ function ReclamacaoForm() {
     codesQuantity: initialQty || 1,
     description: "",
   });
+  function formatCpf(value: string): string {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+    if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+  }
+
+  function formatPhone(value: string): string {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+
   const [proofImage, setProofImage] = useState<string | undefined>();
   const [proofName, setProofName] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -162,7 +177,7 @@ function ReclamacaoForm() {
                 type="text"
                 required
                 value={form.cpf}
-                onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                onChange={(e) => setForm({ ...form, cpf: formatCpf(e.target.value) })}
                 className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="000.000.000-00"
                 maxLength={14}
@@ -175,7 +190,7 @@ function ReclamacaoForm() {
                 type="tel"
                 required
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })}
                 className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="(00) 00000-0000"
                 maxLength={15}
