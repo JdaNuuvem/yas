@@ -514,6 +514,191 @@ export async function masterRoutes(server: FastifyInstance) {
     },
   );
 
+  // Edit the winnerNumber of a drawn prize without assigning it to a buyer.
+  // The winnerBuyerId is set to whoever currently owns the new number (if
+  // anyone) so the existing display still works, but no Number record is
+  // modified. Pass numberValue: null to clear the winner (un-draw the prize).
+  server.put(
+    "/api/master/prize/:position/winner",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId, numberValue } = z
+        .object({
+          raffleId: z.string(),
+          numberValue: z.number().int().min(1).max(1000000).nullable(),
+        })
+        .parse(request.body);
+      const { position } = z
+        .object({ position: z.coerce.number().int().min(1).max(11) })
+        .parse(request.params);
+
+      const prize = await prisma.prize.findUniqueOrThrow({
+        where: { raffleId_position: { raffleId, position } },
+      });
+
+      if (numberValue === null) {
+        await prisma.prize.update({
+          where: { id: prize.id },
+          data: { winnerNumber: null, winnerBuyerId: null, drawnAt: null },
+        });
+        return { success: true, winnerNumber: null, buyer: null };
+      }
+
+      // Look up current owner of that number (if any) — do NOT modify Number.
+      const rec = await prisma.number.findUnique({
+        where: { raffleId_numberValue: { raffleId, numberValue } },
+        include: { buyer: { select: { id: true, name: true, phone: true } } },
+      });
+
+      await prisma.prize.update({
+        where: { id: prize.id },
+        data: {
+          winnerNumber: numberValue,
+          winnerBuyerId: rec?.buyer?.id ?? null,
+          drawnAt: prize.drawnAt ?? new Date(),
+        },
+      });
+
+      return {
+        success: true,
+        winnerNumber: numberValue,
+        buyer: rec?.buyer
+          ? { name: rec.buyer.name, phone: rec.buyer.phone }
+          : null,
+      };
+    },
+  );
+
+  // Unassign a number: clear its buyer/purchase and set status to AVAILABLE.
+  // If any prize has predeterminedNumber pointing to this number, that
+  // predestination is cleared too (prize keeps its position but loses the
+  // explicit winning number).
+  server.post(
+    "/api/master/numbers/unassign",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId, numberValue } = z
+        .object({
+          raffleId: z.string(),
+          numberValue: z.number().int().min(1).max(1000000),
+        })
+        .parse(request.body);
+
+      const rec = await prisma.number.findUnique({
+        where: { raffleId_numberValue: { raffleId, numberValue } },
+        include: { buyer: { select: { name: true, phone: true } } },
+      });
+      if (!rec) {
+        throw new Error(`Número ${numberValue} não encontrado nesta rifa.`);
+      }
+
+      const previousBuyer = rec.buyer
+        ? { name: rec.buyer.name, phone: rec.buyer.phone }
+        : null;
+
+      // Find prizes whose predetermined decrypts to this number
+      const encKey = process.env.ENCRYPTION_KEY ?? "";
+      const { decrypt } = await import("../../lib/crypto.js");
+      const allPrizes = await prisma.prize.findMany({
+        where: { raffleId, predeterminedNumber: { not: null } },
+      });
+      const prizesToClear: { id: string; position: number }[] = [];
+      for (const p of allPrizes) {
+        if (!p.predeterminedNumber) continue;
+        try {
+          const n = parseInt(decrypt(p.predeterminedNumber, encKey), 10);
+          if (n === numberValue) {
+            prizesToClear.push({ id: p.id, position: p.position });
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      await prisma.$transaction([
+        prisma.number.update({
+          where: { id: rec.id },
+          data: {
+            status: "AVAILABLE",
+            buyerId: null,
+            purchaseId: null,
+            reservedAt: null,
+            soldAt: null,
+          },
+        }),
+        ...prizesToClear.map((p) =>
+          prisma.prize.update({
+            where: { id: p.id },
+            data: { predeterminedNumber: null },
+          }),
+        ),
+      ]);
+
+      return {
+        success: true,
+        numberValue,
+        previousBuyer,
+        clearedPrizePositions: prizesToClear.map((p) => p.position),
+      };
+    },
+  );
+
+  // Force-set predeterminedNumber of a prize. Does NOT validate whether the
+  // number is AVAILABLE and does NOT touch the Number table — useful when
+  // master wants the prize to point at an already-sold number while keeping
+  // that number's existing buyer as the winner. Pass numberValue: null to
+  // clear the predestination.
+  server.put(
+    "/api/master/predestine-prize/:position/force",
+    { preHandler: [masterAuth] },
+    async (request) => {
+      const { raffleId, numberValue } = z
+        .object({
+          raffleId: z.string(),
+          numberValue: z.number().int().min(1).max(1000000).nullable(),
+        })
+        .parse(request.body);
+      const { position } = z
+        .object({ position: z.coerce.number().int().min(1).max(11) })
+        .parse(request.params);
+
+      const prize = await prisma.prize.findUniqueOrThrow({
+        where: { raffleId_position: { raffleId, position } },
+      });
+      if (prize.winnerNumber) {
+        throw new Error(
+          "Este prêmio já foi sorteado — zere o sorteio antes de editar o número.",
+        );
+      }
+
+      let encrypted: string | null = null;
+      let buyerPreview: { name: string; phone: string } | null = null;
+
+      if (numberValue !== null) {
+        const { encrypt: encryptFn } = await import("../../lib/crypto.js");
+        const encKey = process.env.ENCRYPTION_KEY ?? "";
+        encrypted = encryptFn(String(numberValue), encKey);
+
+        const rec = await prisma.number.findUnique({
+          where: {
+            raffleId_numberValue: { raffleId, numberValue },
+          },
+          include: { buyer: { select: { name: true, phone: true } } },
+        });
+        if (rec?.buyer) {
+          buyerPreview = { name: rec.buyer.name, phone: rec.buyer.phone };
+        }
+      }
+
+      await prisma.prize.update({
+        where: { id: prize.id },
+        data: { predeterminedNumber: encrypted },
+      });
+
+      return { success: true, numberValue, buyer: buyerPreview };
+    },
+  );
+
   // ─── Bypass Split CPFs ──────────────────────────────────────────────
   server.get(
     "/api/master/bypass-cpfs",

@@ -155,6 +155,42 @@ export const masterApi = {
         body: JSON.stringify({ raffleId }),
       },
     ),
+  forceSetPrizeNumber: (
+    raffleId: string,
+    position: number,
+    numberValue: number | null,
+  ) =>
+    request<{
+      success: boolean;
+      numberValue: number | null;
+      buyer: { name: string; phone: string } | null;
+    }>(`/api/master/predestine-prize/${position}/force`, {
+      method: "PUT",
+      body: JSON.stringify({ raffleId, numberValue }),
+    }),
+  setPrizeWinner: (
+    raffleId: string,
+    position: number,
+    numberValue: number | null,
+  ) =>
+    request<{
+      success: boolean;
+      winnerNumber: number | null;
+      buyer: { name: string; phone: string } | null;
+    }>(`/api/master/prize/${position}/winner`, {
+      method: "PUT",
+      body: JSON.stringify({ raffleId, numberValue }),
+    }),
+  unassignNumber: (raffleId: string, numberValue: number) =>
+    request<{
+      success: boolean;
+      numberValue: number;
+      previousBuyer: { name: string; phone: string } | null;
+      clearedPrizePositions: number[];
+    }>("/api/master/numbers/unassign", {
+      method: "POST",
+      body: JSON.stringify({ raffleId, numberValue }),
+    }),
   getBypassCpfs: () =>
     request<{ cpfs: string[] }>("/api/master/bypass-cpfs"),
   addBypassCpf: (cpf: string) =>

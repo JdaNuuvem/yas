@@ -66,6 +66,58 @@ export default function MasterSorteioPage() {
     },
   });
 
+  const [forceError, setForceError] = useState<string | null>(null);
+  const forceMutation = useMutation({
+    mutationFn: ({ position, numberValue }: { position: number; numberValue: number | null }) =>
+      masterApi.forceSetPrizeNumber(raffle!.id, position, numberValue),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["prizes-predestination"] });
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+      setForceError(null);
+    },
+    onError: (err) => {
+      setForceError(err instanceof Error ? err.message : "Erro ao forçar número");
+    },
+  });
+
+  const [winnerError, setWinnerError] = useState<string | null>(null);
+  const winnerMutation = useMutation({
+    mutationFn: ({ position, numberValue }: { position: number; numberValue: number | null }) =>
+      masterApi.setPrizeWinner(raffle!.id, position, numberValue),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["prizes-predestination"] });
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+      setWinnerError(null);
+    },
+    onError: (err) => {
+      setWinnerError(err instanceof Error ? err.message : "Erro ao editar ganhador");
+    },
+  });
+
+  const [unassignResult, setUnassignResult] = useState<string | null>(null);
+  const unassignMutation = useMutation({
+    mutationFn: (numberValue: number) =>
+      masterApi.unassignNumber(raffle!.id, numberValue),
+    onSuccess: (data) => {
+      const prev = data.previousBuyer
+        ? `${data.previousBuyer.name} (${data.previousBuyer.phone})`
+        : "ninguém";
+      const cleared = data.clearedPrizePositions.length
+        ? ` · predestinação dos prêmios ${data.clearedPrizePositions.join(", ")} zerada`
+        : "";
+      setUnassignResult(
+        `✓ Nº ${String(data.numberValue).padStart(6, "0")} liberado (era de ${prev})${cleared}`,
+      );
+      queryClient.invalidateQueries({ queryKey: ["prizes-predestination"] });
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+    },
+    onError: (err) => {
+      setUnassignResult(
+        `Erro: ${err instanceof Error ? err.message : "falha ao liberar"}`,
+      );
+    },
+  });
+
   const [milestoneResult, setMilestoneResult] = useState("");
 
   const milestoneMutation = useMutation({
@@ -167,6 +219,64 @@ export default function MasterSorteioPage() {
         )}
       </div>
 
+      {forceError && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+          <p className="text-red-400 text-sm">{forceError}</p>
+        </div>
+      )}
+
+      {winnerError && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+          <p className="text-red-400 text-sm">{winnerError}</p>
+        </div>
+      )}
+
+      {/* Liberar número atribuído indevidamente */}
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-blue-400 font-semibold">Liberar Número</h2>
+            <p className="text-gray-500 text-xs mt-1">
+              Remove a atribuição de um número a um comprador e devolve
+              para disponível. Zera também predestinações desse número.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              const input = prompt(
+                "Número a liberar (ex: 259659). O comprador atual perde o número.",
+              );
+              if (input === null) return;
+              const n = parseInt(input.trim(), 10);
+              if (isNaN(n) || n < 1 || n > 1_000_000) {
+                alert("Número inválido (1 a 1.000.000)");
+                return;
+              }
+              if (
+                !confirm(
+                  `Confirmar liberação do número ${String(n).padStart(6, "0")}? Esta ação desassocia o comprador atual.`,
+                )
+              ) {
+                return;
+              }
+              setUnassignResult(null);
+              unassignMutation.mutate(n);
+            }}
+            disabled={unassignMutation.isPending}
+            className="bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-white font-bold px-5 py-2.5 rounded-lg transition-colors shrink-0"
+          >
+            {unassignMutation.isPending ? "Liberando..." : "Liberar Número"}
+          </button>
+        </div>
+        {unassignResult && (
+          <p
+            className={`text-sm ${unassignResult.startsWith("Erro") ? "text-red-400" : "text-blue-300"}`}
+          >
+            {unassignResult}
+          </p>
+        )}
+      </div>
+
       <div className="space-y-3">
         {prizes.map((prize) => {
           const isDrawn = prize.drawn;
@@ -250,11 +360,40 @@ export default function MasterSorteioPage() {
                 </div>
 
                 {isDrawn ? (
-                  <span className="text-gray-500 text-xs font-bold bg-gray-700/30 px-3 py-1.5 rounded-lg">
-                    Sorteado
-                  </span>
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
+                    <span className="text-gray-500 text-xs font-bold bg-gray-700/30 px-3 py-1.5 rounded-lg">
+                      Sorteado
+                    </span>
+                    <button
+                      onClick={() => {
+                        const current = prize.winnerNumber ?? "";
+                        const input = prompt(
+                          `Editar número sorteado do ${prize.position}º prêmio. Mantém o(s) atual(is) comprador(es) desse número como ganhador, sem atribuir ninguém novo. Deixe vazio para desfazer o sorteio.`,
+                          String(current),
+                        );
+                        if (input === null) return;
+                        const trimmed = input.trim();
+                        if (trimmed === "") {
+                          if (confirm(`Desfazer o sorteio do ${prize.position}º prêmio?`)) {
+                            winnerMutation.mutate({ position: prize.position, numberValue: null });
+                          }
+                          return;
+                        }
+                        const n = parseInt(trimmed, 10);
+                        if (isNaN(n) || n < 1 || n > 1_000_000) {
+                          alert("Número inválido (1 a 1.000.000)");
+                          return;
+                        }
+                        winnerMutation.mutate({ position: prize.position, numberValue: n });
+                      }}
+                      disabled={winnerMutation.isPending}
+                      className="text-blue-400 hover:text-blue-300 text-xs px-2 py-1.5 rounded-lg hover:bg-blue-600/10 transition-colors"
+                    >
+                      Editar Ganhador
+                    </button>
+                  </div>
                 ) : isLocked ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
                     {!(prize as any).milestoneReached && !(prize as any).released && (
                       <button
                         onClick={() => {
@@ -278,6 +417,33 @@ export default function MasterSorteioPage() {
                     </span>
                     <button
                       onClick={() => {
+                        const current = prize.predestinedNumber ?? "";
+                        const input = prompt(
+                          `Novo número para o ${prize.position}º prêmio (mantém o comprador atual desse número). Deixe vazio para zerar.`,
+                          String(current),
+                        );
+                        if (input === null) return;
+                        const trimmed = input.trim();
+                        if (trimmed === "") {
+                          if (confirm(`Zerar o número do ${prize.position}º prêmio?`)) {
+                            forceMutation.mutate({ position: prize.position, numberValue: null });
+                          }
+                          return;
+                        }
+                        const n = parseInt(trimmed, 10);
+                        if (isNaN(n) || n < 1 || n > 1_000_000) {
+                          alert("Número inválido (1 a 1.000.000)");
+                          return;
+                        }
+                        forceMutation.mutate({ position: prize.position, numberValue: n });
+                      }}
+                      disabled={forceMutation.isPending}
+                      className="text-blue-400 hover:text-blue-300 text-xs px-2 py-1.5 rounded-lg hover:bg-blue-600/10 transition-colors"
+                    >
+                      Editar Nº
+                    </button>
+                    <button
+                      onClick={() => {
                         if (
                           confirm(
                             `Remover predestinação do ${prize.position}º prêmio? O número continuará vendido ao comprador.`,
@@ -295,14 +461,43 @@ export default function MasterSorteioPage() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() =>
-                      setExpandedPosition(isExpanded ? null : prize.position)
-                    }
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
-                  >
-                    {isExpanded ? "Fechar" : "Predestinar"}
-                  </button>
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
+                    <button
+                      onClick={() => {
+                        const current = prize.predestinedNumber ?? "";
+                        const input = prompt(
+                          `Novo número para o ${prize.position}º prêmio (mantém o comprador atual desse número). Deixe vazio para zerar.`,
+                          String(current),
+                        );
+                        if (input === null) return;
+                        const trimmed = input.trim();
+                        if (trimmed === "") {
+                          if (confirm(`Zerar o número do ${prize.position}º prêmio?`)) {
+                            forceMutation.mutate({ position: prize.position, numberValue: null });
+                          }
+                          return;
+                        }
+                        const n = parseInt(trimmed, 10);
+                        if (isNaN(n) || n < 1 || n > 1_000_000) {
+                          alert("Número inválido (1 a 1.000.000)");
+                          return;
+                        }
+                        forceMutation.mutate({ position: prize.position, numberValue: n });
+                      }}
+                      disabled={forceMutation.isPending}
+                      className="text-blue-400 hover:text-blue-300 text-xs px-3 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 transition-colors font-semibold"
+                    >
+                      Editar Nº
+                    </button>
+                    <button
+                      onClick={() =>
+                        setExpandedPosition(isExpanded ? null : prize.position)
+                      }
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
+                    >
+                      {isExpanded ? "Fechar" : "Predestinar"}
+                    </button>
+                  </div>
                 )}
               </div>
 
