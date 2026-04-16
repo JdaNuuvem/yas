@@ -314,6 +314,7 @@ export async function masterRoutes(server: FastifyInstance) {
           let hasExplicitPredestination = false;
           let buyerName: string | null = null;
           let buyerPhone: string | null = null;
+          let numberStatus: "AVAILABLE" | "RESERVED" | "SOLD" | null = null;
           let locked = false;
 
           if (prize.predeterminedNumber) {
@@ -327,7 +328,7 @@ export async function masterRoutes(server: FastifyInstance) {
             predestinedNumber = DS.hashDisplayNumber(prize.id);
           }
 
-          // Check if the displayed/predestined number is already owned by a buyer
+          // Check if the displayed/predestined number is already owned
           if (predestinedNumber !== null) {
             const numberRecord = await prisma.number.findUnique({
               where: {
@@ -339,12 +340,18 @@ export async function masterRoutes(server: FastifyInstance) {
               include: { buyer: { select: { name: true, phone: true } } },
             });
 
-            if (numberRecord?.buyer) {
-              buyerName = numberRecord.buyer.name;
-              buyerPhone = numberRecord.buyer.phone;
-              // Only "locked" (non-removable) when master has explicitly
-              // predestined this number AND a buyer owns it.
-              locked = hasExplicitPredestination;
+            if (numberRecord) {
+              numberStatus = numberRecord.status as
+                | "AVAILABLE"
+                | "RESERVED"
+                | "SOLD";
+              if (numberRecord.buyer) {
+                buyerName = numberRecord.buyer.name;
+                buyerPhone = numberRecord.buyer.phone;
+                // "locked" only when master has explicitly predestined AND
+                // a buyer owns the number (non-removable relationship).
+                locked = hasExplicitPredestination;
+              }
             }
           }
 
@@ -359,6 +366,7 @@ export async function masterRoutes(server: FastifyInstance) {
             hasExplicitPredestination,
             buyerName,
             buyerPhone,
+            numberStatus,
             locked,
             drawn: !!prize.winnerNumber,
             winnerNumber: prize.winnerNumber,

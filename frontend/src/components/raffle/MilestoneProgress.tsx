@@ -57,6 +57,11 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                       Nº {displayNumber.toString().padStart(6, "0")}
                     </p>
                   )}
+                  {prize.winnerName && (
+                    <p className="text-[11px] text-amber-700 font-semibold truncate">
+                      Ganhador: {prize.winnerName}
+                    </p>
+                  )}
                 </div>
 
                 {displayNumber !== null && (
@@ -68,9 +73,25 @@ export function MilestoneProgress({ raffleId, prizes }: MilestoneProgressProps) 
                       stiffness: 300,
                       delay: 0.1 * idx,
                     }}
-                    className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full font-mono"
+                    className="shrink-0 text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full font-mono"
                   >
                     {displayNumber.toString().padStart(6, "0")}
+                  </motion.span>
+                )}
+
+                {prize.winnerName && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      delay: 0.1 * idx + 0.05,
+                    }}
+                    className="shrink-0 text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full max-w-[120px] truncate"
+                    title={prize.winnerName}
+                  >
+                    {prize.winnerName}
                   </motion.span>
                 )}
               </motion.div>

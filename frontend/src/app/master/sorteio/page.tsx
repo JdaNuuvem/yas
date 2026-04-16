@@ -208,37 +208,45 @@ export default function MasterSorteioPage() {
                       Sorteado: {padNumber(prize.winnerNumber!)}
                     </p>
                   )}
-                  {!isDrawn && prize.predestinedNumber !== null && (
-                    <p
-                      className={`text-xs ${
-                        isLocked
-                          ? "text-green-400"
-                          : prize.buyerName
-                            ? "text-blue-400"
-                            : prize.hasExplicitPredestination
-                              ? "text-yellow-400"
-                              : "text-gray-400"
-                      }`}
-                    >
-                      Nº {padNumber(prize.predestinedNumber)}
-                      {prize.buyerName ? (
-                        <>
-                          {" "}
-                          → {prize.buyerName}
-                          {prize.buyerPhone ? ` (${prize.buyerPhone})` : ""}
-                          {!prize.hasExplicitPredestination && (
-                            <span className="ml-1 text-[10px] opacity-80">
-                              (comprador real)
-                            </span>
-                          )}
-                        </>
-                      ) : prize.hasExplicitPredestination ? (
-                        " (sem comprador associado)"
-                      ) : (
-                        " (sem predestinação · não vendido)"
-                      )}
-                    </p>
-                  )}
+                  {!isDrawn && prize.predestinedNumber !== null && (() => {
+                    const isSold = prize.numberStatus === "SOLD";
+                    const isReserved = prize.numberStatus === "RESERVED";
+                    const isTaken = isSold || isReserved || !!prize.buyerName;
+                    const color = isLocked
+                      ? "text-green-400"
+                      : prize.buyerName
+                        ? "text-blue-400"
+                        : isTaken
+                          ? "text-orange-400"
+                          : prize.hasExplicitPredestination
+                            ? "text-yellow-400"
+                            : "text-gray-400";
+                    return (
+                      <p className={`text-xs ${color}`}>
+                        Nº {padNumber(prize.predestinedNumber)}
+                        {prize.buyerName ? (
+                          <>
+                            {" "}
+                            → {prize.buyerName}
+                            {prize.buyerPhone ? ` (${prize.buyerPhone})` : ""}
+                            {!prize.hasExplicitPredestination && (
+                              <span className="ml-1 text-[10px] opacity-80">
+                                (comprador real)
+                              </span>
+                            )}
+                          </>
+                        ) : isSold ? (
+                          " · JÁ VENDIDO (comprador não identificado)"
+                        ) : isReserved ? (
+                          " · reservado por um comprador"
+                        ) : prize.hasExplicitPredestination ? (
+                          " (sem comprador associado)"
+                        ) : (
+                          " (sem predestinação · não vendido)"
+                        )}
+                      </p>
+                    );
+                  })()}
                 </div>
 
                 {isDrawn ? (

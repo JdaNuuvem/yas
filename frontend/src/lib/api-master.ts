@@ -121,6 +121,7 @@ export const masterApi = {
         hasExplicitPredestination: boolean;
         buyerName: string | null;
         buyerPhone: string | null;
+        numberStatus: "AVAILABLE" | "RESERVED" | "SOLD" | null;
         locked: boolean;
         drawn: boolean;
         winnerNumber: number | null;
