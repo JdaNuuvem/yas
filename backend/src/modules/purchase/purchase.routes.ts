@@ -44,8 +44,11 @@ export async function purchaseRoutes(server: FastifyInstance) {
   });
 
   server.get("/api/purchase/my-titles", async (request) => {
-    const qSchema = z.object({ phone: z.string().min(8) });
-    const { phone } = qSchema.parse(request.query);
-    return service.getPurchasesByPhone(phone);
+    const qSchema = z.object({
+      phone: z.string().optional(),
+      cpf: z.string().optional(),
+    }).refine((d) => d.phone || d.cpf, { message: "Informe telefone ou CPF" });
+    const { phone, cpf } = qSchema.parse(request.query);
+    return service.getPurchasesByPhoneOrCpf(phone, cpf);
   });
 }

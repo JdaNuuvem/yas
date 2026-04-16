@@ -164,6 +164,31 @@ model AdminUser {
   @@map("admin_users")
 }
 
+enum ComplaintStatus {
+  PENDING
+  RESOLVED
+
+  @@map("complaint_status")
+}
+
+model Complaint {
+  id             String          @id @default(cuid()) @map("id")
+  purchaseId     String?         @map("purchase_id")
+  transactionId  String?         @map("transaction_id")
+  name           String          @map("name")
+  cpf            String          @map("cpf")
+  phone          String          @map("phone")
+  codesQuantity  Int             @map("codes_quantity")
+  description    String          @map("description")
+  proofImage     String?         @map("proof_image")
+  status         ComplaintStatus @default(PENDING) @map("status")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  resolvedAt     DateTime?       @map("resolved_at")
+
+  @@index([status])
+  @@map("complaints")
+}
+
 model MasterConfig {
   id                    String         @id @default(cuid()) @map("id")
   splitPercentage       Int            @default(50) @map("split_percentage")

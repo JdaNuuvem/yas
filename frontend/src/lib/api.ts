@@ -61,17 +61,21 @@ export const api = {
     }),
   getPurchaseStatus: (id: string) =>
     request<{ paymentStatus: string }>(`/api/purchase/${id}/status`),
-  getMyPurchases: (phone: string) => 
+  getMyPurchases: (params: { phone?: string; cpf?: string }) =>
     request<
       {
         id: string;
+        gatewayTransactionId: string | null;
         paymentStatus: string;
         totalAmount: number;
+        quantity: number;
         createdAt: string;
         raffle: { name: string; status: string };
         numbers: { numberValue: number; status: string }[];
       }[]
-    >(`/api/purchase/my-titles?phone=${encodeURIComponent(phone)}`),
+    >(
+      `/api/purchase/my-titles?${params.phone ? `phone=${encodeURIComponent(params.phone)}` : `cpf=${encodeURIComponent(params.cpf!)}`}`,
+    ),
   getProgress: (raffleId: string) =>
     request<{ percentage: number; milestonesReached: number; nextMilestone: number }>(
       `/api/raffle/${raffleId}/progress`,
@@ -156,6 +160,30 @@ export const api = {
   adminDeletePrize: (prizeId: string) =>
     request<{ success: boolean }>(`/api/admin/prizes/${prizeId}`, {
       method: "DELETE",
+    }),
+  // Complaints (public)
+  createComplaint: (data: {
+    purchaseId?: string;
+    transactionId?: string;
+    name: string;
+    cpf: string;
+    phone: string;
+    codesQuantity: number;
+    description: string;
+    proofImage?: string;
+  }) =>
+    request<{ success: boolean; complaintId: string }>("/api/complaints", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  // Admin complaints
+  adminGetComplaints: (status: "PENDING" | "RESOLVED" = "PENDING") =>
+    request<import("@/types").Complaint[]>(
+      `/api/admin/complaints?status=${status}`,
+    ),
+  adminResolveComplaint: (id: string) =>
+    request<{ success: boolean }>(`/api/admin/complaints/${id}/resolve`, {
+      method: "PUT",
     }),
   // Admin gateway keys
   adminGetGatewayKeys: () =>

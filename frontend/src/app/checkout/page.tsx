@@ -142,6 +142,8 @@ export default function CheckoutPage() {
               qrCodeText={purchaseResult.qrCodeText}
               amount={purchaseResult.totalAmount}
               purchaseId={purchaseResult.purchaseId}
+              gatewayTransactionId={purchaseResult.gatewayTransactionId}
+              quantity={purchaseResult.quantity}
             />
           </div>
         )}

@@ -40,10 +40,26 @@ export interface NumbersPage {
 
 export interface PurchaseResult {
   purchaseId: string;
+  gatewayTransactionId: string;
   qrCode: string;
   qrCodeText: string;
   quantity: number;
   totalAmount: number;
+}
+
+export interface Complaint {
+  id: string;
+  purchaseId: string | null;
+  transactionId: string | null;
+  name: string;
+  cpf: string;
+  phone: string;
+  codesQuantity: number;
+  description: string;
+  proofImage: string | null;
+  status: "PENDING" | "RESOLVED";
+  createdAt: string;
+  resolvedAt: string | null;
 }
 
 export interface DashboardData {

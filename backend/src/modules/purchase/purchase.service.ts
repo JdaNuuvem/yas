@@ -16,6 +16,7 @@ interface CreatePurchaseInput {
 
 interface CreatePurchaseResult {
   readonly purchaseId: string;
+  readonly gatewayTransactionId: string;
   readonly qrCode: string;
   readonly qrCodeText: string;
   readonly quantity: number;
@@ -205,6 +206,7 @@ export class PurchaseService {
 
     return {
       purchaseId: purchase.id,
+      gatewayTransactionId: String(charge.transactionId),
       qrCode: charge.qrCode,
       qrCodeText: charge.qrCodeBase64,
       quantity: filteredQuantity,
@@ -238,16 +240,31 @@ export class PurchaseService {
     });
   }
 
-  async getPurchasesByPhone(phone: string) {
-    if (!phone || phone.length < 8) {
-      throw new Error("Telefone inválido.");
+  async getPurchasesByPhoneOrCpf(phone?: string, cpf?: string) {
+    if (!phone && !cpf) {
+      throw new Error("Informe telefone ou CPF.");
+    }
+
+    // Build buyer filter
+    let buyerWhere: Record<string, unknown>;
+    if (phone) {
+      if (phone.length < 8) throw new Error("Telefone inválido.");
+      buyerWhere = { phone };
+    } else {
+      const cleanCpf = cpf!.replace(/\D/g, "");
+      if (cleanCpf.length < 11) throw new Error("CPF inválido.");
+      const encryptionKey = process.env.ENCRYPTION_KEY;
+      if (!encryptionKey) throw new Error("ENCRYPTION_KEY não configurada.");
+      const cpfHash = hashDeterministic(cleanCpf, encryptionKey);
+      buyerWhere = { cpfHash };
     }
 
     const rawPurchases = await this.prisma.purchase.findMany({
-      where: { buyer: { phone } },
+      where: { buyer: buyerWhere },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
+        gatewayTransactionId: true,
         paymentStatus: true,
         totalAmount: true,
         quantity: true,
@@ -271,7 +288,7 @@ export class PurchaseService {
     // Also include manually assigned numbers (no purchase)
     const manualNumbers = await this.prisma.number.findMany({
       where: {
-        buyer: { phone },
+        buyer: buyerWhere,
         purchaseId: null,
         status: "SOLD",
       },

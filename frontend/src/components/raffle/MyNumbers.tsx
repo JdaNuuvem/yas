@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { api } from "@/lib/api";
 
 function PurchaseCard({ purchase: p }: { purchase: Awaited<ReturnType<typeof api.getMyPurchases>>[0] }) {
@@ -21,6 +22,11 @@ function PurchaseCard({ purchase: p }: { purchase: Awaited<ReturnType<typeof api
             {new Date(p.createdAt).toLocaleDateString("pt-BR")}
             {isConfirmed && ` — ${p.numbers.length} números`}
           </p>
+          {p.gatewayTransactionId && (
+            <p className="text-xs text-gray-400 font-mono">
+              Transação: {p.gatewayTransactionId}
+            </p>
+          )}
         </div>
         <span className={`text-xs font-bold px-2 py-1 rounded-md ${
           isConfirmed ? "bg-green-100 text-green-700" :
@@ -63,21 +69,35 @@ function PurchaseCard({ purchase: p }: { purchase: Awaited<ReturnType<typeof api
           )}
         </>
       )}
+
+      {!p.id.startsWith("manual-") && (
+        <Link
+          href={`/reclamacao?purchaseId=${p.id}${p.gatewayTransactionId ? `&transactionId=${p.gatewayTransactionId}` : ""}${p.quantity ? `&qty=${p.quantity}` : ""}`}
+          className="block mt-3 py-2 text-center text-xs text-red-500 hover:text-red-600 border border-red-100 hover:border-red-200 rounded-lg transition-colors"
+        >
+          Tive um problema
+        </Link>
+      )}
     </div>
   );
 }
 
 export function MyNumbers() {
   const [isOpen, setIsOpen] = useState(false);
-  const [phone, setPhone] = useState("");
+  const [searchMode, setSearchMode] = useState<"phone" | "cpf">("phone");
+  const [searchValue, setSearchValue] = useState("");
   const [purchases, setPurchases] = useState<Awaited<ReturnType<typeof api.getMyPurchases>> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSearch = async () => {
-    const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length < 10) {
+    const clean = searchValue.replace(/\D/g, "");
+    if (searchMode === "phone" && clean.length < 10) {
       setError("Insira o telefone completo com DDD.");
+      return;
+    }
+    if (searchMode === "cpf" && clean.length < 11) {
+      setError("Insira o CPF completo.");
       return;
     }
     setError("");
@@ -85,14 +105,22 @@ export function MyNumbers() {
     setPurchases(null);
 
     try {
-      const data = await api.getMyPurchases(cleanPhone);
+      const params = searchMode === "phone" ? { phone: clean } : { cpf: clean };
+      const data = await api.getMyPurchases(params);
       setPurchases(data);
     } catch (err: any) {
-      setError(err.message || "Erro ao buscar. Verifique o telefone e tente novamente.");
+      setError(err.message || "Erro ao buscar. Verifique os dados e tente novamente.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  function handleModeSwitch(mode: "phone" | "cpf") {
+    setSearchMode(mode);
+    setSearchValue("");
+    setPurchases(null);
+    setError("");
+  }
 
   return (
     <div className="px-5">
@@ -110,15 +138,41 @@ export function MyNumbers() {
       {isOpen && (
         <div className="mt-3 card p-4 space-y-3 animate-float-up">
           <p className="text-gray-400 text-xs text-center">
-            Insira seu telefone para consultar seus números
+            Busque seus números por telefone ou CPF
           </p>
+
+          {/* Toggle phone/cpf */}
+          <div className="flex bg-gray-100 rounded-lg p-0.5">
+            <button
+              onClick={() => handleModeSwitch("phone")}
+              className={`flex-1 py-2 text-xs font-medium rounded-md transition-colors ${
+                searchMode === "phone"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500"
+              }`}
+            >
+              Telefone
+            </button>
+            <button
+              onClick={() => handleModeSwitch("cpf")}
+              className={`flex-1 py-2 text-xs font-medium rounded-md transition-colors ${
+                searchMode === "cpf"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500"
+              }`}
+            >
+              CPF
+            </button>
+          </div>
+
           <div className="flex gap-2">
             <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              type={searchMode === "phone" ? "tel" : "text"}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              placeholder="(00) 00000-0000"
+              placeholder={searchMode === "phone" ? "(00) 00000-0000" : "000.000.000-00"}
+              maxLength={searchMode === "phone" ? 15 : 14}
               className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-2.5 text-sm"
               disabled={isLoading}
             />
@@ -135,7 +189,7 @@ export function MyNumbers() {
 
           {purchases && purchases.length === 0 && (
             <p className="text-gray-500 text-xs text-center mt-4 pb-2">
-              Nenhum título encontrado para este telefone.
+              Nenhum título encontrado para este {searchMode === "phone" ? "telefone" : "CPF"}.
             </p>
           )}
 

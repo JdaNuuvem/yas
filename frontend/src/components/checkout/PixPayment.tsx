@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { formatCurrency } from "@/lib/format";
 
@@ -11,6 +12,8 @@ interface PixPaymentProps {
   qrCodeText: string;
   amount: number;
   purchaseId: string;
+  gatewayTransactionId?: string;
+  quantity?: number;
 }
 
 export function PixPayment({
@@ -18,6 +21,8 @@ export function PixPayment({
   qrCodeText,
   amount,
   purchaseId,
+  gatewayTransactionId,
+  quantity,
 }: PixPaymentProps) {
   const [copied, setCopied] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(PIX_EXPIRY_SECONDS);
@@ -141,7 +146,21 @@ export function PixPayment({
               : "Copiar código PIX"}
         </button>
 
-        <p className="text-gray-300 text-[11px]">ID: {purchaseId}</p>
+        <div className="space-y-1">
+          <p className="text-gray-300 text-[11px]">ID: {purchaseId}</p>
+          {gatewayTransactionId && (
+            <p className="text-gray-300 text-[11px]">
+              Transação: {gatewayTransactionId}
+            </p>
+          )}
+        </div>
+
+        <Link
+          href={`/reclamacao?purchaseId=${purchaseId}${gatewayTransactionId ? `&transactionId=${gatewayTransactionId}` : ""}${quantity ? `&qty=${quantity}` : ""}`}
+          className="block w-full mt-4 py-2.5 text-center text-sm text-red-500 hover:text-red-600 border border-red-200 hover:border-red-300 rounded-xl transition-colors"
+        >
+          Tive um problema
+        </Link>
       </div>
     </div>
   );

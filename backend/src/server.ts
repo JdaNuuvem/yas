@@ -12,6 +12,7 @@ import { webhookRoutes } from "./modules/webhook/webhook.routes.js";
 import { adminRoutes } from "./modules/admin/admin.routes.js";
 import { masterRoutes } from "./modules/master/master.routes.js";
 import { drawRoutes } from "./modules/draw/draw.routes.js";
+import { complaintRoutes } from "./modules/complaint/complaint.routes.js";
 
 // Initialize Sentry if DSN is provided
 if (process.env.SENTRY_DSN) {
@@ -61,6 +62,7 @@ export async function buildServer() {
   // Protected routes
   await server.register(adminRoutes);
   await server.register(masterRoutes);
+  await server.register(complaintRoutes);
 
   // Global Error Handler
   server.setErrorHandler((error: any, request, reply) => {
