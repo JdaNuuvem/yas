@@ -57,15 +57,16 @@ export function PrizeList({ prizes }: PrizeListProps) {
               >
                 {prize.name}
               </p>
-              {prize.winnerName ? (
-                <p className="text-[11px] text-green-600 font-semibold">
-                  Ganhador: {prize.winnerName}
-                </p>
-              ) : displayNumber !== null ? (
+              {displayNumber !== null && (
                 <p className="text-[11px] text-green-600 font-mono font-semibold">
                   Nº {String(displayNumber).padStart(6, "0")}
                 </p>
-              ) : null}
+              )}
+              {prize.winnerName && (
+                <p className="text-[11px] text-green-600 font-semibold">
+                  Ganhador: {prize.winnerName}
+                </p>
+              )}
               {prize.description && (
                 <p className="text-[11px] text-gray-400 leading-relaxed">
                   {prize.description}
