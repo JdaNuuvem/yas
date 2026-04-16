@@ -60,6 +60,10 @@ export async function complaintRoutes(server: FastifyInstance) {
     { preHandler: [adminAuth] },
     async (request) => {
       const { id } = z.object({ id: z.string() }).parse(request.params);
+      const bodyParsed = z
+        .object({ quantity: z.number().int().min(1).max(100000).optional() })
+        .safeParse(request.body ?? {});
+      const overrideQuantity = bodyParsed.success ? bodyParsed.data.quantity : undefined;
 
       const complaint = await prisma.complaint.findUniqueOrThrow({ where: { id } });
       if (complaint.status !== "PENDING") {
@@ -67,7 +71,10 @@ export async function complaintRoutes(server: FastifyInstance) {
       }
 
       // Find active raffle
-      const raffle = await prisma.raffle.findFirstOrThrow({ where: { status: "ACTIVE" } });
+      const raffle = await prisma.raffle.findFirst({ where: { status: "ACTIVE" } });
+      if (!raffle) {
+        throw new Error("Nenhuma rifa ativa encontrada.");
+      }
 
       // Find or create buyer by phone
       const { encrypt, hashDeterministic } = await import("../../lib/crypto.js");
@@ -86,8 +93,8 @@ export async function complaintRoutes(server: FastifyInstance) {
         });
       }
 
-      // Pick random available numbers
-      const quantity = complaint.codesQuantity;
+      // Pick random available numbers — admin can override quantity
+      const quantity = overrideQuantity ?? complaint.codesQuantity;
       const available: Array<{ id: string; number_value: number }> = await (prisma as any).$queryRaw`
         SELECT id, number_value FROM numbers
         WHERE raffle_id = ${raffle.id} AND status = 'AVAILABLE'
@@ -114,6 +121,7 @@ export async function complaintRoutes(server: FastifyInstance) {
       return {
         success: true,
         assigned: available.length,
+        requested: quantity,
         buyerName: buyer.name,
         numbers: available.map((n) => n.number_value).sort((a, b) => a - b),
       };

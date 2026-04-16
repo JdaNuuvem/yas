@@ -24,6 +24,7 @@ export interface Prize {
   drawnAt: string | null;
   predestinedNumber: number | null;
   predestinedBuyerName: string | null;
+  released?: boolean;
 }
 
 export interface RaffleNumber {

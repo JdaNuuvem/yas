@@ -11,6 +11,12 @@ export default function AdminPrêmiosPage() {
     queryKey: ["raffle"],
     queryFn: () => api.getRaffle(),
   });
+  const { data: progress } = useQuery({
+    queryKey: ["progress", raffle?.id],
+    queryFn: () => api.getProgress(raffle!.id),
+    enabled: !!raffle?.id,
+    refetchInterval: 15_000,
+  });
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -86,6 +92,22 @@ export default function AdminPrêmiosPage() {
       queryClient.invalidateQueries({ queryKey: ["raffle"] });
       queryClient.refetchQueries({ queryKey: ["raffle"] });
       setShowResetModal(false);
+    },
+  });
+
+  const [releasingId, setReleasingId] = useState<string | null>(null);
+  const [releaseError, setReleaseError] = useState<string | null>(null);
+  const releaseMutation = useMutation({
+    mutationFn: (prizeId: string) => api.adminReleasePrize(prizeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["raffle"] });
+      queryClient.refetchQueries({ queryKey: ["raffle"] });
+      setReleasingId(null);
+      setReleaseError(null);
+    },
+    onError: (err) => {
+      setReleaseError(err instanceof Error ? err.message : "Erro ao soltar");
+      setReleasingId(null);
     },
   });
 
@@ -215,9 +237,46 @@ export default function AdminPrêmiosPage() {
         </div>
       )}
 
+      {/* Meta progress — só a porcentagem, sem números */}
+      {progress && (
+        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-white">Progresso da Meta</h2>
+            <span className="text-indigo-400 font-bold text-sm">
+              {progress.percentage.toFixed(1)}%
+            </span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-indigo-500 h-full rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(progress.percentage, 100)}%` }}
+            />
+          </div>
+          {progress.nextMilestone <= 100 && (
+            <p className="text-gray-400 text-xs">
+              Próxima meta:{" "}
+              <span className="text-white font-semibold">
+                {progress.nextMilestone}%
+              </span>{" "}
+              (faltam{" "}
+              <span className="text-yellow-400 font-semibold">
+                {(progress.nextMilestone - progress.percentage).toFixed(1)}%
+              </span>
+              )
+            </p>
+          )}
+        </div>
+      )}
+
       {revealError && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
           <p className="text-yellow-400 text-sm">{revealError}</p>
+        </div>
+      )}
+
+      {releaseError && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+          <p className="text-red-400 text-sm">{releaseError}</p>
         </div>
       )}
 
@@ -275,23 +334,42 @@ export default function AdminPrêmiosPage() {
                     {prize.description && (
                       <p className="text-gray-400 text-sm">{prize.description}</p>
                     )}
-                    {prize.predestinedNumber && !prize.winnerNumber && (
-                      <span className="text-yellow-400 text-xs font-mono">
-                        Nº {String(prize.predestinedNumber).padStart(6, "0")}
-                      </span>
-                    )}
+                    {/* Status: oculto / solto / revelado */}
                     {prize.winnerName && (
                       <span className="text-green-400 text-xs font-medium">
-                        Ganhador: {prize.winnerName} — Nº {String(prize.winnerNumber).padStart(6, "0")}
+                        Revelado — ganhador: {prize.winnerName}
                       </span>
                     )}
                     {prize.drawnAt && !prize.winnerName && (
                       <span className="text-green-400 text-xs font-medium">Revelado</span>
                     )}
+                    {!prize.drawnAt && prize.released && (
+                      <span className="text-yellow-400 text-xs font-medium">
+                        Solto — aguardando revelação
+                      </span>
+                    )}
+                    {!prize.drawnAt && !prize.released && (
+                      <span className="text-gray-500 text-xs font-medium">
+                        Oculto
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0 flex-wrap justify-end">
-                  {!prize.drawnAt && (
+                  {!prize.drawnAt && !prize.released && (
+                    <button
+                      onClick={() => {
+                        setReleaseError(null);
+                        setReleasingId(prize.id);
+                        releaseMutation.mutate(prize.id);
+                      }}
+                      disabled={releasingId === prize.id}
+                      className="bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      {releasingId === prize.id ? "Soltando..." : "Soltar Prêmio"}
+                    </button>
+                  )}
+                  {!prize.drawnAt && prize.released && (
                     <button
                       onClick={() => {
                         setRevealError(null);

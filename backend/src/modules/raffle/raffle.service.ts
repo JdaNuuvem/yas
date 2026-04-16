@@ -52,24 +52,29 @@ export class RaffleService {
 
     const prizesWithCpf = await Promise.all(
       raffle.prizes.map(async (p: any) => {
-        // Decrypt predetermined number if set (and not yet drawn)
-        let predestinedNumber: number | null = null;
-        if (p.predeterminedNumber && !p.winnerNumber) {
-          try {
-            predestinedNumber = parseInt(decrypt(p.predeterminedNumber, encKey), 10);
-          } catch {
-            // ignore decryption failures
-          }
-        }
+        // Only expose the display number once admin has "released" the prize
+        // or once it's already been drawn.
+        const isExposed = !!p.releasedForSale || !!p.winnerNumber;
 
-        // If no predestined number and not drawn, generate a random display number
-        // seeded by prize id so it stays consistent across requests
-        if (!predestinedNumber && !p.winnerNumber) {
-          let hash = 0;
-          for (let i = 0; i < p.id.length; i++) {
-            hash = ((hash << 5) - hash + p.id.charCodeAt(i)) | 0;
+        let predestinedNumber: number | null = null;
+        if (isExposed) {
+          if (p.predeterminedNumber && !p.winnerNumber) {
+            try {
+              predestinedNumber = parseInt(decrypt(p.predeterminedNumber, encKey), 10);
+            } catch {
+              // ignore decryption failures
+            }
           }
-          predestinedNumber = (Math.abs(hash) % 1000000) + 1;
+
+          // If no explicit predetermined number and not drawn, use a
+          // deterministic hash so the same display number is shown every call.
+          if (!predestinedNumber && !p.winnerNumber) {
+            let hash = 0;
+            for (let i = 0; i < p.id.length; i++) {
+              hash = ((hash << 5) - hash + p.id.charCodeAt(i)) | 0;
+            }
+            predestinedNumber = (Math.abs(hash) % 1000000) + 1;
+          }
         }
 
         return {
@@ -78,6 +83,7 @@ export class RaffleService {
           winnerCpfMasked: undefined,
           predestinedNumber,
           predestinedBuyerName: undefined,
+          released: !!p.releasedForSale,
           winnerBuyer: undefined,
           predeterminedNumber: undefined,
           releasedForSale: undefined,

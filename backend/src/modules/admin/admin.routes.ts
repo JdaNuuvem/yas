@@ -389,6 +389,29 @@ export async function adminRoutes(server: FastifyInstance) {
     },
   );
 
+  // Manually release a prize — exposes its display number publicly and unblocks
+  // it from sale. Replaces the old auto-release-by-milestone behavior.
+  server.put(
+    "/api/admin/prizes/:id/release",
+    { preHandler: [adminAuth] },
+    async (request) => {
+      const { id } = z.object({ id: z.string() }).parse(request.params);
 
+      const prize = await prisma.prize.findUnique({ where: { id } });
+      if (!prize) {
+        throw new Error("Prêmio não encontrado.");
+      }
+      if (prize.releasedForSale) {
+        return { success: true, alreadyReleased: true };
+      }
+
+      await prisma.prize.update({
+        where: { id },
+        data: { releasedForSale: true },
+      });
+
+      return { success: true };
+    },
+  );
 }
 

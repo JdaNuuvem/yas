@@ -69,27 +69,23 @@ export class DrawService {
   }
 
   async getBlockedNumbers(raffleId: string): Promise<number[]> {
-    const milestonesReached = await this.getMilestonesReached(raffleId);
-
+    // Prize numbers stay blocked from sale until the admin explicitly
+    // "releases" the prize (releasedForSale = true) or it gets drawn.
     const prizes = await this.prisma.prize.findMany({
       where: { raffleId, winnerNumber: null, releasedForSale: false },
     });
 
     const blocked: number[] = [];
     for (const prize of prizes) {
-      const required = DrawService.requiredMilestone(prize.position);
-      if (milestonesReached < required) {
-        if (prize.predeterminedNumber) {
-          try {
-            const num = parseInt(this.decryptNumber(prize.predeterminedNumber), 10);
-            blocked.push(num);
-          } catch {
-            // ignore decryption failures
-          }
-        } else {
-          // Block the hash-generated display number too
-          blocked.push(DrawService.hashDisplayNumber(prize.id));
+      if (prize.predeterminedNumber) {
+        try {
+          const num = parseInt(this.decryptNumber(prize.predeterminedNumber), 10);
+          blocked.push(num);
+        } catch {
+          // ignore decryption failures
         }
+      } else {
+        blocked.push(DrawService.hashDisplayNumber(prize.id));
       }
     }
     return blocked;

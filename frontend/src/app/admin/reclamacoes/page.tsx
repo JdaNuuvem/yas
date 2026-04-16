@@ -10,11 +10,18 @@ export default function ReclamacoesPage() {
   const [processing, setProcessing] = useState<string | null>(null);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ id: string; msg: string; type: "success" | "error" } | null>(null);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const fetchComplaints = useCallback(async () => {
     try {
       const data = await api.adminGetComplaints("PENDING");
       setComplaints(data);
+      setQuantities(
+        data.reduce<Record<string, number>>((acc, c) => {
+          acc[c.id] = c.codesQuantity;
+          return acc;
+        }, {}),
+      );
     } catch {
       // ignore
     } finally {
@@ -27,13 +34,22 @@ export default function ReclamacoesPage() {
   }, [fetchComplaints]);
 
   async function handleAccept(id: string) {
+    const qty = quantities[id];
+    if (!qty || qty < 1) {
+      setFeedback({ id, msg: "Informe uma quantidade válida", type: "error" });
+      return;
+    }
     setProcessing(id);
     setFeedback(null);
     try {
-      const result = await api.adminAcceptComplaint(id);
+      const result = await api.adminAcceptComplaint(id, qty);
+      const warning =
+        result.requested && result.assigned < result.requested
+          ? ` (${result.requested - result.assigned} indisponíveis)`
+          : "";
       setFeedback({
         id,
-        msg: `${result.assigned} números atribuídos para ${result.buyerName}`,
+        msg: `${result.assigned} números atribuídos para ${result.buyerName}${warning}`,
         type: "success",
       });
       setTimeout(() => {
@@ -122,8 +138,53 @@ export default function ReclamacoesPage() {
                   <span className="text-gray-200">{c.cpf}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs block">Qtd. códigos</span>
-                  <span className="text-white font-bold text-lg">{c.codesQuantity}</span>
+                  <span className="text-gray-500 text-xs block mb-1">
+                    Qtd. códigos
+                    {(quantities[c.id] ?? c.codesQuantity) !== c.codesQuantity && (
+                      <span className="text-yellow-400 ml-2 font-normal">
+                        (cliente informou {c.codesQuantity})
+                      </span>
+                    )}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setQuantities((prev) => ({
+                          ...prev,
+                          [c.id]: Math.max(1, (prev[c.id] ?? c.codesQuantity) - 10),
+                        }))
+                      }
+                      disabled={processing === c.id}
+                      className="px-2 py-1 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-white rounded text-xs"
+                    >
+                      −10
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      value={quantities[c.id] ?? c.codesQuantity}
+                      onChange={(e) => {
+                        const v = Math.max(1, Number(e.target.value) || 1);
+                        setQuantities((prev) => ({ ...prev, [c.id]: v }));
+                      }}
+                      disabled={processing === c.id}
+                      className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 text-white font-bold text-center rounded text-base focus:outline-none focus:border-indigo-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setQuantities((prev) => ({
+                          ...prev,
+                          [c.id]: (prev[c.id] ?? c.codesQuantity) + 10,
+                        }))
+                      }
+                      disabled={processing === c.id}
+                      className="px-2 py-1 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-white rounded text-xs"
+                    >
+                      +10
+                    </button>
+                  </div>
                 </div>
                 {c.transactionId && (
                   <div>
@@ -182,7 +243,9 @@ export default function ReclamacoesPage() {
                   disabled={processing === c.id}
                   className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
                 >
-                  {processing === c.id ? "Processando..." : `Aceitar (${c.codesQuantity} números)`}
+                  {processing === c.id
+                    ? "Processando..."
+                    : `Aceitar (${quantities[c.id] ?? c.codesQuantity} números)`}
                 </button>
                 <button
                   onClick={() => {

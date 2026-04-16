@@ -6,10 +6,13 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     needsAuth && typeof window !== "undefined"
       ? localStorage.getItem("token")
       : null;
+  // Only send Content-Type when we actually have a body. Fastify rejects
+  // requests with Content-Type: application/json and an empty body.
+  const hasBody = options?.body !== undefined && options?.body !== null;
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...(hasBody ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
@@ -170,6 +173,11 @@ export const api = {
     request<{ success: boolean }>(`/api/admin/prizes/${prizeId}`, {
       method: "DELETE",
     }),
+  adminReleasePrize: (prizeId: string) =>
+    request<{ success: boolean; alreadyReleased?: boolean }>(
+      `/api/admin/prizes/${prizeId}/release`,
+      { method: "PUT" },
+    ),
   // Complaints (public)
   createComplaint: (data: {
     purchaseId?: string;
@@ -190,10 +198,13 @@ export const api = {
     request<import("@/types").Complaint[]>(
       `/api/admin/complaints?status=${status}`,
     ),
-  adminAcceptComplaint: (id: string) =>
-    request<{ success: boolean; assigned: number; buyerName: string }>(
+  adminAcceptComplaint: (id: string, quantity?: number) =>
+    request<{ success: boolean; assigned: number; requested?: number; buyerName: string }>(
       `/api/admin/complaints/${id}/accept`,
-      { method: "PUT" },
+      {
+        method: "PUT",
+        body: JSON.stringify(quantity !== undefined ? { quantity } : {}),
+      },
     ),
   adminRejectComplaint: (id: string) =>
     request<{ success: boolean }>(`/api/admin/complaints/${id}/reject`, {
